@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Encryption Microservice</title>
+</head>
+<body>
+<h1>Data Encryption Microservice</h1>
+<form id="encryptionForm">
+  <label for="plaintext">Plaintext:</label>
+  <input type="text" id="plaintext" name="plaintext" required>
+  <br><br>
+  <label for="userHash">User Hash:</label>
+  <input type="text" id="userHash" name="userHash" required>
+  <br><br>
+  <button type="button" id="encryptButton">Encrypt</button>
+</form>
+<br>
+<div id="result"></div>
+
+<script>
+  document.getElementById('encryptButton').addEventListener('click', () => {
+    const plaintext = document.getElementById('plaintext').value;
+    const userHash = document.getElementById('userHash').value;
+
+    fetch(`http://127.0.0.1:3000/ciphertext?plaintext=${encodeURIComponent(plaintext)}&userHash=${userHash}`)
+            .then(response => response.json())
+            .then(data => {
+              const resultDiv = document.getElementById('result');
+              resultDiv.innerHTML = `Encrypted Data: ${data.encryptedData}`;
+            })
+            .catch(error => {
+              console.error(error);
+            });
+  });
+</script>
+</body>
+</html>
