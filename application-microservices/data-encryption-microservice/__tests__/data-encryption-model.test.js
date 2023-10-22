@@ -72,7 +72,7 @@ describe('Data Encryption Controller - HTTP request', () => {
         try {
             const response = await axios.get(url, {
                 headers: {
-                    'Content-Type': 'application/json', // Adjust content type as needed
+                    'Content-Type': 'application/json',
                 },
             });
 
