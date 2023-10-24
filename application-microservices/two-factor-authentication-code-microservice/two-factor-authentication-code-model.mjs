@@ -68,8 +68,5 @@ const verifyTOTP = (token, secret, window = 1) => {
     return false;
 }
 
-
-
-
 // Exports for genre-microservice-controller
 export { generateSecret, verifyTOTP };

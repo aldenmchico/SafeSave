@@ -16,7 +16,9 @@
     "node-json-db": "^2.3.0",
     "nodemon": "^2.0.22",
     "qrcode": "^1.5.3",
-    "time2fa": "^1.2.2",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.6"
   }
 }
