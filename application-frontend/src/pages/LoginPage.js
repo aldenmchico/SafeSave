@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Updated from useHistory
 
 function LoginPage() {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-    const history = useHistory();
+    const navigate = useNavigate(); // Updated from useHistory
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -20,18 +20,19 @@ function LoginPage() {
             return;
         }
 
-        const credentials = { username, password };
+        // Use credentials from state, not undefined variables
+        const userCredentials = { username: credentials.username, password: credentials.password }; 
 
         try {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(credentials),
+                body: JSON.stringify(userCredentials), // Updated variable name
             });
 
             if (response.ok) {
                 alert('Logged in successfully!');
-                history.push('/home'); // Redirect to the home page after successful login
+                navigate('/home'); // Redirect to the home page after successful login
             } else {
                 const responseData = await response.json();
                 alert(responseData.message || 'Failed to log in. Please check your credentials.');
