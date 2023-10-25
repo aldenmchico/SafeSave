@@ -8,34 +8,56 @@ var con = mysql.createConnection(db.dbConfig);
 // CREATE (POST) MODEL FUNCTIONS *****************************************
 
 // POST Users Table Model Functions *****************************************
-const createUser = function(username, email, password, callback) {
-    let q = `INSERT INTO Users (userUsername, userEmail, userPassword) VALUES ("${username}", "${email}", "${password}")`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
-    });
+const createUser = function(reqBody, callback) {
+    if (reqBody.username === undefined || reqBody.email === undefined || reqBody.password === undefined) {
+        callback({"code": "EMPTY_FIELD"}, null);
+    }
+    else {
+        let q = `INSERT INTO Users (userUsername, userEmail, userPassword) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}")`;
+        con.query(q, (err, result) => {
+            if (err) callback(err, null);
+            else callback(null, result);
+        });
+    }
 }
 
 // POST UserLoginItems Table Model Functions  *****************************************
-const createUserLoginItem = function(website, username, password, dateCreated, dateUpdated, dateAccessed, userID, callback) {
-    let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-                userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID) 
-                VALUES ("${website}", "${username}", "${password}", "${dateCreated}", "${dateUpdated}", "${dateAccessed}", ${userID})`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
-    });
+const createUserLoginItem = function(reqBody, callback) {
+    if (reqBody.website === undefined || reqBody.username === undefined || reqBody.password === undefined ||
+        reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
+        reqBody.userID === undefined) {
+        callback({"code": "EMPTY_FIELD"}, null);
+    }
+    else {
+        let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
+                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID) 
+                    VALUES ("${reqBody.website}", "${reqBody.username}", "${reqBody.password}", 
+                    "${reqBody.dateCreated}", "${reqBody.dateUpdated}", "${reqBody.dateAccessed}", ${reqBody.userID})`;
+        con.query(q, (err, result) => {
+            if (err) callback(err, null);
+            else callback(null, result);
+        });
+    }
 }
 
 // POST UserNotes Table Model Functions  *****************************************
-const createUserNote = function(title, text, dateCreated, dateUpdated, dateAccessed, userID, callback) {
-    let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
-                userNoteUpdated, userNoteAccessed, userID) 
-                VALUES ("${title}", "${text}", "${dateCreated}", "${dateUpdated}", "${dateAccessed}", ${userID})`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
-    });
+const createUserNote = function(reqBody, callback) {
+    if (reqBody.title === undefined || reqBody.text === undefined ||
+        reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
+        reqBody.userID === undefined) {
+        callback({"code": "EMPTY_FIELD"}, null);
+    }
+    else {
+        let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
+            userNoteUpdated, userNoteAccessed, userID) 
+            VALUES ("${reqBody.title}", "${reqBody.text}", "${reqBody.dateCreated}", 
+            "${reqBody.dateUpdated}", "${reqBody.dateAccessed}", ${reqBody.userID})`;
+        con.query(q, (err, result) => {
+            if (err) callback(err, null);
+            else callback(null, result);
+        });
+    }
+    
 }
 
 // RETRIEVE (GET) MODEL FUNCTIONS *****************************************
@@ -117,22 +139,102 @@ const getUserNoteByTitle = function(id, title, callback) {
 };
 
 
-// UPDATE (POST) MODEL FUNCTIONS *****************************************************
+// UPDATE (PATCH) MODEL FUNCTIONS *****************************************************
 
-/*
-const {FUNCTION_NAME} = async (FUNCTION_PARAMS) => {
-    pass
-};
-*/
+const patchUser = function(reqBody, callback) {
+    if (reqBody.userID === undefined) {
+        callback({"code": "NO_USER_ID"}, null);
+    }
+    else {
+        let q = '';
+        if (reqBody.email !== undefined) q = `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.password !== undefined) q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
+        if (q === '') callback ({"code": "NO_CHANGE"}, null) 
+        else {
+            con.query(q, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    callback(err, null);
+                }
+                else callback(null, result);
+            });
+        }
+    }
+}
+
+const patchLoginItem = function(reqBody, callback) {
+    if (reqBody.loginItemID === undefined || reqBody.userID === undefined) {
+        callback({"code": "NO_ID"}, null);
+    }
+    else {
+        let q = '';
+        if (reqBody.website !== undefined) q = `UPDATE UserLoginItems SET userLoginItemWebsite = "${reqBody.website}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.username !== undefined) q += `UPDATE UserLoginItems SET userLoginItemUsername = "${reqBody.username}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.password !== undefined) q += `UPDATE UserLoginItems SET userLoginItemPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateUpdated = "${reqBody.dateUpdated}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateAccessed = "${reqBody.dateAccessed}" WHERE userID = ${reqBody.userID}; `;
+        if (q === '') callback ({"code": "NO_CHANGE"}, null) 
+        else {
+            con.query(q, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    callback(err, null);
+                }
+                else callback(null, result);
+            });
+        }
+    }
+}
+
+const patchNote = function(reqBody, callback) {
+    if (reqBody.userNoteID === undefined || reqBody.userID === undefined) {
+        callback({"code": "NO_ID"}, null);
+    }
+    else {
+        let q = '';
+        if (reqBody.title !== undefined) q = `UPDATE UserNotes SET userNoteTitle = "${reqBody.title}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.text !== undefined) q += `UPDATE UserNotes SET userNoteText = "${reqBody.text}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserNotes SET userNoteUpdated = "${reqBody.dateUpdated}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserNotes SET userNoteAccessed = "${reqBody.dateAccessed}" WHERE userID = ${reqBody.userID}; `;
+        if (q === '') callback ({"code": "NO_CHANGE"}, null) 
+        else {
+            con.query(q, (err, result) => {
+                if (err) {
+                    console.log(err);
+                    callback(err, null);
+                }
+                else callback(null, result);
+            });
+        }
+    }
+}
 
 
 // DELETE (DELETE) MODEL FUNCTIONS  *****************************************
 
-/*
-const {FUNCTION_NAME} = async (FUNCTION_PARAMS) => {
-    pass
-};
-*/
+const deleteUser = function(userId, callback) {
+    let q = `DELETE FROM Users WHERE userID = ${userId}`;
+    con.query(q, (err, result) => {
+        if (err) callback(err, null);
+        else callback(null, result);
+    });
+}
+
+const deleteUserLoginItem = function(userId, userLoginItemId, callback) {
+    let q = `DELETE FROM UserLoginItems WHERE userID = ${userId} AND userLoginItemID = ${userLoginItemId}`;
+    con.query(q, (err, result) => {
+        if (err) callback(err, null);
+        else callback(null, result);
+    });
+}
+
+const deleteNote = function(userId, userNoteId, callback) {
+    let q = `DELETE FROM UserNotes WHERE userID = ${userId} AND userNoteID = ${userNoteId}`;
+    con.query(q, (err, result) => {
+        if (err) callback(err, null);
+        else callback(null, result);
+    });
+}
 
 
 // Exports for application-controller
@@ -140,5 +242,7 @@ export {
     createUser, createUserLoginItem, createUserNote,
     getAllUsers, getUserByUsername,
     getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite,
-    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle   
+    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle,
+    patchUser, patchLoginItem, patchNote,
+    deleteNote, deleteUserLoginItem, deleteUser   
 };
