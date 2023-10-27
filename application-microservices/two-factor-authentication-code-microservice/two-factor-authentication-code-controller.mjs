@@ -4,9 +4,8 @@ import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
 import { JsonDB, Config } from 'node-json-db';
 import { v4 as uuidv4 } from 'uuid';
+import { pool } from '../../database/db-connector.mjs';
 
-import mysql from 'mysql'; 
-import { pool } from '../../database/db-connector-example.mjs';
 
 // Configure express server
 const PORT = process.env.PORT || 3000;
@@ -163,9 +162,9 @@ app.listen(PORT, () => {
 
     pool.query(`SELECT * FROM Users`, (err, result, filled) => {
         if (err) return console.log(err);
-    
+
         return console.log(result);
     })
-    
+
     console.log(`Server listening on port ${PORT}...`);
 });
