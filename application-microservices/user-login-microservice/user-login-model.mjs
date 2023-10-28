@@ -46,7 +46,7 @@ const validatePassword = async (username, plainTextPassword) => {
     }
 }
 
-const hashPasswordAndUpdateUser = async (plainTextPassword, userId) => {
+const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
     const saltRounds = 10;
     try {
         // Hash the password
@@ -81,4 +81,4 @@ const hashPasswordAndUpdateUser = async (plainTextPassword, userId) => {
 
 
 // Exports for genre-microservice-controller
-export { validatePassword, checkIfUsernameExists, hashPasswordAndUpdateUser };
+export { validatePassword, checkIfUsernameExists, hashPasswordAndUpdateExistingUser };
