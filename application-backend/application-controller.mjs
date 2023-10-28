@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import * as appModel from './application-model.mjs';
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT | 4000;
 const app = express();
 app.use(express.json());
 
@@ -225,7 +225,8 @@ userRouter.patch('/', (req,res) => {
         else {
             console.log(result);
             res.set('Content-Type', 'application/json');
-            res.status(200).end();
+            // res.status(200).end();
+            res.status(200).json({ message: "User updated successfully" });
         }
     })
 });
