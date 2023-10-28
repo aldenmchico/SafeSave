@@ -58,7 +58,7 @@ app.patch('/users/', async (req, res) => {
     try {
 
         // Update the user's password with the new hashed password
-        const result = await userLoginModel.hashPasswordAndUpdateUser(password, userId);
+        const result = await userLoginModel.hashPasswordAndUpdateExistingUser(password, userId);
 
         
 

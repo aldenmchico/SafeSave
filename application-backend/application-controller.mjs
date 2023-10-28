@@ -225,7 +225,8 @@ userRouter.patch('/', (req,res) => {
         else {
             console.log(result);
             res.set('Content-Type', 'application/json');
-            res.status(200).end();
+            // res.status(200).end();
+            res.status(200).json({ message: "User updated successfully" });
         }
     })
 });
