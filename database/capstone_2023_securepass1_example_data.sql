@@ -156,13 +156,13 @@ ALTER TABLE `Users`
 -- Constraints for table `UserLoginItems`
 --
 ALTER TABLE `UserLoginItems`
-  ADD CONSTRAINT `fk_UserLoginItems_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_UserLoginItems_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `UserNotes`
 --
 ALTER TABLE `UserNotes`
-  ADD CONSTRAINT `fk_UserNotes_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_UserNotes_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
