@@ -1,44 +1,32 @@
-// const { getEncryptedData } = require('../data-encryption-model.mjs');
-
+const axios = require('axios');
+const https = require('https');
 const crypto = require('crypto');
 
-const axios = require('axios');
+const serverBaseUrl = 'https://localhost:3000';
 
-
-//Had to copy and paste this function from data encryption controller because I was having
-//a hard time importing it for jest
 const getEncryptedData = async (plaintext, userHash) => {
     try {
-        // Ensure both plaintext and userHash are provided.
         if (!plaintext || !userHash) {
             throw new Error('Plaintext and userHash are required.');
         }
 
         const iv = crypto.randomBytes(16);
-
         const key = crypto.scryptSync(userHash, 'salt', 32);
-
-        console.log("secret key is", key.toString('hex'))
-
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
-        console.log(cipher)
         let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
         encryptedData += cipher.final('hex');
 
-        console.log("iv is ", iv.toString('hex'))
         return {
             iv: iv.toString('hex'),
             encryptedData,
         };
-
     } catch (error) {
         throw error;
     }
-}
+};
 
-
-describe('Data Encryption Model without HTTP request', () => {
+describe('Data Encryption Model without HTTPS request', () => {
     it('should encrypt and decrypt data', async () => {
         const plaintext = 'This is a test message';
         const userHash = 'myStrongPassw0rd!!';
@@ -58,19 +46,21 @@ describe('Data Encryption Model without HTTP request', () => {
     });
 });
 
-//Src: https://www.robinwieruch.de/axios-jest/
-
-describe('Data Encryption Controller - HTTP request', () => {
-    it('should successfully encrypt data via HTTP', async () => {
+describe('Data Encryption Controller - HTTPS POST request with SSL certificate verification disabled', () => {
+    it('should successfully encrypt data via HTTPS POST with SSL certificate verification disabled', async () => {
         const plaintext = 'Welcome to the Machine';
         const userHash = 'P1nkFloyd';
-        const baseURL = 'http://127.0.0.1:3000'; // Define the base URL
-        const path = `/ciphertext?plaintext=${encodeURIComponent(plaintext)}&userHash=${encodeURIComponent(userHash)}`;
-
-        const url = `${baseURL}${path}`;
 
         try {
-            const response = await axios.get(url, {
+            const agent = new https.Agent({
+                rejectUnauthorized: false, //Because this is a self-signed certificate we are using
+            });
+
+            const response = await axios.post(`${serverBaseUrl}/ciphertext`, {
+                plaintext,
+                userHash,
+            }, {
+                httpsAgent: agent,
                 headers: {
                     'Content-Type': 'application/json',
                 },
