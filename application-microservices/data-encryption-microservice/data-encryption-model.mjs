@@ -22,11 +22,15 @@ const getEncryptedData = async (plaintext, userHash) => {
         let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
         encryptedData += cipher.final('hex');
 
+        console.log("encrypted data is", encryptedData)
+
         console.log("iv is ", iv.toString('hex'))
         return {
             iv: iv.toString('hex'),
             encryptedData,
         };
+
+
 
     } catch (error) {
         throw error;
