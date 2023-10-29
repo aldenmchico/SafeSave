@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Decryption Microservice</title>
+</head>
+<body>
+<h1>Data Decryption Microservice</h1>
+<form id="decryptionForm">
+  <label for="encryptedtext">Encrypted data:</label>
+  <input type="text" id="encryptedtext" name="encryptedtext" required>
+  <br><br>
+  <label for="keytext">Key:</label>
+  <input type="text" id="keytext" name="keytext" required>
+  <br><br>
+  <label for="ivText">IV:</label>
+  <input type="text" id="ivText" name="ivText" required>
+  <br><br>
+  <button type="button" id="decryptButton">Decrypt</button>
+</form>
+<br>
+<div id="result"></div>
+
+<script>
+  document.getElementById('decryptButton').addEventListener('click', () => {
+    const encryptedText = document.getElementById('encryptedtext').value;
+    const keytext = document.getElementById('keytext').value;
+    const ivText = document.getElementById('ivText').value;
+
+    fetch('https://127.0.0.1:3001/decrypttext', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ encryptedText: encryptedText, keytext: keytext, ivText: ivText }),
+    })
+            .then(response => response.json())
+            .then(data => {
+              const resultDiv = document.getElementById('result');
+              resultDiv.innerHTML = `Decrypted Data: ${data.decryptedData}`;
+            })
+            .catch(error => {
+              console.error(error);
+            });
+  });
+</script>
+</body>
+</html>

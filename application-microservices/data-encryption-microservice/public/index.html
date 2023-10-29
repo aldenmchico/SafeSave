@@ -22,7 +22,13 @@
     const plaintext = document.getElementById('plaintext').value;
     const userHash = document.getElementById('userHash').value;
 
-    fetch(`http://127.0.0.1:3000/ciphertext?plaintext=${encodeURIComponent(plaintext)}&userHash=${userHash}`)
+    fetch('https://127.0.0.1:3000/ciphertext', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ plaintext: plaintext, userHash: userHash }),
+    })
             .then(response => response.json())
             .then(data => {
               const resultDiv = document.getElementById('result');
