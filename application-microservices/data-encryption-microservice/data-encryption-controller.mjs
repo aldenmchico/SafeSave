@@ -10,7 +10,6 @@ import { readFileSync } from 'fs';
 // Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import * as dataDecryptionModel from "./data-decryption-model.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -59,37 +58,12 @@ app.post('/ciphertext', (req, res) => {
 });
 
 
-
-app.post('/decrypttext', async (req, res) => {
-    const { encryptedText, keytext, ivText } = req.body;
-
-    try {
-        // Convert the plaintext IV to hexadecimal
-        const ivHex = Buffer.from(ivText, 'hex').toString('hex');
-
-        // Perform the decryption with the hexadecimal IV
-        const result = await dataDecryptionModel.getDecryptedData(encryptedText, keytext, ivHex);
-        res.status(201).json(result);
-    } catch (error) {
-        console.error('Decryption failed:', error);
-        res.status(400).json({ error: error.message });
-    }
-});
-
-
-
 app.get('/', (req, res) => {
     const htmlFilePath = 'public/index.html';
     const normalizedPath = path.normalize(htmlFilePath);
     res.sendFile(normalizedPath);
 });
 
-app.get('/decrypt', (req, res) => {
-    const htmlFileName = 'decrypt.html';
-    res.sendFile(htmlFileName, { root: 'public' });
-});
-
-
 httpsServer.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
+    console.log(`Encryption server listening on port ${PORT}...`);
 });
