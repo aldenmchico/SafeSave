@@ -37,6 +37,7 @@ const Navigation = () => {
             </div>
             <ul style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around' }}>
                 <li><NavLink to="/">Home</NavLink></li>
+                <li><NavLink to="/createaccount">Create Account</NavLink></li>
                 <li><NavLink to="/favorites">Favorites</NavLink></li>
                 <li><NavLink to="/settings">Settings</NavLink></li>
                 <li><NavLink to="/about">About</NavLink></li>
