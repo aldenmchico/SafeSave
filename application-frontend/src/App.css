@@ -300,6 +300,49 @@ main {
   height: 38px;
 }
 
+.create-account-button-container {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 500px !important;
+  text-align: center !important;
+  clear: both !important; 
+}
+
+
+
+.create-account-button {
+  margin: 0 auto !important;
+  display: block !important;
+  width: 140px !important;
+  text-align: center !important;
+  background-color: #eee !important;
+  color: #555 !important;
+  border: 1px solid #ccc !important;
+  padding: 5px 10px !important;
+  font-size: 0.9rem !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s !important;
+}
+
+form .create-account-button-container {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 50px !important; 
+  text-align: center !important;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+
+.create-account-button:hover {
+  background-color: #ddd !important;
+}
+
 .submit-button {
   width: 100% !important;
   display: block !important;
