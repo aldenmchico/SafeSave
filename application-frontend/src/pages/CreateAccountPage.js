@@ -84,7 +84,7 @@ function CreateAccountPage() {
         <div>
             <h1>Create a New SafeSave Account</h1>
             <p>Enter your desired credentials to create a new account.</p>
-            <form onSubmit={handleAccountCreation}>
+            <form onSubmit={handleAccountCreation} className="clearfix">
                 <label>
                     Username:
                     <input 
@@ -136,7 +136,9 @@ function CreateAccountPage() {
                     {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
                 </label>
                 <br/>
-                <button type="submit">Create Account</button>
+                <div className="create-account-button-container">
+                    <button type="submit" className="create-account-button">Create Account</button>
+                </div>
             </form>
         </div>
     );
