@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Updated from useHistory
+import { Link, useNavigate } from 'react-router-dom';
 
 function LoginPage() {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate(); // Updated from useHistory
+    const navigate = useNavigate();
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -14,28 +14,30 @@ function LoginPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        // Front-end validation
         if (credentials.username.trim() === '' || credentials.password.trim() === '') {
             alert('Please enter your credentials!');
             return;
         }
 
-        // Use credentials from state, not undefined variables
-        const userCredentials = { username: credentials.username, password: credentials.password }; 
+        const userCredentials = { username: credentials.username, password: credentials.password };
 
         try {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userCredentials), // Updated variable name
+                body: JSON.stringify(userCredentials),
             });
 
             if (response.ok) {
                 alert('Logged in successfully!');
-                navigate('/home'); // Redirect to the home page after successful login
+                navigate('/home');
             } else {
-                const responseData = await response.json();
-                alert(responseData.message || 'Failed to log in. Please check your credentials.');
+                if (response.status === 401) {
+                    alert('Invalid username or password. Please try again.');
+                } else {
+                    const responseData = await response.json();
+                    alert(responseData.message || 'An error occurred. Please try again.');
+                }
             }
         } catch (error) {
             console.error('There was an error logging in:', error);
@@ -47,12 +49,14 @@ function LoginPage() {
     };
 
     return (
-        <div>
+        <div className="login-container">
             <h1>Login to SafeSave</h1>
             <p>Enter your credentials to access your vault.</p>
-            <form onSubmit={handleLogin}>
-                <label>
-                    Username:
+            
+            {/* Form for username and password input */}
+            <form onSubmit={handleLogin} className="login-form">
+                <div className="input-group">
+                    <label>Username</label>
                     <input 
                         type="text" 
                         name="username"
@@ -61,10 +65,9 @@ function LoginPage() {
                         placeholder="Enter your username"
                         required
                     />
-                </label>
-                <br/>
-                <label>
-                    Password:
+                </div>
+                <div className="input-group">
+                    <label>Password</label>
                     <input 
                         type={showPassword ? "text" : "password"} 
                         name="password"
@@ -73,15 +76,17 @@ function LoginPage() {
                         placeholder="Enter your password"
                         required
                     />
-                </label>
-                <button type="button" onClick={togglePasswordVisibility}>
-                    {showPassword ? 'Hide' : 'Show'} Password
-                </button>
-                <br/>
-                <button type="submit">Login</button>
+                    <button className="action-button" type="button" onClick={togglePasswordVisibility}>
+                        {showPassword ? 'Hide' : 'Show'} Password
+                    </button>
+                </div>
             </form>
-            <br/>
-            <p>Don't have an account? <a href="/createaccount">Create one now</a></p>
+            
+            {/* Separate login button */}
+            <div className="submit-button">
+                <button className="login-button" onClick={handleLogin}>Login</button>
+            </div>
+            <p className="register-text">Don't have an account? <Link to="/createaccount">Create one now</Link></p>
         </div>
     );
 }

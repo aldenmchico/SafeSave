@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function CreateAccountPage() {
     const [formData, setFormData] = useState({
@@ -9,7 +9,7 @@ function CreateAccountPage() {
         confirmPassword: '',
     });
     const [errors, setErrors] = useState({});
-    const history = useHistory();
+    const navigate = useNavigate();
     
     const validateEmail = (email) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,28 +42,30 @@ function CreateAccountPage() {
         }
 
         if (valid) {
-            // Simulate account creation logic
-            console.log('Creating account...'); // Add logic later
             const newUser = {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password, 
             };
 
-            // Placeholder for future endpoint
-            const response = await fetch('/createaccount', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newUser),
-            });
+            try {
+                const response = await fetch('/createaccount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newUser),
+                });
 
-            if (response.ok) {
-                alert('Account created successfully!');
-                history.push('/login'); // Redirect to the login page after account creation
-            } else {
-                alert('Failed to create account. Please try again.');
+                if (response.ok) {
+                    alert('Account created successfully! Please check your email for a confirmation link.');
+                    navigate('/login');
+                } else {
+                    const responseData = await response.json();
+                    alert(responseData.message || 'Failed to create account. Please try again.');
+                }
+            } catch (error) {
+                console.error('There was an error creating the account:', error);
             }
         } else {
             setErrors(errs);

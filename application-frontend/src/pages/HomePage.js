@@ -39,10 +39,10 @@ function HomePage() {
 
     return (
         <div>
-            <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
-            <p>Your secure vault for online credentials and notes.</p>
-            <div>
-                <h2>Your Saved Logins</h2>
+        <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
+        <p>Your secure vault for online credentials and notes.</p>
+        <div className="content-section">
+            <h2>Your Saved Logins</h2>
                 <ul>
                     {savedLogins.map(login => (
                         <li key={login._id}>
@@ -53,13 +53,13 @@ function HomePage() {
                 <Link to="/createsavedlogin">Add New Login</Link>
             </div>
 
-            <div>
-                <h2>Quick Summary</h2>
+            <div className="content-section">
+            <h2>Quick Summary</h2>
                 <p>You have {savedLogins.length} saved logins and {savedNotes.length} saved notes.</p>
             </div>
 
-            <section>
-                <h2>Why Use SafeSave?</h2>
+            <section className="content-section">
+            <h2>Why Use SafeSave?</h2>
                 <p>With SafeSave, you can securely store your passwords and ensure they're always at your fingertips. Never forget a password again!</p>
             </section>
         </div>
