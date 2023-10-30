@@ -9,7 +9,10 @@ function SavedLoginsPage() {
     const loadSavedLogins = async () => {
         const loginsData = [
             { _id: '1', name: 'Email', username: 'user1@example.com' },
-            // ...
+            { _id: '2', name: 'Facebook', username: 'user1' },
+            { _id: '3', name: 'Twitter', username: 'user1' },
+            { _id: '4', name: 'Instagram', username: 'user1' },
+            { _id: '5', name: 'Reddit', username: 'user1' },
         ];
         setSavedLogins(loginsData);
     };

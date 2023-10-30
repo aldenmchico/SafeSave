@@ -1,24 +1,21 @@
 import React, { createContext, useState, useEffect, useContext, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css'; 
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
-// Import other components
-
+import { useNavigate } from 'react-router-dom';
 
 // Lazy-loaded components
 const Navigation = lazy(() => import('./components/Navigation'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
-const LoginsPage = lazy(() => import('./pages/LoginPage'));
+const TwoFactorAuthenticationPage = lazy(() => import('./pages/TwoFactorAuthenticationPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 const NotesPage = lazy(() => import('./pages/SavedNotesPage'));
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
 const PersonalInfoPage = lazy(() => import('./pages/PersonalInfoPage'));
 const IDsPage = lazy(() => import('./pages/IDsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
-const NotFound = lazy(() => import('./pages/NotFound')); // Make sure you have a NotFound component
-
+const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
 
 // Authentication context
 const AuthContext = createContext();
@@ -26,17 +23,16 @@ const AuthContext = createContext();
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Placeholder
   useEffect(() => {
     const user = sessionStorage.getItem('user');
     if (user) setIsAuthenticated(true);
   }, []);
 
-  const login = () => setIsAuthenticated(true); // Update later 
+  const login = () => setIsAuthenticated(true);
   const logout = () => {
     sessionStorage.removeItem('user');
     setIsAuthenticated(false);
-  }; // Update later
+  };
 
   return { isAuthenticated, login, logout };
 }
@@ -44,14 +40,15 @@ function useAuth() {
 // Protected route
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   const { isAuthenticated } = useContext(AuthContext);
-  const navigate = useNavigate(); // New navigation hook
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/'); // Navigate to home if not authenticated
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
-  return isAuthenticated ? <Route {...rest} element={<Component />} /> : null; // Adjusted for v6
+  return isAuthenticated ? <Route {...rest} element={<Component />} /> : null;
 };
 
 // Error boundary
@@ -86,14 +83,14 @@ function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
-                <Route path="/logins" element={<LoginsPage />} />
+                <Route path="/twofactorauth" element={<TwoFactorAuthenticationPage />} />
+                <Route path="/login" element={<LoginPage />} />
                 <Route path="/notes" element={<NotesPage />} />
                 <Route path="/payments" element={<PaymentsPage />} />
                 <Route path="/personalinfo" element={<PersonalInfoPage />} />
                 <Route path="/ids" element={<IDsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/about" element={<AboutPage />} />
-                {/* Add a catch-all route for 404 Not Found pages */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
