@@ -51,6 +51,40 @@ app.post('/login/validation', async (req, res) => {
     }
 });
 
+app.post('/create/account', async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+        return res.status(400).json({ message: "Username and email and password are required." });
+    }
+
+    console.log(`Checking account creation for username:[${username}]... and email:[${email}] and password:[${password}]...`);
+
+    try {
+        // check if username or email already exists
+        const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(username, email);
+        if (usernameOrEmailExists) {
+            console.log(`Username ${username} or email ${email} already exist.`);
+            return res.status(401).json({ message: "Username or email already exists." });
+        }
+
+        // create a new user entry in db 
+        const createdUser = await userLoginModel.createUser(username, email, password);
+        if (!createdUser) {
+            console.log('Error creating a user');
+            return res.status(400).json({ message: "Error while creating a user" });
+        }
+
+        // If all validations pass, send a success response.
+        return res.status(200).json({ message: "Account creation successful." });
+
+    } catch (error) {
+        // current implementation - model file handles nonexistent user... this catch block never hits 
+        console.error(`Error validating username or email field for ${username} and ${email}: ${error.message}`);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 app.patch('/users/', async (req, res) => {
 
     const { password, userId } = req.body;
@@ -59,8 +93,6 @@ app.patch('/users/', async (req, res) => {
 
         // Update the user's password with the new hashed password
         const result = await userLoginModel.hashPasswordAndUpdateExistingUser(password, userId);
-
-        
 
         if (result) {
             res.status(200).json({ message: 'User password updated successfully' });
