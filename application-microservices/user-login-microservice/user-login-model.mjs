@@ -4,6 +4,9 @@ import bcrypt from 'bcrypt';
 
 
 const checkIfUsernameOrEmailExists = async (username, email) => {
+    /*
+    Error code 404 = entity does not exist ; not an system error.. interpret as a valid response
+    */
     let usernameExists = false;
     let emailExists = false;
 
@@ -31,6 +34,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
         }
 
         return usernameExists || emailExists;
+        
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
         throw error; // Re-throw the error to handle it in the calling context.
@@ -39,15 +43,19 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
 
 
 
-const createUser = async (username, email, password) => {
+const createUser = async (userId, username, email, password) => {
     try {
 
         // Prepare data for the POST request
         // TODO: assumption...data needs to be encrypted/hashed
         const postData = {
+            userId: userId,
             username: username,
             email: email,
             password: password
+
+            // include uid using uuid 
+
         };
 
         const createResponse = await fetch(`http://localhost:4000/users/`, {

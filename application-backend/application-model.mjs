@@ -157,8 +157,19 @@ const patchUser = function (reqBody, callback) {
     }
     else {
         let q = '';
-        if (reqBody.email !== undefined) q = `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.password !== undefined) q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.email !== undefined) {
+            q = `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
+        }
+        if (reqBody.password !== undefined) {
+            q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
+        }
+        // Additional fields for userSecret and userTempSecret
+        if (reqBody.userSecret !== undefined) {
+            q += `UPDATE Users SET userSecret = "${reqBody.userSecret}" WHERE userID = ${reqBody.userID}; `;
+        }
+        if (reqBody.userTempSecret !== undefined) {
+            q += `UPDATE Users SET userTempSecret = "${reqBody.userTempSecret}" WHERE userID = ${reqBody.userID}; `;
+        }
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {
             con.query(q, (err, result) => {
