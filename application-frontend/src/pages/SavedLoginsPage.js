@@ -1,43 +1,52 @@
 // SavedLoginsPage.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+// Import React components
+import SavedLoginList from '../components/SavedLoginList';
 
 function SavedLoginsPage() {
     const [savedLogins, setSavedLogins] = useState([]);
 
-    // Placeholder 
+    // Load saved logins from the backend
     const loadSavedLogins = async () => {
-        const loginsData = [
-            { _id: '1', name: 'Email', username: 'user1@example.com' },
-            { _id: '2', name: 'Facebook', username: 'user1' },
-            { _id: '3', name: 'Twitter', username: 'user1' },
-            { _id: '4', name: 'Instagram', username: 'user1' },
-            { _id: '5', name: 'Reddit', username: 'user1' },
-        ];
-        setSavedLogins(loginsData);
-    };
-
-    const deleteLogin = (id) => {
-        // Placeholder
-        const updatedLogins = savedLogins.filter(login => login._id !== id);
-        setSavedLogins(updatedLogins);
-    };
+        const response = await fetch(`/login_items/users/${userID}`);
+        const logins = await response.json();
+        setSavedLogins(logins);
+    }
 
     useEffect(() => {
         loadSavedLogins();
     }, []);
 
+    const deleteLoginRow = async _id => {
+        const response = await fetch(`/logins/${_id}`, { method: 'DELETE' });
+        if (response.status === 204) {
+            loadSavedLogins();
+            alert('Deleted Login Entry');
+        } else {
+            alert('Failed to Delete Login Entry');
+        }
+    }
+
+    // UPDATE a row
+    const history = useNavigate();
+    const editLoginRow = async login => {
+        setLogin(login);
+        history.push("/edit-login");
+    }
+
     return (
         <div>
             <h1>Your Saved Logins</h1>
-            <ul>
-                {savedLogins.map(login => (
-                    <li key={login._id}>
-                        {login.name} - {login.username}
-                        <button onClick={() => deleteLogin(login._id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <div className="login-item-list">
+                <SavedLoginList
+                    loginItems={savedLogins}
+                    editLoginItem={editLoginRow}
+                    deleteLoginItem = {deleteLoginRow}
+                />
+            </div>
             <Link to="/createsavedlogin">Add New Login</Link>
         </div>
     );
