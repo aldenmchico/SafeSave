@@ -45,6 +45,8 @@ app.post('/ciphertext', (req, res) => {
     const { plaintext, userHash } = req.body;
 
     try {
+        // UPDATE: This needs to be updated to accept the full request body containing data for a single row to be added to database. 
+        // UPDATE: Hash (unencrypted password) will be included in the request Header as Hash.
         dataEncryptionModel.getEncryptedData(plaintext, userHash)
             .then((result) => {
                 res.status(201).json(result);

@@ -41,6 +41,8 @@ app.post('/login/validation', async (req, res) => {
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
+        // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
+
         // If all validations pass, send a success response.
         return res.status(200).json({ message: "Login successful." });
 
@@ -67,6 +69,8 @@ app.post('/create/account', async (req, res) => {
             console.log(`Username ${username} or email ${email} already exist.`);
             return res.status(401).json({ message: "Username or email already exists." });
         }
+
+        // UPDATE: Need to hash the password here using bcrypt.
 
         // create a new user entry in db 
         const createdUser = await userLoginModel.createUser(username, email, password);

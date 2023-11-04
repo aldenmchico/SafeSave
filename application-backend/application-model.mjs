@@ -29,6 +29,8 @@ const createUserLoginItem = function (reqBody, callback) {
         callback({ "code": "EMPTY_FIELD" }, null);
     }
     else {
+        // UPDATE: Need to call encryption microservice here to encrypt data in reqBody before saving to DB.
+        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
         let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
                     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID) 
                     VALUES ("${reqBody.website}", "${reqBody.username}", "${reqBody.password}", 
@@ -48,6 +50,8 @@ const createUserNote = function (reqBody, callback) {
         callback({ "code": "EMPTY_FIELD" }, null);
     }
     else {
+        // UPDATE: Need to call encryption microservice here to encrypt data in reqBody before saving to DB.
+        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
         let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
             userNoteUpdated, userNoteAccessed, userID) 
             VALUES ("${reqBody.title}", "${reqBody.text}", "${reqBody.dateCreated}", 
@@ -191,6 +195,8 @@ const patchLoginItem = function (reqBody, callback) {
     }
     else {
         let q = '';
+        // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
+        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
         if (reqBody.website !== undefined) q = `UPDATE UserLoginItems SET userLoginItemWebsite = "${reqBody.website}" WHERE userID = ${reqBody.userID}; `;
         if (reqBody.username !== undefined) q += `UPDATE UserLoginItems SET userLoginItemUsername = "${reqBody.username}" WHERE userID = ${reqBody.userID}; `;
         if (reqBody.password !== undefined) q += `UPDATE UserLoginItems SET userLoginItemPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
@@ -215,6 +221,8 @@ const patchNote = function (reqBody, callback) {
     }
     else {
         let q = '';
+        // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
+        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
         if (reqBody.title !== undefined) q = `UPDATE UserNotes SET userNoteTitle = "${reqBody.title}" WHERE userID = ${reqBody.userID}; `;
         if (reqBody.text !== undefined) q += `UPDATE UserNotes SET userNoteText = "${reqBody.text}" WHERE userID = ${reqBody.userID}; `;
         if (reqBody.dateUpdated !== undefined) q += `UPDATE UserNotes SET userNoteUpdated = "${reqBody.dateUpdated}" WHERE userID = ${reqBody.userID}; `;

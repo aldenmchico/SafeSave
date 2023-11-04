@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 
+// UPDATE: Data decryption needs to accept a JSON object containing row data.
 const getDecryptedData = async (encryptedText, keytext, ivText) => {
     try {
         if (!encryptedText || !keytext || !ivText) {
@@ -18,6 +19,7 @@ const getDecryptedData = async (encryptedText, keytext, ivText) => {
 
         console.log('Decrypted Data:', decryptedData);
 
+        // UPDATE: Return should send back a JSON object of decrypted row data without the IVs that were provided in the input
         return {
             decryptedData
         };

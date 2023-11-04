@@ -25,6 +25,8 @@ const getEncryptedData = async (plaintext, userHash) => {
         console.log("encrypted data is", encryptedData)
 
         console.log("iv is ", iv.toString('hex'))
+
+        // UPDATE: This needs to be updated to return a JSON object for encrypted values from request body and the values' IV's
         return {
             iv: iv.toString('hex'),
             encryptedData,
