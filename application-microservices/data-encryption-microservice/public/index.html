@@ -61,7 +61,7 @@
             .then(response => response.json())
             .then(data => {
               const encryptedNoteTitleDiv = document.getElementById('encryptedNoteTitle');
-              encryptedNoteTitleDiv.innerHTML = `Encrypted Note Title: ${data.encryptedData}`;
+              encryptedNoteTitleDiv.innerHTML = `Encrypted Note Title: ${data.encryptedTitleData}`;
               const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
               encryptedNoteDataDiv.innerHTML = `Encrypted Note Data: ${data.encryptedNoteData}`;
             })
