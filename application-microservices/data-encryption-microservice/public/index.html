@@ -27,13 +27,11 @@
   <label for="userHash">User Hash:</label>
   <input type="text" id="userHash" name="userHash" required>
   <br><br>
-  <label for="plaintext">Plaintext Data:</label>
-  <input type="text" id="plaintext" name="plaintext" required>
-  <br><br>
   <button type="button" id="encryptButton">Encrypt</button>
 </form>
 <br>
-<div id="result"></div>
+<div id="encryptedNoteTitle"></div>
+<div id="encryptedNoteData"></div>
 
 <script>
   document.getElementById('encryptButton').addEventListener('click', () => {
@@ -44,7 +42,6 @@
     const noteAccessedDate = document.getElementById('noteAccessedDate').value;
     const userID = document.getElementById('userID').value;
     const userHash = document.getElementById('userHash').value;
-    const plaintext = document.getElementById('plaintext').value;
 
     fetch('https://127.0.0.1:3000/ciphertext', {
       method: 'POST',
@@ -63,8 +60,10 @@
     })
             .then(response => response.json())
             .then(data => {
-              const resultDiv = document.getElementById('result');
-              resultDiv.innerHTML = `Encrypted Data: ${data.encryptedData}`;
+              const encryptedNoteTitleDiv = document.getElementById('encryptedNoteTitle');
+              encryptedNoteTitleDiv.innerHTML = `Encrypted Note Title: ${data.encryptedData}`;
+              const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
+              encryptedNoteDataDiv.innerHTML = `Encrypted Note Data: ${data.encryptedNoteData}`;
             })
             .catch(error => {
               console.error(error);

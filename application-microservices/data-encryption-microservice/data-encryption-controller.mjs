@@ -3,6 +3,8 @@ import express from 'express';
 import * as dataEncryptionModel from './data-encryption-model.mjs';
 import path from 'path';
 
+var db = import("./db-connector.cjs")
+
 // HTTPS
 import https from 'https';
 import { readFileSync } from 'fs';
