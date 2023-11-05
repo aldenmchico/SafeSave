@@ -2,12 +2,14 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 
+
+
 // Encrypt data using the password hash and plaintext data
-const getEncryptedData = async (plaintext, userHash) => {
+const getEncryptedData = async (noteTitle, noteText, noteCreatedDate, noteUpdatedDate, noteAccessedDate, userID, userHash) => {
     try {
         // Ensure both plaintext and userHash are provided.
-        if (!plaintext || !userHash) {
-            throw new Error('Plaintext and userHash are required.');
+        if (!userHash) {
+            throw new Error(' userHash is required.');
         }
 
         const iv = crypto.randomBytes(16);
@@ -19,7 +21,7 @@ const getEncryptedData = async (plaintext, userHash) => {
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
         console.log(cipher)
-        let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
+        let encryptedData = cipher.update(noteTitle, 'utf8', 'hex');
         encryptedData += cipher.final('hex');
 
         console.log("encrypted data is", encryptedData)

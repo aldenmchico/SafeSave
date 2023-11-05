@@ -42,10 +42,26 @@ const httpsServer = https.createServer(creds, app);
 
 // POST /ciphertext
 app.post('/ciphertext', (req, res) => {
-    const { plaintext, userHash } = req.body;
+    const {
+        noteTitle,
+        noteText,
+        noteCreatedDate,
+        noteUpdatedDate,
+        noteAccessedDate,
+        userID,
+        userHash,
+    } = req.body;
 
     try {
-        dataEncryptionModel.getEncryptedData(plaintext, userHash)
+        dataEncryptionModel.getEncryptedData(
+            noteTitle,
+            noteText,
+            noteCreatedDate,
+            noteUpdatedDate,
+            noteAccessedDate,
+            userID,
+            userHash,
+        )
             .then((result) => {
                 res.status(201).json(result);
             })
@@ -56,6 +72,7 @@ app.post('/ciphertext', (req, res) => {
         res.status(400).json({ error: error.message });
     }
 });
+
 
 
 app.get('/', (req, res) => {

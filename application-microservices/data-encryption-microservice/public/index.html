@@ -6,11 +6,29 @@
 <body>
 <h1>Data Encryption Microservice</h1>
 <form id="encryptionForm">
-  <label for="plaintext">Plaintext:</label>
-  <input type="text" id="plaintext" name="plaintext" required>
+  <label for="noteTitle">Note Title:</label>
+  <input type="text" id="noteTitle" name="noteTitle" required>
+  <br><br>
+  <label for="noteText">Note Text:</label>
+  <input type="text" id="noteText" name="noteText" required>
+  <br><br>
+  <label for="noteCreatedDate">Note Created Date:</label>
+  <input type="date" id="noteCreatedDate" name="noteCreatedDate" required>
+  <br><br>
+  <label for="noteUpdatedDate">Note Updated Date:</label>
+  <input type="date" id="noteUpdatedDate" name="noteUpdatedDate" required>
+  <br><br>
+  <label for="noteAccessedDate">Note Accessed Date:</label>
+  <input type="date" id="noteAccessedDate" name="noteAccessedDate" required>
+  <br><br>
+  <label for="userID">User ID:</label>
+  <input type="number" id="userID" name="userID" required>
   <br><br>
   <label for="userHash">User Hash:</label>
   <input type="text" id="userHash" name="userHash" required>
+  <br><br>
+  <label for="plaintext">Plaintext Data:</label>
+  <input type="text" id="plaintext" name="plaintext" required>
   <br><br>
   <button type="button" id="encryptButton">Encrypt</button>
 </form>
@@ -19,15 +37,29 @@
 
 <script>
   document.getElementById('encryptButton').addEventListener('click', () => {
-    const plaintext = document.getElementById('plaintext').value;
+    const noteTitle = document.getElementById('noteTitle').value;
+    const noteText = document.getElementById('noteText').value;
+    const noteCreatedDate = document.getElementById('noteCreatedDate').value;
+    const noteUpdatedDate = document.getElementById('noteUpdatedDate').value;
+    const noteAccessedDate = document.getElementById('noteAccessedDate').value;
+    const userID = document.getElementById('userID').value;
     const userHash = document.getElementById('userHash').value;
+    const plaintext = document.getElementById('plaintext').value;
 
     fetch('https://127.0.0.1:3000/ciphertext', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ plaintext: plaintext, userHash: userHash }),
+      body: JSON.stringify({
+        noteTitle,
+        noteText,
+        noteCreatedDate,
+        noteUpdatedDate,
+        noteAccessedDate,
+        userID,
+        userHash,
+      }),
     })
             .then(response => response.json())
             .then(data => {
