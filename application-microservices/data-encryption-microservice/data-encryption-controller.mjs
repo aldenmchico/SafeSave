@@ -74,8 +74,8 @@ app.post('/ciphertext', async (req, res) => {
         db.pool.query(query, [
             encryptedData.encryptedTitleData,
             encryptedData.encryptedNoteData,
-            encryptedData.noteCreatedDate,
-            encryptedData.noteUpdatedDate,
+            encryptedData.encryptednoteCreatedDate,
+            encryptedData.encryptednoteUpdatedDate,
             encryptedData.noteAccessedDate,
             encryptedData.userID,
             encryptedData.iv
@@ -84,9 +84,8 @@ app.post('/ciphertext', async (req, res) => {
                 res.status(400).json({ error: error.message });
             } else {
                 // If the insertion is successful, you can serve your HTML file
-                const htmlFilePath = 'public/index.html';
-                const normalizedPath = path.normalize(htmlFilePath);
-                res.sendFile(normalizedPath);
+                const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
+                res.sendFile(htmlFilePath);
             }
         });
     } catch (error) {
