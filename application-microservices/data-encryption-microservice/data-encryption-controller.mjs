@@ -83,10 +83,22 @@ app.post('/ciphertext', async (req, res) => {
             if (error) {
                 res.status(400).json({ error: error.message });
             } else {
-                const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
-                res.sendFile(htmlFilePath);
+                const response = {
+                    encryptedTitleData: encryptedData.encryptedTitleData,
+                    encryptedNoteData: encryptedData.encryptedNoteData,
+                    encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
+                    encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
+                    encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
+                    iv: encryptedData.iv,
+                    key: encryptedData.key.toString('hex')
+                };
+                res.status(201).json(response);
+                // const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
+                // res.sendFile(htmlFilePath);
             }
         });
+
+
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

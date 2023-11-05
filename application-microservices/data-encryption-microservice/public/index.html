@@ -32,7 +32,12 @@
 <br>
 <div id="encryptedNoteTitle"></div>
 <div id="encryptedNoteData"></div>
-
+<div id="encryptedNoteCreated"></div>
+<div id="encryptedNoteUpdated"></div>
+<div id="encryptedNoteAccessed"></div>
+<div id="unencryptedUserID"></div>
+<div id="noteIV"></div>
+<div id="key"></div>
 <script>
   document.getElementById('encryptButton').addEventListener('click', () => {
     const noteTitle = document.getElementById('noteTitle').value;
@@ -60,11 +65,33 @@
     })
             .then(response => response.json())
             .then(data => {
+              console.log("success")
+
               const encryptedNoteTitleDiv = document.getElementById('encryptedNoteTitle');
               encryptedNoteTitleDiv.innerHTML = `Encrypted Note Title: ${data.encryptedTitleData}`;
-              // const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
-              // encryptedNoteDataDiv.innerHTML = `Encrypted Note Data: ${data.encryptedNoteData}`;
+
+              const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
+              encryptedNoteDataDiv.innerHTML = `Encrypted Note Text: ${data.encryptedNoteData}`;
+
+              const encryptedNoteCreatedDiv = document.getElementById('encryptedNoteCreated');
+              encryptedNoteCreatedDiv.innerHTML = `Encrypted Note Created Date: ${data.encryptednoteCreatedDate}`;
+
+              const encryptedNoteUpdatedDiv = document.getElementById('encryptedNoteUpdated');
+              encryptedNoteUpdatedDiv.innerHTML = `Encrypted Note Updated Date: ${data.encryptednoteUpdatedDate}`;
+
+              const encryptedNoteAccessedDiv = document.getElementById('encryptedNoteAccessed');
+              encryptedNoteAccessedDiv.innerHTML = `Encrypted Note Accessed: ${data.encryptednoteAccessedDate}`;
+
+              const unencryptedUserID = document.getElementById('unencryptedUserID');
+              unencryptedUserID.innerHTML = `Unencrypted User ID: ${userID}. This field is currently not encrypted due to database design.`;
+
+              const ivDiv = document.getElementById('noteIV');
+              ivDiv.innerHTML = `IV: ${data.iv}`
+
+              document.getElementById('key').innerHTML = `Secret key: ${data.key}`
+
             })
+
             .catch(error => {
               console.error(error);
             });
