@@ -2,4 +2,3 @@ node_modules/
 /key.pem
 /cert.pem
 /.env
-db-connector.cjs
