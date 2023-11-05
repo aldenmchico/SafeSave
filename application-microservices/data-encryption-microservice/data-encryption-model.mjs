@@ -29,9 +29,21 @@ const getEncryptedData = async (noteTitle, noteText, noteCreatedDate, noteUpdate
         let encryptednoteUpdatedDate = noteUpdatedDateCipher.update(noteUpdatedDate, 'utf8', 'hex');
         encryptednoteUpdatedDate += noteUpdatedDateCipher.final('hex');
 
+        const noteAccessedDateCipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+        let encryptednoteAccessedDate = noteAccessedDateCipher.update(noteUpdatedDate, 'utf8', 'hex');
+        encryptednoteAccessedDate += noteAccessedDateCipher.final('hex');
+
 
 
         console.log("iv is ", iv.toString('hex'));
+        console.log("key is", key.toString('hex'))
+        console.log("encrypted note title is", encryptedTitleData)
+        console.log("encrypted note data is", encryptedNoteData)
+        console.log("encrypted created date", encryptednoteCreatedDate)
+        console.log("encrypted note updated date", encryptednoteUpdatedDate)
+        console.log("encrypted note accessed date", encryptednoteAccessedDate)
+
+
 
         const encryptedData = {
             iv: iv.toString('hex'),
@@ -39,7 +51,7 @@ const getEncryptedData = async (noteTitle, noteText, noteCreatedDate, noteUpdate
             encryptedNoteData,
             encryptednoteCreatedDate,
             encryptednoteUpdatedDate,
-            noteAccessedDate,
+            encryptednoteAccessedDate,
             userID
         };
 

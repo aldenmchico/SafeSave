@@ -3,7 +3,7 @@ import express from 'express';
 import * as dataEncryptionModel from './data-encryption-model.mjs';
 import path from 'path';
 
-// Import your database connector
+
 import db from './db-connector.cjs';
 
 // HTTPS
@@ -76,14 +76,13 @@ app.post('/ciphertext', async (req, res) => {
             encryptedData.encryptedNoteData,
             encryptedData.encryptednoteCreatedDate,
             encryptedData.encryptednoteUpdatedDate,
-            encryptedData.noteAccessedDate,
+            encryptedData.encryptednoteAccessedDate,
             encryptedData.userID,
             encryptedData.iv
         ], (error, result) => {
             if (error) {
                 res.status(400).json({ error: error.message });
             } else {
-                // If the insertion is successful, you can serve your HTML file
                 const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
                 res.sendFile(htmlFilePath);
             }

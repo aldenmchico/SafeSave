@@ -62,8 +62,8 @@
             .then(data => {
               const encryptedNoteTitleDiv = document.getElementById('encryptedNoteTitle');
               encryptedNoteTitleDiv.innerHTML = `Encrypted Note Title: ${data.encryptedTitleData}`;
-              const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
-              encryptedNoteDataDiv.innerHTML = `Encrypted Note Data: ${data.encryptedNoteData}`;
+              // const encryptedNoteDataDiv = document.getElementById('encryptedNoteData');
+              // encryptedNoteDataDiv.innerHTML = `Encrypted Note Data: ${data.encryptedNoteData}`;
             })
             .catch(error => {
               console.error(error);
