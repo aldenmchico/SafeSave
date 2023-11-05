@@ -3,13 +3,12 @@ import express from 'express';
 import * as dataEncryptionModel from './data-encryption-model.mjs';
 import path from 'path';
 
-var db = import("./db-connector.cjs")
+// Import your database connector
+import db from './db-connector.cjs';
 
 // HTTPS
 import https from 'https';
 import { readFileSync } from 'fs';
-
-// Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -33,8 +32,7 @@ try {
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
 
-// Configure express server
-const PORT = process.env.PORT || 3000; // Port 3000 because I do not know which port we will be using yet
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());
@@ -43,7 +41,7 @@ app.use(express.static('public'));
 const httpsServer = https.createServer(creds, app);
 
 // POST /ciphertext
-app.post('/ciphertext', (req, res) => {
+app.post('/ciphertext', async (req, res) => {
     const {
         noteTitle,
         noteText,
@@ -55,7 +53,8 @@ app.post('/ciphertext', (req, res) => {
     } = req.body;
 
     try {
-        dataEncryptionModel.getEncryptedData(
+
+        const encryptedData = await dataEncryptionModel.getEncryptedData(
             noteTitle,
             noteText,
             noteCreatedDate,
@@ -63,24 +62,36 @@ app.post('/ciphertext', (req, res) => {
             noteAccessedDate,
             userID,
             userHash,
-        )
-            .then((result) => {
-                res.status(201).json(result);
-            })
-            .catch((error) => {
+        );
+
+
+        const query = `
+            INSERT INTO UserNotes
+            (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.pool.query(query, [
+            encryptedData.encryptedTitleData,
+            encryptedData.encryptedNoteData,
+            encryptedData.noteCreatedDate,
+            encryptedData.noteUpdatedDate,
+            encryptedData.noteAccessedDate,
+            encryptedData.userID,
+            encryptedData.iv
+        ], (error, result) => {
+            if (error) {
                 res.status(400).json({ error: error.message });
-            });
+            } else {
+                // If the insertion is successful, you can serve your HTML file
+                const htmlFilePath = 'public/index.html';
+                const normalizedPath = path.normalize(htmlFilePath);
+                res.sendFile(normalizedPath);
+            }
+        });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
-
-
-
-app.get('/', (req, res) => {
-    const htmlFilePath = 'public/index.html';
-    const normalizedPath = path.normalize(htmlFilePath);
-    res.sendFile(normalizedPath);
 });
 
 httpsServer.listen(PORT, () => {
