@@ -9,8 +9,8 @@
   <label for="encryptedtext">Encrypted data:</label>
   <input type="text" id="encryptedtext" name="encryptedtext" required>
   <br><br>
-  <label for="keytext">Key:</label>
-  <input type="text" id="keytext" name="keytext" required>
+  <label for="userHash">Password:</label>
+  <input type="text" id="userHash" name="userHash" required>
   <br><br>
   <label for="ivText">IV:</label>
   <input type="text" id="ivText" name="ivText" required>
@@ -23,7 +23,7 @@
 <script>
   document.getElementById('decryptButton').addEventListener('click', () => {
     const encryptedText = document.getElementById('encryptedtext').value;
-    const keytext = document.getElementById('keytext').value;
+    const userHash = document.getElementById('userHash').value;
     const ivText = document.getElementById('ivText').value;
 
     fetch('https://127.0.0.1:3001/decrypttext', {
@@ -31,7 +31,7 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ encryptedText: encryptedText, keytext: keytext, ivText: ivText }),
+      body: JSON.stringify({ encryptedText: encryptedText, userHash: userHash, ivText: ivText }),
     })
             .then(response => response.json())
             .then(data => {
