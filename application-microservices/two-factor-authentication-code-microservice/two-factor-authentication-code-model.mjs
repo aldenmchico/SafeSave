@@ -14,7 +14,8 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
         // Prepare data for the PATCH request
         const patchData = {
             userTempSecret: cleanedSecret,
-            userID: userId
+            userID: userId,
+            user2FAEnabled: 1
         };
 
         // Send PATCH request to update user's temp secret
@@ -150,7 +151,9 @@ const disableTwoFactor = async (userId) => {
     // Prepare data for the PATCH request
     const patchData = {
         userID: userId,
-        user2FAEnabled: 0
+        user2FAEnabled: 0,
+        userSecret: null,
+        userTempSecret: null
     };
     try {
         // Send PATCH request to update user's primary secret field
