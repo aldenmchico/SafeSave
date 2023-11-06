@@ -11,7 +11,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch(`http://localhost:4000/users/byUsername/${username}`);
+        const usernameResponse = await fetch(`http://localhost:3001/users/byUsername/${username}`);
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
             console.log(`Username exists: `, usernameData);
@@ -22,7 +22,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
             throw new Error('An error occurred while checking the username.');
         }
 
-        const emailResponse = await fetch(`http://localhost:4000/users/byEmail/${email}`);
+        const emailResponse = await fetch(`http://localhost:3001/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
             console.log(`Email exists: `, emailData);
@@ -43,13 +43,12 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
 
 
 
-const createUser = async (userId, username, email, password) => {
+const createUser = async (username, email, password) => {
     try {
 
         // Prepare data for the POST request
         // TODO: assumption...data needs to be encrypted/hashed
         const postData = {
-            userId: userId,
             username: username,
             email: email,
             password: password
@@ -58,7 +57,7 @@ const createUser = async (userId, username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`http://localhost:4000/users/`, {
+        const createResponse = await fetch(`http://localhost:3001/users/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -84,7 +83,7 @@ const createUser = async (userId, username, email, password) => {
 
 const checkIfUsernameExists = async (username) => {
     try {
-        const response = await fetch(`http://localhost:4000/users/byUsername/${username}`)
+        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -106,7 +105,7 @@ const validatePassword = async (username, plainTextPassword) => {
     - pass username externally
     */
     try {
-        const response = await fetch(`http://localhost:4000/users/byUsername/${username}`)
+        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -139,7 +138,7 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
         };
 
         // Send PATCH request to update user's password
-        const response = await fetch(`http://localhost:4000/users/`, {
+        const response = await fetch(`http://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -160,4 +159,4 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
 
 
 // Exports for genre-microservice-controller
-export { validatePassword, checkIfUsernameExists, hashPasswordAndUpdateExistingUser, checkIfUsernameOrEmailExists, createUser };
+export { validatePassword, checkIfUsernameExists, checkIfUsernameOrEmailExists, createUser };
