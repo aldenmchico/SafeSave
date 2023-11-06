@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 
+
+
 // HTTPS
 import https from 'https';
 import { readFileSync } from 'fs';
@@ -13,6 +15,7 @@ import * as dataDecryptionModel from "./data-decryption-model.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+import * as db from "./db-connector.cjs";
 
 const privateKeyPath = path.resolve(__dirname, 'key.pem');
 const certificatePath = path.resolve(__dirname, 'cert.pem');
@@ -39,6 +42,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
+import('ejs');
+
+app.set('view engine', 'ejs');
+
 const httpsServer = https.createServer(creds, app);
 
 app.post('/decrypttext', async (req, res) => {
@@ -59,11 +66,22 @@ app.post('/decrypttext', async (req, res) => {
 
 
 
-app.get('/', (req, res) => {
-    const htmlFilePath = 'public/index.html';
-    const normalizedPath = path.normalize(htmlFilePath);
-    res.sendFile(normalizedPath);
+app.get('/', async (req, res) => {
+    const queryDatabase = `SELECT * FROM UserNotes`;
+
+    await db.pool.query(queryDatabase, function(error, notes, fields) {
+        if (error) {
+            console.log(error);
+            res.send('An error occurred while fetching data from the database.');
+        } else {
+            res.render('table', { notes });
+        }
+    });
 });
+
+// app.listen(PORT, () => {
+//     console.log('Server is running on port 3001');
+// });
 
 
 httpsServer.listen(PORT, () => {
