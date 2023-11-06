@@ -22,7 +22,7 @@ function LoginPage() {
         const userCredentials = { username: credentials.username, password: credentials.password };
 
         try {
-            const response = await fetch('/login', {
+            const response = await fetch('http://localhost:8008/login/validation', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userCredentials),
@@ -30,7 +30,7 @@ function LoginPage() {
 
             if (response.ok) {
                 alert('Logged in successfully!');
-                navigate('/home');
+                navigate('/');
             } else {
                 if (response.status === 401) {
                     alert('Invalid username or password. Please try again.');

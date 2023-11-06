@@ -18,7 +18,7 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
         };
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`http://localhost:4000/users/`, {
+        const response = await fetch(`http://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
                 };
 
                 // Send PATCH request to update user's primary secret field
-                const response = await fetch(`http://localhost:4000/users/`, {
+                const response = await fetch(`http://localhost:3001/users/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -145,5 +145,33 @@ const verifyAuthenticatedTOTP = async (token, secret, window = 1) => {
     return false;
 }
 
+const disableTwoFactor = async (userId) => {
+
+    // Prepare data for the PATCH request
+    const patchData = {
+        userID: userId,
+        user2FAEnabled: 0
+    };
+    try {
+        // Send PATCH request to update user's primary secret field
+        const response = await fetch(`http://localhost:3001/users/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(patchData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(`User information updated - 2FA disabled: `, data);
+        return data;
+    } catch (error) {
+        console.error('Error in disabling 2FA in model: ', error.message);
+    }
+};
+
 // Exports for genre-microservice-controller
-export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP };
+export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP, disableTwoFactor };

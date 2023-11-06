@@ -176,6 +176,10 @@ const patchUser = function (reqBody, callback) {
             const tempSecretValue = reqBody.userTempSecret === null ? 'NULL' : `"${reqBody.userTempSecret}"`;
             q += `UPDATE Users SET userTempSecret = ${tempSecretValue} WHERE userID = ${reqBody.userID}; `;
         }
+        // Additional fields for user2FAEnabled
+        if (reqBody.user2FAEnabled !== undefined) {
+            q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
+        }
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {
             con.query(q, (err, result) => {

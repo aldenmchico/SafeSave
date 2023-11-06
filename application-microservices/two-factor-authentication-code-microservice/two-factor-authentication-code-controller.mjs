@@ -2,12 +2,17 @@ import 'dotenv/config';
 import express from 'express';
 import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
+import cors from 'cors';
 
 // Configure express server
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+
 app.use(express.json());
+
+// Enable All CORS Requests
+app.use(cors());
 
 app.get('/api', (req, res) => {
     /*
@@ -16,7 +21,7 @@ app.get('/api', (req, res) => {
     res.status(200).json({ message: 'Welcome to 2FA controller!' });
 })
 
-app.post('/api/2fa-registration', async (req, res) => {
+app.post('/api/2fa-registration', cors(), async (req, res) => {
     /*
     generates and stores a temporary secret given a userId
     */
@@ -25,7 +30,22 @@ app.post('/api/2fa-registration', async (req, res) => {
     // replace userId below with user from db  
 
     // temporary solution to emulate a user
-    const { userId } = req.body;
+    const { enableTwoFactor, userId } = req.body;
+
+    console.log(`enableTwoFactor is: ${enableTwoFactor}`);
+
+    // If the request is to disable 2FA
+    if (!enableTwoFactor) {
+        try {
+            const twoFADisabled = twoFACodeModel.disableTwoFactor(userId);
+            if (!twoFADisabled) {
+                return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userId ${userId}` });
+            }
+            return res.status(200).json({ message: `2FA was disabled for userId ${userId}` });
+        } catch (error) {
+            return res.status(500).json({ message: "Error in process of disabling 2FA." });
+        }
+    }
 
     try {
         const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userId);
@@ -145,7 +165,6 @@ app.listen(PORT, () => {
 
 Eugene's Notes: (Will remove later) 
 
-// import { JsonDB, Config } from 'node-json-db';
 // import { v4 as uuidv4 } from 'uuid';
   // const id = uuidv4();
 

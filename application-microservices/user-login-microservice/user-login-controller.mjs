@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import * as userLoginModel from './user-login-model.mjs';
 import bcrypt from 'bcrypt';
+import cors from 'cors';
 
 
 // Configure express server
@@ -9,8 +10,11 @@ const PORT = process.env.PORT;
 const app = express();
 app.use(express.json());
 
+// Enable All CORS Requests
+app.use(cors());
 
-app.post('/login/validation', async (req, res) => {
+
+app.post('/login/validation', cors(), async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
