@@ -48,15 +48,18 @@ app.set('view engine', 'ejs');
 
 const httpsServer = https.createServer(creds, app);
 
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+
 app.post('/decrypttext', async (req, res) => {
-    const { encryptedText, userHash, ivText } = req.body;
+    const { userNoteID, userHash } = req.body;
 
     try {
-        // Convert the plaintext IV to hexadecimal
-        const ivHex = Buffer.from(ivText, 'hex').toString('hex');
 
         // Perform the decryption with the hexadecimal IV
-        const result = await dataDecryptionModel.getDecryptedData(encryptedText, userHash, ivHex);
+        const result = await dataDecryptionModel.getDecryptedData(userNoteID, userHash);
         res.status(201).json(result);
     } catch (error) {
         console.error('Decryption failed:', error);
