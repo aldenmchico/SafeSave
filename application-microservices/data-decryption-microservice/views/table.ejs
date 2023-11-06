@@ -1,0 +1,28 @@
+<table>
+    <thead>
+    <tr>
+        <th>userNoteID</th>
+        <th>userNoteTitle</th>
+        <th>userNoteText</th>
+        <th>userNoteCreated</th>
+        <th>userNoteUpdated</th>
+        <th>userNoteAccessed</th>
+        <th>userID</th>
+        <th>userNoteIV</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% notes.forEach(function(note) { %>
+        <tr>
+            <td><%= note.userNoteID %></td>
+            <td><%= note.userNoteTitle %></td>
+            <td><%= note.userNoteText %></td>
+            <td><%= note.userNoteCreated %></td>
+            <td><%= note.userNoteUpdated %></td>
+            <td><%= note.userNoteAccessed %></td>
+            <td><%= note.userID %></td>
+            <td><%= note.userNoteIV %></td>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>
