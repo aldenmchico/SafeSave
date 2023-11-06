@@ -3,10 +3,38 @@ import 'dotenv/config';
 import crypto from 'crypto';
 import base32 from 'hi-base32';
 
-// generate secret key for step 1 of 2FA 
-const generateSecret = (length = 20) => {
-    const randomBuffer = crypto.randomBytes(length);
-    return base32.encode(randomBuffer).replace(/=/g, '');
+// generate temp secret key for step 1 of 2FA 
+const generateAndStoreTempSecretToken = async (userId, length = 20) => {
+
+    try {
+
+        const randomBuffer = crypto.randomBytes(length);
+        const cleanedSecret = base32.encode(randomBuffer).replace(/=/g, '');
+
+        // Prepare data for the PATCH request
+        const patchData = {
+            userTempSecret: cleanedSecret,
+            userID: userId
+        };
+
+        // Send PATCH request to update user's temp secret
+        const response = await fetch(`http://localhost:4000/users/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(patchData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(`User updated: `, data);
+        return data;
+    } catch (error) {
+        console.error('Error in generating and storing secret: ', error.message);
+    }
 }
 
 const doDynamicTruncation = (hmacValue) => {
@@ -53,7 +81,56 @@ const generateTOTP = (secret, window = 0) => {
 }
 
 // token is the TOTP from Google Authenticator
-const verifyTOTP = (token, secret, window = 1) => {
+const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
+
+    try {
+
+        if (Math.abs(+window) > 10) {
+            console.error('Window size is too large');
+            return false;
+        }
+
+        for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
+            const totp = generateTOTP(secret, errorWindow);
+
+            // token matches totp from auth
+            if (token == totp) {
+
+                // Prepare data for the PATCH request
+                const patchData = {
+                    userSecret: secret,
+                    userID: userId,
+                    userTempSecret: null,
+                };
+
+                // Send PATCH request to update user's primary secret field
+                const response = await fetch(`http://localhost:4000/users/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(patchData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                console.log(`User updated: `, data);
+                return data;
+            }
+        }
+
+    } catch (error) {
+        console.error('Error in generating and storing secret: ', error.message);
+    }
+
+    return false;
+}
+
+// token is the TOTP from Google Authenticator
+const verifyAuthenticatedTOTP = async (token, secret, window = 1) => {
+
     if (Math.abs(+window) > 10) {
         console.error('Window size is too large');
         return false;
@@ -69,4 +146,4 @@ const verifyTOTP = (token, secret, window = 1) => {
 }
 
 // Exports for genre-microservice-controller
-export { generateSecret, verifyTOTP };
+export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP };

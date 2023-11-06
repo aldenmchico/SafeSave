@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function HomePage() {
+// Import React components
+import SavedLoginList from '../components/SavedLoginList';
+
+
+function HomePage({setLogin}) {
+
+    // Use state variable exercises to bring in the data
     const [savedLogins, setSavedLogins] = useState([]);
     const [savedNotes, setSavedNotes] = useState([]);
+
+    // When the homepage is loaded, the userID and userHash to be used for encryption/decryption are defined
+    const [userID, setUserID] = useState(1);
+    const [userHash, setUserHash] = useState('pass1');
     const [username, setUsername] = useState('Guest');
 
     // Load saved logins from the backend
     const loadSavedLogins = async () => {
-        const response = await fetch('/logins');
+        const response = await fetch(`/login_items/users/${userID}`);
         const logins = await response.json();
         setSavedLogins(logins);
     }
 
     // Load saved notes from the backend
     const loadSavedNotes = async () => {
-        const response = await fetch('/notes');
+        const response = await fetch(`/notes/users/${userID}`);
         const notesData = await response.json();
         setSavedNotes(notesData);
     }
@@ -37,19 +48,26 @@ function HomePage() {
         }
     }
 
+    // UPDATE a row
+    const history = useNavigate();
+    const editLoginRow = async login => {
+        setLogin(login);
+        history.push("/edit-login");
+    }
+
     return (
         <div>
         <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
         <p>Your secure vault for online credentials and notes.</p>
         <div className="content-section">
             <h2>Your Saved Logins</h2>
-                <ul>
-                    {savedLogins.map(login => (
-                        <li key={login._id}>
-                            {login.name} <button onClick={() => deleteLoginRow(login._id)}>Delete</button>
-                        </li>
-                    ))}
-                </ul>
+                <div className="login-item-list">
+                <SavedLoginList
+                    loginItems={savedLogins}
+                    editLoginItem={editLoginRow}
+                    deleteLoginItem = {deleteLoginRow}
+                />
+                </div>
                 <Link to="/createsavedlogin">Add New Login</Link>
             </div>
 

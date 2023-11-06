@@ -16,8 +16,7 @@
     "mysql": "^2.18.1",
     "node-json-db": "^2.3.0",
     "nodemon": "^2.0.22",
-    "qrcode": "^1.5.3",
-    "uuid": "^9.0.1"
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
     "@types/uuid": "^9.0.6"

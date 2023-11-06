@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function SavedNotesPage() {
+// Import React components
+import SavedNoteList from '../components/SavedNoteList';
+
+function SavedNotesPage({setNote}) {
+
+    // Use state variable exercises to bring in the data
     const [savedNotes, setSavedNotes] = useState([]);
+
+    // When the homepage is loaded, the userID and userHash to be used for encryption/decryption are defined
+    const [userID, setUserID] = useState(1);
+    const [userHash, setUserHash] = useState('pass1');
+    const [username, setUsername] = useState('Guest');
 
     // Load saved notes from the backend
     const loadSavedNotes = async () => {
-        const response = await fetch('/notes');
+        const response = await fetch(`/notes/users/${userID}`);
         const notesData = await response.json();
         setSavedNotes(notesData);
     }
@@ -15,6 +26,7 @@ function SavedNotesPage() {
         loadSavedNotes();
     }, []);
 
+    // DELETE a row (Working functionality to be updated later)
     const deleteNoteRow = async _id => {
         const response = await fetch(`/notes/${_id}`, { method: 'DELETE' });
         if (response.status === 204) {
@@ -25,19 +37,26 @@ function SavedNotesPage() {
         }
     }
 
+    // UPDATE a row (Working functionality to be updated later)
+    const history = useNavigate();
+    const editNoteRow = async note => {
+        setNote(note);
+        history.push("/edit-note");
+    }
+
+
     return (
         <div>
             <h1>Your Saved Notes</h1>
             <p>Below is the list of your saved notes. Click on any item to view or edit details.</p>
             
-            <ul>
-                {savedNotes.map(note => (
-                    <li key={note._id}>
-                        <Link to={`/notes/${note._id}`}>{note.title}</Link>
-                        <button onClick={() => deleteNoteRow(note._id)} style={{ marginLeft: '10px' }}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+            <div className="note-list">
+                <SavedNoteList
+                    notes={savedNotes}
+                    editNote={editNoteRow}
+                    deleteNote = {deleteNoteRow}
+                />
+            </div>
             
             <Link to="/createsavednote">Add New Note</Link>
         </div>

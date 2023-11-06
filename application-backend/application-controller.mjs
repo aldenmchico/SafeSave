@@ -22,55 +22,56 @@ app.use('/notes', notesRouter);
 // Response (FAILURE): INSERT COMMENT
 
 // POST Users Table endpoint ****************************************************
-userRouter.post('/', (req,res) => {
-    appModel.createUser(req.body, (err, result) => { 
-        if (err !== null) {
-            if (err.code === "EMPTY_FIELD") res.status(406).send({"error": `${err.code} - Not all fields populated.`});
-            else if (err.code === 'ER_DUP_ENTRY') res.status(409).send({"error": `${err.code} - Conflict between entered values and data in database.`});
-            else res.status(400).send({"error": `Bad Request.`});
+userRouter.post('/', (req, res) => {
+    appModel.createUser(req.body, (err, result) => {
+        if (err) {
+            console.error(err); // Log detailed error for server-side troubleshooting
+            if (err.code === "EMPTY_FIELD") res.status(406).send({ "error": `${err.code} - Not all fields populated.` });
+            else if (err.code === 'ER_DUP_ENTRY') res.status(409).send({ "error": `${err.code} - Conflict between entered values and data in database.` });
+            else res.status(400).send({ "error": `Bad Request.` });
         }
         else {
-            if (result.length == 0) res.status(400).send({"error": "Could not create user."});
+            if (result.length == 0) res.status(400).send({ "error": "Could not create user." });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
-                res.status(201).send({"insertId": `${result.insertId}`});
+                res.status(201).send({ "insertId": `${result.insertId}` });
             }
         }
     })
 });
 
 // POST UserLoginItems Table endpoint ****************************************************
-loginItemRouter.post('/', (req,res) => { 
+loginItemRouter.post('/', (req, res) => {
     appModel.createUserLoginItem(req.body, (err, result) => {
         if (err !== null) {
-            if (err.code === "EMPTY_FIELD") res.status(406).send({"error": `${err.code} - Not all fields populated.`});
-            else res.status(400).send({"error": `${err.code} - Bad Request.`});
+            if (err.code === "EMPTY_FIELD") res.status(406).send({ "error": `${err.code} - Not all fields populated.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            if (result.length == 0) res.status(400).send({"error": "Could not create user login item"});
+            if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
-                res.status(201).send({"insertId": `${result.insertId}`});
+                res.status(201).send({ "insertId": `${result.insertId}` });
             }
         }
     })
 });
 
 // POST UserNotes Table endpoint ****************************************************
-notesRouter.post('/', (req,res) => { 
+notesRouter.post('/', (req, res) => {
     appModel.createUserNote(req.body, (err, result) => {
         if (err !== null) {
-            if (err.code === "EMPTY_FIELD") res.status(406).send({"error": `${err.code} - Not all fields populated.`});
-            else res.status(400).send({"error": `${err.code} - Bad Request.`});
+            if (err.code === "EMPTY_FIELD") res.status(406).send({ "error": `${err.code} - Not all fields populated.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            if (result.length == 0) res.status(400).send({"error": "Could not create user login item"});
+            if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
-                res.status(201).send({"insertId": `${result.insertId}`});
+                res.status(201).send({ "insertId": `${result.insertId}` });
             }
         }
     })
@@ -79,11 +80,11 @@ notesRouter.post('/', (req,res) => {
 // GET HTTP ENDPOINTS ****************************************************
 
 // GET Users Table endpoints ****************************************************
-userRouter.get('/', (req,res) => { 
+userRouter.get('/', (req, res) => {
     appModel.getAllUsers((err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "Could not retrieve user from specified username"});
+            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user from specified username" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -93,11 +94,11 @@ userRouter.get('/', (req,res) => {
     })
 });
 
-userRouter.get('/:username', (req,res) => { 
+userRouter.get('/byUsername/:username', (req, res) => {
     appModel.getUserByUsername(req.params.username, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "Could not retrieve user from specified username"});
+            if (result.length == 0) res.status(404).send({ "error": "Username not found" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -106,15 +107,35 @@ userRouter.get('/:username', (req,res) => {
         }
     })
 });
+
+userRouter.get('/byEmail/:email', (req, res) => {
+    appModel.getUserByEmail(req.params.email, (err, result) => {
+        if (err) {
+            // Log the actual error internally, but don't send it to the client
+            console.error(err);
+            res.status(400).send({ "error": "Bad Request." });
+        } else {
+            if (result.length == 0) {
+                res.status(404).send({ "error": "User email not found." });
+            } else {
+                console.log(result);  // Be cautious about logging sensitive information in a production environment
+                res.set('Content-Type', 'application/json');
+                res.status(200).send(result); // Express can stringify the result directly
+            }
+        }
+    });
+});
+
 
 // GET UserLoginItems Table endpoints ****************************************************
-loginItemRouter.get('/', (req,res) => { 
+loginItemRouter.get('/', (req, res) => {
     appModel.getAllLoginItems((err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "Could not retrieve user login items"});
+            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user login items" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -122,13 +143,14 @@ loginItemRouter.get('/', (req,res) => {
     })
 });
 
-loginItemRouter.get('/users/:id', (req,res) => { 
+loginItemRouter.get('/users/:id', (req, res) => {
     appModel.getSingleUserLoginItems(req.params.id, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "No user login items found for specified user ID"});
+            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -136,13 +158,14 @@ loginItemRouter.get('/users/:id', (req,res) => {
     })
 });
 
-loginItemRouter.get('/users/:id/website/:website', (req,res) => { 
+loginItemRouter.get('/users/:id/website/:website', (req, res) => {
     appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "No user login items found for specified user ID with given website"});
+            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -150,13 +173,14 @@ loginItemRouter.get('/users/:id/website/:website', (req,res) => {
     })
 });
 
-loginItemRouter.get('/users/:id/username/:username', (req,res) => { 
+loginItemRouter.get('/users/:id/username/:username', (req, res) => {
     appModel.getUserLoginItemByUsername(req.params.id, req.params.username, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "No user login items found for specified user ID with given username"});
+            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given username" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -165,13 +189,14 @@ loginItemRouter.get('/users/:id/username/:username', (req,res) => {
 });
 
 // GET UserNotes Table endpoints ****************************************************
-notesRouter.get('/', (req,res) => { 
+notesRouter.get('/', (req, res) => {
     appModel.getAllUserNotes((err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "Could not retrieve user notes"});
+            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user notes" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -179,13 +204,14 @@ notesRouter.get('/', (req,res) => {
     })
 });
 
-notesRouter.get('/users/:id', (req,res) => { 
+notesRouter.get('/users/:id', (req, res) => {
     appModel.getSingleUserNotes(req.params.id, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "No notes found for specified user ID"});
+            if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -193,17 +219,18 @@ notesRouter.get('/users/:id', (req,res) => {
     })
 });
 
-notesRouter.get('/users/:id/title/:title', (req,res) => { 
+notesRouter.get('/users/:id/title/:title', (req, res) => {
     appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({"error": "No notes found for specified user ID with given title"});
+            if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
             else {
                 console.log(result);
+                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
-        } 
+        }
     })
 });
 
@@ -215,12 +242,12 @@ notesRouter.get('/users/:id/title/:title', (req,res) => {
 // Response (FAILURE): INSERT COMMENT
 
 
-userRouter.patch('/', (req,res) => { 
+userRouter.patch('/', (req, res) => {
     appModel.patchUser(req.body, (err, result) => {
         if (err !== null) {
-            if (err.code === "NO_USER_ID") res.status(406).send({"error": `${err.code} - User ID required to update user information.`});
-            else if (err.code === "NO_CHANGE") res.status(404).send({"error": `${err.code} - User information not modified.`});
-            else res.status(400).send({"error": `${err.code} - Bad Request.`});
+            if (err.code === "NO_USER_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
             console.log(result);
@@ -231,12 +258,12 @@ userRouter.patch('/', (req,res) => {
     })
 });
 
-loginItemRouter.patch('/', (req,res) => { 
+loginItemRouter.patch('/', (req, res) => {
     appModel.patchLoginItem(req.body, (err, result) => {
         if (err !== null) {
-            if (err.code === "NO_ID") res.status(406).send({"error": `${err.code} - User ID required to update user information.`});
-            else if (err.code === "NO_CHANGE") res.status(404).send({"error": `${err.code} - User information not modified.`});
-            else res.status(400).send({"error": `${err.code} - Bad Request.`});
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
             console.log(result);
@@ -246,12 +273,12 @@ loginItemRouter.patch('/', (req,res) => {
     })
 });
 
-notesRouter.patch('/', (req,res) => { 
+notesRouter.patch('/', (req, res) => {
     appModel.patchNote(req.body, (err, result) => {
         if (err !== null) {
-            if (err.code === "NO_ID") res.status(406).send({"error": `${err.code} - User ID required to update user information.`});
-            else if (err.code === "NO_CHANGE") res.status(404).send({"error": `${err.code} - User information not modified.`});
-            else res.status(400).send({"error": `${err.code} - Bad Request.`});
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
             console.log(result);
@@ -268,11 +295,11 @@ notesRouter.patch('/', (req,res) => {
 // Response (Sucess): INSERT COMMENT
 // Response (FAILURE): INSERT COMMENT
 
-userRouter.delete('/:userId', (req,res) => { 
+userRouter.delete('/:userId', (req, res) => {
     appModel.deleteUser(req.params.userId, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.affectedRows === 0) res.status(404).send({"error": "No users found with specified user ID"});
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No users found with specified user ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -282,11 +309,11 @@ userRouter.delete('/:userId', (req,res) => {
     })
 });
 
-loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req,res) => { 
+loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req, res) => {
     appModel.deleteUserLoginItem(req.params.userId, req.params.loginItemId, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.affectedRows === 0) res.status(404).send({"error": "No login items found for specified user ID with given login item ID"});
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No login items found for specified user ID with given login item ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -297,11 +324,11 @@ loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req,res) => {
 });
 
 
-notesRouter.delete('/users/:userId/notes/:noteId', (req,res) => { 
+notesRouter.delete('/users/:userId/notes/:noteId', (req, res) => {
     appModel.deleteNote(req.params.userId, req.params.noteId, (err, result) => {
-        if (err !== null) res.status(400).send({"error": `${err.code} - Bad Request.`});
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.affectedRows === 0) res.status(404).send({"error": "No notes found for specified user ID with given note ID"});
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No notes found for specified user ID with given note ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
