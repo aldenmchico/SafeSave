@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function CreateSavedLoginPage() {
     const [website, setWebsite] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleSaveLogin = async (e) => {
         e.preventDefault();
@@ -16,19 +16,28 @@ function CreateSavedLoginPage() {
             password
         };
 
-        const response = await fetch('/savelogin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loginDetails),
-        });
+        try {
+            const response = await fetch('/login_items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginDetails),
+            });
 
-        if (response.ok) {
-            alert('Login details saved successfully!');
-            history.push('/savedlogins'); // Redirect to the saved logins page after saving
-        } else {
-            alert('Failed to save login details. Please try again.');
+            if (response.ok) {
+                alert('Login details saved successfully!');
+                setWebsite(''); // Reset the website field
+                setUsername(''); // Reset the username field
+                setPassword(''); // Reset the password field
+                navigate('/savedlogins'); // Redirect to the saved logins page after saving
+            } else {
+                // Extract error message if any from the response
+                const errorMessage = await response.text();
+                alert(`Failed to save login details. Please try again. Error: ${errorMessage}`);
+            }
+        } catch (error) {
+            alert(`An error occurred while saving the login details: ${error}`);
         }
     }
 
@@ -40,7 +49,7 @@ function CreateSavedLoginPage() {
                 <label>
                     Website/Service:
                     <input 
-                        type="text" 
+                        type="txt" 
                         value={website} 
                         onChange={e => setWebsite(e.target.value)} 
                         placeholder="Website or Service name"
@@ -51,7 +60,7 @@ function CreateSavedLoginPage() {
                 <label>
                     Username:
                     <input 
-                        type="text" 
+                        type="txt" 
                         value={username} 
                         onChange={e => setUsername(e.target.value)} 
                         placeholder="Enter username"
@@ -62,7 +71,7 @@ function CreateSavedLoginPage() {
                 <label>
                     Password:
                     <input 
-                        type="password" 
+                        type="pwd" 
                         value={password} 
                         onChange={e => setPassword(e.target.value)} 
                         placeholder="Enter password"
@@ -70,8 +79,8 @@ function CreateSavedLoginPage() {
                     />
                 </label>
                 <br/>
-                <button type="submit">Save Login</button>
             </form>
+            <button type="submit">Save Login</button>
         </div>
     );
 }

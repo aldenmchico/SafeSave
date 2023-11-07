@@ -254,82 +254,87 @@ main {
 
 
 .login-container {
-  max-width: 500px !important;
-  margin: 0 auto !important;
-  padding: 50px !important;
-  background-color: #fff !important;
-  border-radius: 40px !important;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important; 
-  justify-content: space-between !important;
+  max-width: 750px; /* Adjusted width for a more compact form */
+  margin: 20px auto; /* Increased top and bottom margin, centered horizontally */
+  padding: 10px; /* Reduced padding */
+  background-color: #fff;
+  border-radius: 10px; /* More subtle border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+
 .login-form {
-  width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: block !important;
-  display: block !important;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  display: block;
+  display: block;
   padding: auto;
 }
 
 
 .input-group {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  margin-bottom: 10px; 
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  margin-bottom: 0px; 
 }
 
-.login-form input {
-  flex: 1;
-  height: 38px;
-  margin-right: 10px !important;
+.input-group label {
+  flex-basis: 15%;
+  text-align: right;
+  margin-right: 5px; 
 }
+
+.input-group input {
+  flex-grow: 1; 
+  margin-right: 5px;
+  padding: 4px; 
+  width: 30%;
+}
+
+
+.input-group p {
+  color: #ff0000; 
+  font-size: 0.65rem; 
+}
+
+
 
 .login-form input[type="text"], 
 .login-form input[type="password"] {
-    width: calc(100% - 150px) !important;
-    box-sizing: border-box !important;  
+    width: calc(100%);
+    box-sizing: border-box;  
 }
 
 .action-button {
-  flex-shrink: 0;
-  height: 38px;
+  margin-left: 0;
 }
 
 .create-account-button-container {
-  display: block !important;
-  width: 100% !important;
-  margin-top: 500px !important;
-  text-align: center !important;
-  clear: both !important; 
+  display: flex;
+  justify-content: center;
+  margin-top: 75px; 
+  margin-bottom: 20px;
 }
-
-
 
 .create-account-button {
-  margin: 0 auto !important;
-  display: block !important;
-  width: 140px !important;
-  text-align: center !important;
-  background-color: #eee !important;
-  color: #555 !important;
-  border: 1px solid #ccc !important;
-  padding: 5px 10px !important;
-  font-size: 0.9rem !important;
-  border-radius: 5px !important;
-  cursor: pointer !important;
-  transition: background-color 0.3s !important;
+  margin: 0 auto; 
+  display: block;
+  padding: 10px 20px;
+  background-color: #000000;
+  color: #fff; 
+  border: 2px solid #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-form .create-account-button-container {
-  display: block !important;
-  width: 100% !important;
-  margin-top: 50px !important; 
-  text-align: center !important;
+.create-account-button:hover {
+  background-color: #000000; 
 }
 
 .clearfix::after {
@@ -338,23 +343,18 @@ form .create-account-button-container {
   display: table;
 }
 
-
-.create-account-button:hover {
-  background-color: #ddd !important;
-}
-
 .submit-button {
-  width: 100% !important;
-  display: block !important;
-  text-align: center !important;
-  margin-top: 20px !important;
-  margin-bottom: 20px !important;
+  width: 100%;
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .login-button {
-  display: block !important;
-  margin: 0 auto !important;
-  width: 140px !important;
+  display: block;
+  margin: 0 auto;
+  width: 140px;
 }
 
 /* Styles for the dropdown */
