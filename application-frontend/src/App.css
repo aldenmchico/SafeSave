@@ -254,11 +254,11 @@ main {
 
 
 .login-container {
-  max-width: 750px; /* Adjusted width for a more compact form */
-  margin: 20px auto; /* Increased top and bottom margin, centered horizontally */
-  padding: 10px; /* Reduced padding */
+  max-width: 750px;
+  margin: 20px auto; 
+  padding: 10px; 
   background-color: #fff;
-  border-radius: 10px; /* More subtle border radius */
+  border-radius: 10px; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
