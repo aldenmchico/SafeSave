@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function CreateSavedNotePage() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const handleNoteCreation = async (e) => {
         e.preventDefault();
@@ -14,19 +14,27 @@ function CreateSavedNotePage() {
             content
         };
 
-        const response = await fetch('/notes', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newNote),
-        });
+        try {
+            const response = await fetch('/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newNote),
+            });
 
-        if (response.ok) {
-            alert('Note saved successfully!');
-            history.push('/savednotes'); // Redirect to the saved notes page after creation
-        } else {
-            alert('Failed to save note. Please try again.');
+            if (response.ok) {
+                alert('Note saved successfully!');
+                setTitle(''); // Reset the title field
+                setContent(''); // Reset the content field
+                navigate('/savednotes'); // Redirect to the saved notes page after creation
+            } else {
+                // Extract error message if any from the response
+                const errorMessage = await response.text();
+                alert(`Failed to save note. Please try again. Error: ${errorMessage}`);
+            }
+        } catch (error) {
+            alert(`An error occurred while saving the note: ${error}`);
         }
     }
 
@@ -38,7 +46,7 @@ function CreateSavedNotePage() {
                 <label>
                     Title:
                     <input 
-                        type="text" 
+                        type="txt" 
                         value={title} 
                         onChange={e => setTitle(e.target.value)} 
                         placeholder="Note title"
@@ -56,8 +64,8 @@ function CreateSavedNotePage() {
                     />
                 </label>
                 <br/>
-                <button type="submit">Save Note</button>
             </form>
+            <button type="submit">Save Note</button>
         </div>
     );
 }
