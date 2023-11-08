@@ -3,11 +3,12 @@ import express from 'express';
 import * as dataEncryptionModel from './data-encryption-model.mjs';
 import path from 'path';
 
+
+import db from './db-connector.cjs';
+
 // HTTPS
 import https from 'https';
 import { readFileSync } from 'fs';
-
-// Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -31,8 +32,7 @@ try {
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
 
-// Configure express server
-const PORT = process.env.PORT || 3000; // Port 3000 because I do not know which port we will be using yet
+const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());
@@ -41,29 +41,67 @@ app.use(express.static('public'));
 const httpsServer = https.createServer(creds, app);
 
 // POST /ciphertext
-app.post('/ciphertext', (req, res) => {
-    const { plaintext, userHash } = req.body;
+app.post('/ciphertext', async (req, res) => {
+    const {
+        noteTitle,
+        noteText,
+        noteCreatedDate,
+        noteUpdatedDate,
+        noteAccessedDate,
+        userID,
+        userHash,
+    } = req.body;
 
     try {
-        // UPDATE: This needs to be updated to accept the full request body containing data for a single row to be added to database. 
-        // UPDATE: Hash (unencrypted password) will be included in the request Header as Hash.
-        dataEncryptionModel.getEncryptedData(plaintext, userHash)
-            .then((result) => {
-                res.status(201).json(result);
-            })
-            .catch((error) => {
+
+        const encryptedData = await dataEncryptionModel.getEncryptedData(
+            noteTitle,
+            noteText,
+            noteCreatedDate,
+            noteUpdatedDate,
+            noteAccessedDate,
+            userID,
+            userHash,
+        );
+
+
+        const query = `
+            INSERT INTO UserNotes
+            (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.pool.query(query, [
+            encryptedData.encryptedTitleData,
+            encryptedData.encryptedNoteData,
+            encryptedData.encryptednoteCreatedDate,
+            encryptedData.encryptednoteUpdatedDate,
+            encryptedData.encryptednoteAccessedDate,
+            encryptedData.userID,
+            encryptedData.iv
+        ], (error, result) => {
+            if (error) {
                 res.status(400).json({ error: error.message });
-            });
+            } else {
+                const response = {
+                    encryptedTitleData: encryptedData.encryptedTitleData,
+                    encryptedNoteData: encryptedData.encryptedNoteData,
+                    encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
+                    encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
+                    encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
+                    iv: encryptedData.iv,
+                    key: encryptedData.key.toString('hex')
+                };
+                res.status(201).json(response);
+                // const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
+                // res.sendFile(htmlFilePath);
+            }
+        });
+
+
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-});
-
-
-app.get('/', (req, res) => {
-    const htmlFilePath = 'public/index.html';
-    const normalizedPath = path.normalize(htmlFilePath);
-    res.sendFile(normalizedPath);
 });
 
 httpsServer.listen(PORT, () => {

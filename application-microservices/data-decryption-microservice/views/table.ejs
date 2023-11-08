@@ -1,0 +1,36 @@
+<table>
+    <thead>
+    <tr>
+        <th>userNoteID</th>
+        <th>userNoteTitle</th>
+        <th>userNoteText</th>
+        <th>userNoteCreated</th>
+        <th>userNoteUpdated</th>
+        <th>userNoteAccessed</th>
+        <th>userID</th>
+        <th>userNoteIV</th>
+        <th>Actions</th> <!-- New column for the Decrypt button -->
+    </tr>
+    </thead>
+    <tbody>
+    <% notes.forEach(function(note) { %>
+        <tr>
+            <td><%= note.userNoteID %></td>
+            <td><%= note.userNoteTitle %></td>
+            <td><%= note.userNoteText %></td>
+            <td><%= note.userNoteCreated %></td>
+            <td><%= note.userNoteUpdated %></td>
+            <td><%= note.userNoteAccessed %></td>
+            <td><%= note.userID %></td>
+            <td><%= note.userNoteIV %></td>
+            <td>
+                <form action="/decrypttext" method="post">
+                    <input type="hidden" name="userNoteID" value="<%= note.userNoteID %>">
+                    <input type="text" name="userHash" placeholder="Enter Password">
+                    <button type="submit">Decrypt</button>
+                </form>
+            </td>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>

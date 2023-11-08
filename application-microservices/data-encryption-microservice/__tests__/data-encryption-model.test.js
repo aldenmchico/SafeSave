@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 const serverBaseUrl = 'https://localhost:3000';
 
-const getEncryptedData = async (plaintext, userHash) => {
+const getEncryptedData = async (noteTitle, noteText, noteCreatedDate, noteUpdatedDate, noteAccessedDate, userID, userHash) => {
     try {
         if (!plaintext || !userHash) {
             throw new Error('Plaintext and userHash are required.');
@@ -14,7 +14,7 @@ const getEncryptedData = async (plaintext, userHash) => {
         const key = crypto.scryptSync(userHash, 'salt', 32);
         const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
 
-        let encryptedData = cipher.update(plaintext, 'utf8', 'hex');
+        let encryptedData = cipher.update(noteText, 'utf8', 'hex');
         encryptedData += cipher.final('hex');
 
         return {
