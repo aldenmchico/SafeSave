@@ -16,6 +16,8 @@ const IDsPage = lazy(() => import('./pages/IDsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const CreateAccountPage = lazy(() => import('./pages/CreateAccountPage'));
+const CreateSavedLoginPage = lazy(() => import('./pages/CreateSavedLoginPage'));
+const CreateSavedNotePage = lazy(() => import('./pages/CreateSavedNotePage'));
 const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
 
 // Authentication context
@@ -93,6 +95,8 @@ function App() {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/createaccount" element={<CreateAccountPage />} />
+                <Route path="/createsavedlogin" element={<CreateSavedLoginPage />} />
+                <Route path="/createsavednote" element={<CreateSavedNotePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

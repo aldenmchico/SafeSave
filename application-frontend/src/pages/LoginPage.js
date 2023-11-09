@@ -58,7 +58,7 @@ function LoginPage() {
                 <div className="input-group">
                     <label>Username</label>
                     <input 
-                        type="text" 
+                        type="txt" 
                         name="username"
                         value={credentials.username} 
                         onChange={handleInputChange} 
@@ -69,7 +69,7 @@ function LoginPage() {
                 <div className="input-group">
                     <label>Password</label>
                     <input 
-                        type={showPassword ? "text" : "password"} 
+                        type={showPassword ? "txt" : "pwd"} 
                         name="password"
                         value={credentials.password} 
                         onChange={handleInputChange} 

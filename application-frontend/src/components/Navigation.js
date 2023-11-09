@@ -44,6 +44,8 @@ const Navigation = () => {
                 <li><NavLink to="/twofactorauth">2FA</NavLink></li>
                 <li><NavLink to="/login">Login</NavLink></li>
                 <li><NavLink to="/personalinfo">Personal Info</NavLink></li>
+                <li><NavLink to="/createsavedlogin">Create Saved Login</NavLink></li>
+                <li><NavLink to="/createsavednote">Create Saved Note</NavLink></li>
                 <div className="dropdown">
                     <NavLink to="#" className="dropbtn">Saved</NavLink>
                     <div className="dropdown-content">
