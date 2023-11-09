@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 function SettingsPage() {
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');
+    const [qrCode, setQRCode] = useState('');
 
-    const toggleTwoFactorAuthentication = async () => {
-        setTwoFactorEnabled(prevState => !prevState);
+
+
+    const updateTwoFactorSetting = async (newState) => {
         // Account update logic
-
-        // TODO:  temporary user id created...need to implement session JWT token to hold curr user creds
-        const userId = 87;
+        const userId = 87; // TODO: Replace with actual user ID from session or JWT token
 
         try {
             const response = await fetch('http://localhost:8006/api/2fa-registration', {
@@ -18,7 +18,7 @@ function SettingsPage() {
                     'Content-Type': 'application/json',
                     // Include other headers as required, such as authentication tokens
                 },
-                body: JSON.stringify({ enableTwoFactor: twoFactorEnabled, userId: userId }),
+                body: JSON.stringify({ enableTwoFactor: newState, userId: userId }),
             });
 
             if (response.ok) {
@@ -33,8 +33,58 @@ function SettingsPage() {
             console.error('Error updating 2FA settings:', error);
             setMessage('An error occurred while updating two-factor authentication settings.');
             // Revert the checkbox state in case of an error
-            setTwoFactorEnabled(prevState => !prevState);
+            setTwoFactorEnabled(!newState);
         }
+    };
+
+    const generateQRCode = async () => {
+        // Assume you have the necessary data like mfaSecret and username
+        const mfaSecret = '6Y7CQOWNSMA4TTNM5WCLUM6Y67GMP7CV' // The secret generated for the user's 2FA
+        const username = 'port11' // The username for the authenticator
+        const twoFactorEnabled = 1
+    
+        try {
+            const response = await fetch('http://localhost:8006/api/generate-mfa-qr-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include other headers as required, such as authentication tokens
+                },
+                body: JSON.stringify({ mfaEnabled: twoFactorEnabled, mfaSecret: mfaSecret, username: username }),
+            });
+    
+            if (response.ok) {
+                const qrCodeImageBlob = await response.blob();
+                setQRCode(URL.createObjectURL(qrCodeImageBlob));
+            } else {
+                throw new Error('Failed to generate QR code');
+            }
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            setMessage('An error occurred while generating the QR code for two-factor authentication.');
+        }
+    };
+
+
+    const toggleTwoFactorAuthentication = () => {
+        setTwoFactorEnabled(prevState => {
+            const newState = !prevState;
+            // Update the backend about the 2FA status
+            updateTwoFactorSetting(newState).then(() => {
+                // If 2FA is being enabled, generate the QR code
+                if (newState) {
+                    generateQRCode();
+                } else {
+                    // If 2FA is being disabled, clear the QR code
+                    setQRCode('');
+                }
+            }).catch(error => {
+                console.error('Error during 2FA update:', error);
+                // Optionally revert the checkbox if there's an error
+                setTwoFactorEnabled(prevState);
+            });
+            return newState;
+        });
     };
 
     const handleDeleteAccount = () => {
@@ -65,6 +115,12 @@ function SettingsPage() {
                         Enable Two-Factor Authentication
                     </label>
                     <p>Enhance your account security by requiring a second verification step during login.</p>
+                    {twoFactorEnabled && qrCode && (
+                        <div>
+                            <p>Scan this QR code with your 2FA app:</p>
+                            <img src={qrCode} alt="2FA QR Code" />
+                        </div>
+                    )}
                 </div>
             </section>
             <section>

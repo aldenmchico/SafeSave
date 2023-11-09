@@ -170,7 +170,7 @@ const patchUser = function (reqBody, callback) {
         // Additional fields for userSecret and userTempSecret
         if (reqBody.userSecret !== undefined) {
             const secretValue = reqBody.userSecret === null ? null : `"${reqBody.userSecret}"`;
-            q += `UPDATE Users SET userSecret = "${secretValue}" WHERE userID = ${reqBody.userID}; `;
+            q += `UPDATE Users SET userSecret = ${secretValue} WHERE userID = ${reqBody.userID}; `;
         }
         if (reqBody.userTempSecret !== undefined) {
             // If userTempSecret is explicitly set to null, construct the SQL without quotes

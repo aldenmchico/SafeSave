@@ -5,7 +5,7 @@ import qrcode from 'qrcode';
 import cors from 'cors';
 
 // Configure express server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const app = express();
 
 
@@ -102,7 +102,7 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     const { mfaEnabled, mfaSecret, username } = req.body;
 
     // For security, we no longer show the QR code if already verified
-    if (mfaEnabled) return res.status(404).json({ message: "mfa is already enabled " });
+    // if (mfaEnabled) return res.status(404).json({ message: "mfa is already enabled " });
 
     // Ensure that the mfaSecret is provided
     if (!mfaSecret) {
