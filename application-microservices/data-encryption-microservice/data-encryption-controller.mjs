@@ -64,25 +64,25 @@ app.post('/ciphertext', async (req, res) => {
             userHash,
         );
 
+        //
+        // const query = `
+        //     INSERT INTO UserNotes
+        //     (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
+        //     VALUES (?, ?, ?, ?, ?, ?, ?)
+        // `;
 
-        const query = `
-            INSERT INTO UserNotes
-            (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        db.pool.query(query, [
-            encryptedData.encryptedTitleData,
-            encryptedData.encryptedNoteData,
-            encryptedData.encryptednoteCreatedDate,
-            encryptedData.encryptednoteUpdatedDate,
-            encryptedData.encryptednoteAccessedDate,
-            encryptedData.userID,
-            encryptedData.iv
-        ], (error, result) => {
-            if (error) {
-                res.status(400).json({ error: error.message });
-            } else {
+        // db.pool.query(query, [
+        //     encryptedData.encryptedTitleData,
+        //     encryptedData.encryptedNoteData,
+        //     encryptedData.encryptednoteCreatedDate,
+        //     encryptedData.encryptednoteUpdatedDate,
+        //     encryptedData.encryptednoteAccessedDate,
+        //     encryptedData.userID,
+        //     encryptedData.iv
+        // ], (error, result) => {
+        //     if (error) {
+        //         res.status(400).json({ error: error.message });
+        //     } else {
                 const response = {
                     encryptedTitleData: encryptedData.encryptedTitleData,
                     encryptedNoteData: encryptedData.encryptedNoteData,
@@ -94,9 +94,7 @@ app.post('/ciphertext', async (req, res) => {
                 };
                 res.status(201).json(response);
                 // const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
-                // res.sendFile(htmlFilePath);
-            }
-        });
+
 
 
     } catch (error) {
