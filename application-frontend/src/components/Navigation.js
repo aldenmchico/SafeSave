@@ -44,15 +44,15 @@ const Navigation = () => {
                 <li><NavLink to="/twofactorauth">2FA</NavLink></li>
                 <li><NavLink to="/login">Login</NavLink></li>
                 <li><NavLink to="/personalinfo">Personal Info</NavLink></li>
+                <li><NavLink to="/ids">IDs</NavLink></li>
+                <li><NavLink to="/payments">Payments</NavLink></li>
                 <li><NavLink to="/createsavedlogin">Create Saved Login</NavLink></li>
                 <li><NavLink to="/createsavednote">Create Saved Note</NavLink></li>
                 <div className="dropdown">
-                    <NavLink to="#" className="dropbtn">Saved</NavLink>
+                    <NavLink to="#" className="dropbtn">Saved Info</NavLink>
                     <div className="dropdown-content">
-                        <NavLink to="/savedlogins">Logins</NavLink>
-                        <NavLink to="/savednotes">Notes</NavLink>
-                        <NavLink to="/ids">IDs</NavLink>
-                        <NavLink to="/payments">Payments</NavLink>
+                        <NavLink to="/savedlogins">Saved Logins</NavLink>
+                        <NavLink to="/savednotes">Saved Notes</NavLink>
                     </div>
                 </div>
             </ul>
