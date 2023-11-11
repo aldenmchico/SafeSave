@@ -35,7 +35,7 @@ const Navigation = () => {
                     </form>
                 </div>
             </div>
-            <ul style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around' }}>
+            <ul style={{ marginTop: '5px', display: 'flex', justifyContent: 'space-arod' }}>
                 <li><NavLink to="/">Home</NavLink></li>
                 <li><NavLink to="/createaccount">Create Account</NavLink></li>
                 <li><NavLink to="/favorites">Favorites</NavLink></li>

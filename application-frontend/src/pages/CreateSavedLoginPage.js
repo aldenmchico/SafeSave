@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const getCurrentUserID = () => {
+    // Placeholder
+    return 1;
+};
+
 function CreateSavedLoginPage() {
     const [website, setWebsite] = useState('');
     const [username, setUsername] = useState('');
@@ -10,36 +15,39 @@ function CreateSavedLoginPage() {
     const handleSaveLogin = async (e) => {
         e.preventDefault();
 
-        const loginDetails = {
-            website,
-            username,
-            password
+        const loginItemData = {
+            userLoginItemWebsite: website,
+            userLoginItemUsername: username,
+            userLoginItemPassword: password,
+            userLoginItemDateCreated: new Date().toISOString(),
+            userLoginItemDateUpdated: new Date().toISOString(),
+            userLoginItemDateAccessed: new Date().toISOString(),
+            userID: getCurrentUserID()
         };
 
         try {
-            const response = await fetch('/login_items', {
+            const response = await fetch('http://localhost:8008/login_items', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(loginDetails),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginItemData)
             });
 
             if (response.ok) {
                 alert('Login details saved successfully!');
-                setWebsite(''); // Reset the website field
-                setUsername(''); // Reset the username field
-                setPassword(''); // Reset the password field
-                navigate('/savedlogins'); // Redirect to the saved logins page after saving
+                // Resetting the form fields after successful submission
+                setWebsite('');
+                setUsername('');
+                setPassword('');
+                navigate('/savedlogins'); // Redirect to the saved logins page
             } else {
-                // Extract error message if any from the response
+                // Error handling for non-200 responses
                 const errorMessage = await response.text();
-                alert(`Failed to save login details. Please try again. Error: ${errorMessage}`);
+                alert(`Failed to save login details. Error: ${errorMessage}`);
             }
         } catch (error) {
             alert(`An error occurred while saving the login details: ${error}`);
         }
-    }
+    };
 
     return (
         <div>
@@ -48,37 +56,37 @@ function CreateSavedLoginPage() {
             <form onSubmit={handleSaveLogin}>
                 <label>
                     Website/Service:
-                    <input 
-                        type="txt" 
-                        value={website} 
-                        onChange={e => setWebsite(e.target.value)} 
+                    <input
+                        type="txt"
+                        value={website}
+                        onChange={e => setWebsite(e.target.value)}
                         placeholder="Website or Service name"
                         required
                     />
                 </label>
-                <br/>
+                <br />
                 <label>
                     Username:
-                    <input 
-                        type="txt" 
-                        value={username} 
-                        onChange={e => setUsername(e.target.value)} 
+                    <input
+                        type="txt"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                         placeholder="Enter username"
                         required
                     />
                 </label>
-                <br/>
+                <br />
                 <label>
                     Password:
-                    <input 
-                        type="pwd" 
-                        value={password} 
-                        onChange={e => setPassword(e.target.value)} 
+                    <input
+                        type="pwd"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                         placeholder="Enter password"
                         required
                     />
                 </label>
-                <br/>
+                <br />
                 <button type="submit">Save Login</button>
             </form>
         </div>

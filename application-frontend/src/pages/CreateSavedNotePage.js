@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const getCurrentUserID = () => {
+    return 1; // Temporary userID of 1
+};
+
 function CreateSavedNotePage() {
+    const currentUserID = getCurrentUserID(); 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const navigate = useNavigate();
@@ -11,11 +16,14 @@ function CreateSavedNotePage() {
 
         const newNote = {
             title,
-            content
+            content,
+            userNoteDateCreated: new Date().toISOString(),
+            userNoteDateUpdated: new Date().toISOString(),
+            userID: currentUserID 
         };
 
         try {
-            const response = await fetch('/notes', {
+            const response = await fetch('http://localhost:8008/notes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,23 +33,21 @@ function CreateSavedNotePage() {
 
             if (response.ok) {
                 alert('Note saved successfully!');
-                setTitle(''); // Reset the title field
-                setContent(''); // Reset the content field
-                navigate('/savednotes'); // Redirect to the saved notes page after creation
+                setTitle('');
+                setContent('');
+                navigate('/savednotes');
             } else {
-                // Extract error message if any from the response
                 const errorMessage = await response.text();
-                alert(`Failed to save note. Please try again. Error: ${errorMessage}`);
+                alert(`Failed to save note. Error: ${errorMessage}`);
             }
         } catch (error) {
-            alert(`An error occurred while saving the note: ${error}`);
+            alert(`An error occurred: ${error}`);
         }
-    }
+    };
 
     return (
         <div>
             <h1>Create a New Note</h1>
-            <p>Fill out the details below to save a new note.</p>
             <form onSubmit={handleNoteCreation}>
                 <label>
                     Title:
