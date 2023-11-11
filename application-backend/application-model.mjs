@@ -209,9 +209,17 @@ const getAllLoginItems = function (callback) {
 
 const getSingleUserLoginItems = function (id, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ${id}`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
@@ -247,7 +255,6 @@ const getSingleUserNotes = function (id, callback) {
             callback(err);
             return;
         }
-
         try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             console.log("application-model.mjs result", decryptedResult);
@@ -258,6 +265,8 @@ const getSingleUserNotes = function (id, callback) {
     });
 };
 
+
+//Helper function to call decryption microservice
 async function decryptRowData(row) {
     return new Promise(async (resolve, reject) => {
         var encryptedData = {};

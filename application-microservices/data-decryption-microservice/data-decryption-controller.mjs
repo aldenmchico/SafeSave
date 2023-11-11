@@ -54,25 +54,47 @@ app.use(express.json());
 
 
 app.post('/decrypttext', async (req, res) => {
-    const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash} = req.body
+    const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed,
+        userID, userNoteIV, userHash, userLoginItemID, userLoginItemWebsite, userLoginItemPassword,
+    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userLoginItemUsername, IV} = req.body
 
-    try {
-
-        // Perform the decryption with the hexadecimal IV
+    if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
+    && userLoginItemDateAccessed && IV){
         const result = await dataDecryptionModel.getDecryptedData({
-            userNoteID: userNoteID,
-            userNoteTitle: userNoteTitle,
-            userNoteText: userNoteText,
-            userNoteCreated: userNoteCreated,
-            userNoteUpdated: userNoteUpdated,
-            userNoteAccessed: userNoteAccessed,
-            userID: userID,
-            userNoteIV: userNoteIV,
-            userHash: userHash});
+            userLoginItemID: userLoginItemID,
+            userLoginItemWebsite: userLoginItemWebsite,
+            userLoginItemUsername: userLoginItemUsername,
+            userLoginItemPassword: userLoginItemPassword,
+            userLoginItemDateCreated: userLoginItemDateCreated,
+            userLoginItemDateUpdated: userLoginItemDateUpdated,
+            userLoginItemDateAccessed: userLoginItemDateAccessed,
+            userHash: userHash,
+            IV: IV
+        });
         res.status(201).json(result);
-    } catch (error) {
-        console.error('Decryption failed:', error);
-        res.status(400).json({ error: error.message });
+    }
+
+    else
+    {
+        try {
+
+            // Perform the decryption with the hexadecimal IV
+            const result = await dataDecryptionModel.getDecryptedData({
+                userNoteID: userNoteID,
+                userNoteTitle: userNoteTitle,
+                userNoteText: userNoteText,
+                userNoteCreated: userNoteCreated,
+                userNoteUpdated: userNoteUpdated,
+                userNoteAccessed: userNoteAccessed,
+                userID: userID,
+                userNoteIV: userNoteIV,
+                userHash: userHash
+            });
+            res.status(201).json(result);
+        } catch (error) {
+            console.error('Decryption failed:', error);
+            res.status(400).json({error: error.message});
+        }
     }
 });
 
