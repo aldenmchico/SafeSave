@@ -47,6 +47,7 @@ const createUserLoginItem = function (reqBody, callback) {
     var userLoginWebsite = reqBody.website;
     var userLoginUsername = reqBody.username;
     var userLoginPassword = reqBody.password;
+    var userHash = "pass1";
 
 
     fetch('https://127.0.0.1:8002/ciphertext', {
@@ -58,6 +59,7 @@ const createUserLoginItem = function (reqBody, callback) {
             userLoginWebsite,
             userLoginUsername,
             userLoginPassword,
+            userHash
         }),
         agent, // Include the custom agent here
     })
@@ -74,7 +76,8 @@ const createUserLoginItem = function (reqBody, callback) {
             //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
                     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, IV)
-          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}", 
+          VALUES ("${responseData.encryptedWebsite}", "${responseData.encryptedUsername}", 
+          "${responseData.encryptedPassword}", 
           '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}")`;
 
             con.query(q, (err, result) => {

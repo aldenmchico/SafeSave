@@ -57,13 +57,15 @@ app.post('/ciphertext', async (req, res) => {
         if (req.body.noteTitle && req.body.noteText && req.body.noteCreatedDate && req.body.noteUpdatedDate && req.body.noteAccessedDate
         && req.body.userID) {
             const encryptedData = await dataEncryptionModel.getEncryptedData(
-                noteTitle,
-                noteText,
-                noteCreatedDate,
-                noteUpdatedDate,
-                noteAccessedDate,
-                userID,
-                userHash,
+                {
+                    noteTitle: noteTitle,
+                    noteText: noteText,
+                    noteCreatedDate: noteCreatedDate,
+                    noteUpdatedDate: noteUpdatedDate,
+                    noteAccessedDate: noteAccessedDate,
+                    userID: userID,
+                    userHash: userHash,
+                }
             );
 
             const response = {
@@ -81,19 +83,26 @@ app.post('/ciphertext', async (req, res) => {
         else if (req.body.userLoginWebsite && req.body.userLoginUsername && req.body.userLoginPassword){
 
             const encryptedData = await dataEncryptionModel.getEncryptedData(
-                req.body.userLoginWebsite,
-                req.body.userLoginUsername,
-                req.body.userLoginPassword
+                {
+                    website: req.body.userLoginWebsite,
+                    username: req.body.userLoginUsername,
+                    password: req.body.userLoginPassword,
+                    userHash: req.body.userHash
+                }
             );
 
             const response = {
-                encryptedWebsite: encryptedData.encryptedWebsite,
-                encryptedUsername: encryptedData.encryptedUsername,
-                encryptedPassword: encryptedData.encryptedPassword,
+                encryptedWebsite: encryptedData.encryptedWebsiteData,
+                encryptedUsername: encryptedData.encryptedUsernameData,
+                encryptedPassword: encryptedData.encryptedPasswordData,
                 iv: encryptedData.iv,
             };
 
             res.status(201).json(response);
+        }
+        else{
+            console.log("Invalid query");
+            res.status(400).json({error: error.message});
         }
 
 
