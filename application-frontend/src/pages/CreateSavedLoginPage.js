@@ -79,8 +79,8 @@ function CreateSavedLoginPage() {
                     />
                 </label>
                 <br/>
+                <button type="submit">Save Login</button>
             </form>
-            <button type="submit">Save Login</button>
         </div>
     );
 }
