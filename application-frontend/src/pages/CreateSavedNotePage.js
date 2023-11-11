@@ -64,8 +64,8 @@ function CreateSavedNotePage() {
                     />
                 </label>
                 <br/>
+                <button type="submit">Save Note</button>
             </form>
-            <button type="submit">Save Note</button>
         </div>
     );
 }
