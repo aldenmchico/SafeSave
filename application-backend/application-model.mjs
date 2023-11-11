@@ -2,8 +2,10 @@
 import 'dotenv/config';
 import mysql from 'mysql';
 import * as db from './db-connector.mjs';
-
 var con = mysql.createConnection(db.dbConfig);
+
+import fetch from 'node-fetch';
+import https from 'https';
 
 // CREATE (POST) MODEL FUNCTIONS *****************************************
 
@@ -42,27 +44,83 @@ const createUserLoginItem = function (reqBody, callback) {
     }
 }
 
-// POST UserNotes Table Model Functions  *****************************************
-const createUserNote = function (reqBody, callback) {
-    if (reqBody.title === undefined || reqBody.text === undefined ||
-        reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
-        reqBody.userID === undefined) {
-        callback({ "code": "EMPTY_FIELD" }, null);
-    }
-    else {
-        // UPDATE: Need to call encryption microservice here to encrypt data in reqBody before saving to DB.
-        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
-            userNoteUpdated, userNoteAccessed, userID) 
-            VALUES ("${reqBody.title}", "${reqBody.text}", "${reqBody.dateCreated}", 
-            "${reqBody.dateUpdated}", "${reqBody.dateAccessed}", ${reqBody.userID})`;
-        con.query(q, (err, result) => {
-            if (err) callback(err, null);
-            else callback(null, result);
-        });
-    }
 
-}
+
+
+
+// POST UserNotes Table Model Functions  *****************************************
+
+const createUserNote = function (reqBody, callback) {
+
+    //     // if (reqBody.title === undefined || reqBody.text === undefined ||
+//     //     reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
+//     //     reqBody.userID === undefined) {
+//     //     callback({ "code": "EMPTY_FIELD" }, null);
+//     // }
+//     // else {
+//
+    var currentDate = new Date();
+    var year = currentDate.getFullYear();
+    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    var day = currentDate.getDate().toString().padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+
+    let noteTitle = reqBody.title;
+    let noteText = reqBody.content;
+    let noteCreatedDate = formattedDate;
+    let noteUpdatedDate = formattedDate;
+    let noteAccessedDate = formattedDate;
+    let userID = 1;
+    let userHash = "pass1";
+
+    const agent = new https.Agent({
+        rejectUnauthorized: false
+    });
+
+    let responseData; // Variable to store the JSON response
+
+    fetch('https://127.0.0.1:8002/ciphertext', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            noteTitle,
+            noteText,
+            noteCreatedDate,
+            noteUpdatedDate,
+            noteAccessedDate,
+            userID,
+            userHash,
+        }),
+        agent, // Include the custom agent here
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            responseData = data;
+            console.log("data is", data);
+
+            //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
+            let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
+          userNoteUpdated, userNoteAccessed, userID, userNoteIV) 
+          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}", 
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}")`;
+
+            con.query(q, (err, result) => {
+                if (err) callback(err, null);
+                else callback(null, result);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            callback(error, null);
+        });
+};
 
 // RETRIEVE (GET) MODEL FUNCTIONS *****************************************
 
