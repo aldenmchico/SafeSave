@@ -142,23 +142,23 @@ const getDecryptedData = async (userNoteID, userHash) => {
         let decryptedNoteText = decipherText.update(userNoteText, 'hex', 'utf8');
         decryptedNoteText += decipherText.final('utf8');
 
-        let decryptedNoteCreated = decipherCreated.update(userNoteCreated, 'hex', 'utf8');
-        decryptedNoteCreated += decipherCreated.final('utf8')
-
-        let decryptedNoteUpdated = decipherUpdated.update(userNoteUpdated, 'hex', 'utf8');
-        decryptedNoteUpdated += decipherUpdated.final('utf8');
-
-        let decryptedNoteAccessed = decipherAccessed.update(userNoteAccessed, 'hex', 'utf8');
-        decryptedNoteAccessed += decipherAccessed.final('utf8')
+        // let decryptedNoteCreated = decipherCreated.update(userNoteCreated, 'hex', 'utf8');
+        // decryptedNoteCreated += decipherCreated.final('utf8')
+        //
+        // let decryptedNoteUpdated = decipherUpdated.update(userNoteUpdated, 'hex', 'utf8');
+        // decryptedNoteUpdated += decipherUpdated.final('utf8');
+        //
+        // let decryptedNoteAccessed = decipherAccessed.update(userNoteAccessed, 'hex', 'utf8');
+        // decryptedNoteAccessed += decipherAccessed.final('utf8')
 
         console.log('Decrypted Data:', decryptedNoteTitle);
 
         return {
             decryptedNoteTitle: decryptedNoteTitle,
             decryptedNoteText: decryptedNoteText,
-            decryptedNoteCreated: decryptedNoteCreated,
-            decryptedNoteUpdated: decryptedNoteUpdated,
-            decryptedNoteAccessed: decryptedNoteAccessed
+            // decryptedNoteCreated: decryptedNoteCreated,
+            // decryptedNoteUpdated: decryptedNoteUpdated,
+            // decryptedNoteAccessed: decryptedNoteAccessed
         };
     } catch (error) {
         console.error('Decryption failed:', error);

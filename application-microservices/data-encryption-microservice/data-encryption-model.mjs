@@ -2,7 +2,8 @@ import 'dotenv/config';
 import crypto from 'crypto';
 
 // Encrypt data using the password hash and plaintext data
-const getEncryptedData = async (noteTitle, noteText, noteCreatedDate, noteUpdatedDate, noteAccessedDate, userID, userHash) => {
+const getEncryptedData = async (noteTitle, noteText, noteCreatedDate,
+                                noteUpdatedDate, noteAccessedDate, userID, userHash, website, username, password) => {
     try {
         // Ensure both plaintext and userHash are provided.
         if (!userHash || !noteTitle || !noteText || !noteCreatedDate || !noteUpdatedDate || !noteAccessedDate || !userID) {

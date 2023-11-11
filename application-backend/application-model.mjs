@@ -25,25 +25,68 @@ const createUser = function (reqBody, callback) {
 
 // POST UserLoginItems Table Model Functions  *****************************************
 const createUserLoginItem = function (reqBody, callback) {
-    if (reqBody.website === undefined || reqBody.username === undefined || reqBody.password === undefined ||
-        reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
-        reqBody.userID === undefined) {
-        callback({ "code": "EMPTY_FIELD" }, null);
-    }
-    else {
-        // UPDATE: Need to call encryption microservice here to encrypt data in reqBody before saving to DB.
-        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID) 
-                    VALUES ("${reqBody.website}", "${reqBody.username}", "${reqBody.password}", 
-                    "${reqBody.dateCreated}", "${reqBody.dateUpdated}", "${reqBody.dateAccessed}", ${reqBody.userID})`;
-        con.query(q, (err, result) => {
-            if (err) callback(err, null);
-            else callback(null, result);
-        });
-    }
-}
 
+    // if (reqBody.website === undefined || reqBody.username === undefined || reqBody.password === undefined ||
+    //     reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
+    //     reqBody.userID === undefined) {
+    //     callback({ "code": "EMPTY_FIELD" }, null);
+    // }
+    // else {
+
+    var currentDate = new Date();
+    var year = currentDate.getFullYear();
+    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    var day = currentDate.getDate().toString().padStart(2, '0');
+    var formattedDate = year + '-' + month + '-' + day;
+
+    const agent = new https.Agent({
+        rejectUnauthorized: false
+    });
+
+    let responseData;
+    var userLoginWebsite = reqBody.website;
+    var userLoginUsername = reqBody.username;
+    var userLoginPassword = reqBody.password;
+
+
+    fetch('https://127.0.0.1:8002/ciphertext', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userLoginWebsite,
+            userLoginUsername,
+            userLoginPassword,
+        }),
+        agent, // Include the custom agent here
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            responseData = data;
+            console.log("data is", data);
+
+            //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
+            let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
+                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, IV)
+          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}", 
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}")`;
+
+            con.query(q, (err, result) => {
+                if (err) callback(err, null);
+                else callback(null, result);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            callback(error, null);
+        });
+};
 
 
 

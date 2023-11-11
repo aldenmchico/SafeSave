@@ -54,46 +54,47 @@ app.post('/ciphertext', async (req, res) => {
 
     try {
 
-        const encryptedData = await dataEncryptionModel.getEncryptedData(
-            noteTitle,
-            noteText,
-            noteCreatedDate,
-            noteUpdatedDate,
-            noteAccessedDate,
-            userID,
-            userHash,
-        );
+        if (req.body.noteTitle && req.body.noteText && req.body.noteCreatedDate && req.body.noteUpdatedDate && req.body.noteAccessedDate
+        && req.body.userID) {
+            const encryptedData = await dataEncryptionModel.getEncryptedData(
+                noteTitle,
+                noteText,
+                noteCreatedDate,
+                noteUpdatedDate,
+                noteAccessedDate,
+                userID,
+                userHash,
+            );
 
-        //
-        // const query = `
-        //     INSERT INTO UserNotes
-        //     (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
-        //     VALUES (?, ?, ?, ?, ?, ?, ?)
-        // `;
+            const response = {
+                encryptedTitleData: encryptedData.encryptedTitleData,
+                encryptedNoteData: encryptedData.encryptedNoteData,
+                encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
+                encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
+                encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
+                iv: encryptedData.iv,
+                key: encryptedData.key.toString('hex')
+            };
+            res.status(201).json(response);
+        }
 
-        // db.pool.query(query, [
-        //     encryptedData.encryptedTitleData,
-        //     encryptedData.encryptedNoteData,
-        //     encryptedData.encryptednoteCreatedDate,
-        //     encryptedData.encryptednoteUpdatedDate,
-        //     encryptedData.encryptednoteAccessedDate,
-        //     encryptedData.userID,
-        //     encryptedData.iv
-        // ], (error, result) => {
-        //     if (error) {
-        //         res.status(400).json({ error: error.message });
-        //     } else {
-                const response = {
-                    encryptedTitleData: encryptedData.encryptedTitleData,
-                    encryptedNoteData: encryptedData.encryptedNoteData,
-                    encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
-                    encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
-                    encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
-                    iv: encryptedData.iv,
-                    key: encryptedData.key.toString('hex')
-                };
-                res.status(201).json(response);
-                // const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
+        else if (req.body.userLoginWebsite && req.body.userLoginUsername && req.body.userLoginPassword){
+
+            const encryptedData = await dataEncryptionModel.getEncryptedData(
+                req.body.userLoginWebsite,
+                req.body.userLoginUsername,
+                req.body.userLoginPassword
+            );
+
+            const response = {
+                encryptedWebsite: encryptedData.encryptedWebsite,
+                encryptedUsername: encryptedData.encryptedUsername,
+                encryptedPassword: encryptedData.encryptedPassword,
+                iv: encryptedData.iv,
+            };
+
+            res.status(201).json(response);
+        }
 
 
 
