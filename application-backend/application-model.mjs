@@ -61,7 +61,7 @@ const createUserLoginItem = function (reqBody, callback) {
             userLoginPassword,
             userHash
         }),
-        agent, // Include the custom agent here
+        agent, // to get rid of self-signed errors on SSL cert
     })
         .then(response => {
             if (!response.ok) {
@@ -242,11 +242,55 @@ const getAllUserNotes = function (callback) {
 
 const getSingleUserNotes = function (id, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ${id}`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        try {
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            console.log("application-model.mjs result", decryptedResult);
+            callback(null, decryptedResult);
+        } catch (error) {
+            callback(error);
+        }
     });
 };
+
+async function decryptRowData(row) {
+    return new Promise(async (resolve, reject) => {
+        var encryptedData = {};
+        for (const key in row) {
+            encryptedData[key] = row[key];
+        }
+
+        // TODO: Fix Hardcoded password!
+        let userHash = "userHash";
+        encryptedData[userHash] = "pass1";
+
+        const agent = new https.Agent({
+            rejectUnauthorized: false
+        });
+
+        try {
+            const response = await fetch("https://127.0.0.1:8001/decrypttext", {
+                method: "POST",
+                body: JSON.stringify(encryptedData),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                agent: agent
+            });
+
+            const data = await response.json();
+            resolve(data); // Resolve the promise with the decrypted data
+        } catch (error) {
+            reject(error); // Reject the promise with the error
+        }
+    });
+}
+
 
 const getUserNoteByTitle = function (id, title, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND userNoteTitle = "${title}"`;

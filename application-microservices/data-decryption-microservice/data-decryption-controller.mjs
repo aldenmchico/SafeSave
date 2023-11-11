@@ -54,12 +54,21 @@ app.use(express.json());
 
 
 app.post('/decrypttext', async (req, res) => {
-    const { userNoteID, userHash } = req.body;
+    const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash} = req.body
 
     try {
 
         // Perform the decryption with the hexadecimal IV
-        const result = await dataDecryptionModel.getDecryptedData(userNoteID, userHash);
+        const result = await dataDecryptionModel.getDecryptedData({
+            userNoteID: userNoteID,
+            userNoteTitle: userNoteTitle,
+            userNoteText: userNoteText,
+            userNoteCreated: userNoteCreated,
+            userNoteUpdated: userNoteUpdated,
+            userNoteAccessed: userNoteAccessed,
+            userID: userID,
+            userNoteIV: userNoteIV,
+            userHash: userHash});
         res.status(201).json(result);
     } catch (error) {
         console.error('Decryption failed:', error);

@@ -99,30 +99,34 @@ const getNoteAccessed = async (noteAccessedQuery) => {
     });
 };
 
-const getDecryptedData = async (userNoteID, userHash) => {
+const getDecryptedData = async (options) => {
+
+    const {
+        userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash
+    } = options;
+
+
+    if(userNoteIV){
+        console.log("happy")
+    }
     try {
-        if (!userNoteID || !userHash ) {
-            console.log("Checking to see if we received the userNote ID ", userNoteID, userHash)
-            throw new Error('Note ID and user hash are required');
-        }
-
-        const userNoteIDBuffer = Buffer.from(userNoteID, 'utf8')
-
-        //SQL queries
-        const noteIVQuery = `SELECT userNoteIV FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
-        const noteTitleQuery = `SELECT userNoteTitle FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
-        const noteTextQuery = `SELECT userNoteText FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
-        const userNoteCreatedQuery = `SELECT userNoteCreated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
-        const userNoteUpdatedQuery = `SELECT userNoteUpdated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
-        const userNoteAccessedQuery = `SELECT userNoteAccessed FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
 
 
-        const userNoteIV = await getUserNoteIV(noteIVQuery);
-        const userNoteTitle = await getNoteTitle(noteTitleQuery);
-        const userNoteText = await getNoteText(noteTextQuery);
-        const userNoteCreated = await getNoteCreated(userNoteCreatedQuery);
-        const userNoteUpdated = await getNoteUpdated(userNoteUpdatedQuery);
-        const userNoteAccessed = await getNoteAccessed(userNoteAccessedQuery);
+        // const userNoteIDBuffer = Buffer.from(userNoteID, 'utf8')
+        //
+        // //SQL queries
+        // const noteIVQuery = `SELECT userNoteIV FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        // const noteTitleQuery = `SELECT userNoteTitle FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        // const noteTextQuery = `SELECT userNoteText FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        // const userNoteCreatedQuery = `SELECT userNoteCreated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        // const userNoteUpdatedQuery = `SELECT userNoteUpdated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        // const userNoteAccessedQuery = `SELECT userNoteAccessed FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+
+
+        // const userNoteIV = await getUserNoteIV(noteIVQuery);
+        // const userNoteTitle = await getNoteTitle(noteTitleQuery);
+        // const userNoteText = await getNoteText(noteTextQuery);
+
 
         const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
 
@@ -132,9 +136,6 @@ const getDecryptedData = async (userNoteID, userHash) => {
 
         const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
         const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-        const decipherCreated = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-        const decipherUpdated = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-        const decipherAccessed = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
 
         let decryptedNoteTitle = decipherTitle.update(userNoteTitle, 'hex', 'utf8');
         decryptedNoteTitle += decipherTitle.final('utf8');
@@ -142,23 +143,17 @@ const getDecryptedData = async (userNoteID, userHash) => {
         let decryptedNoteText = decipherText.update(userNoteText, 'hex', 'utf8');
         decryptedNoteText += decipherText.final('utf8');
 
-        // let decryptedNoteCreated = decipherCreated.update(userNoteCreated, 'hex', 'utf8');
-        // decryptedNoteCreated += decipherCreated.final('utf8')
-        //
-        // let decryptedNoteUpdated = decipherUpdated.update(userNoteUpdated, 'hex', 'utf8');
-        // decryptedNoteUpdated += decipherUpdated.final('utf8');
-        //
-        // let decryptedNoteAccessed = decipherAccessed.update(userNoteAccessed, 'hex', 'utf8');
-        // decryptedNoteAccessed += decipherAccessed.final('utf8')
 
         console.log('Decrypted Data:', decryptedNoteTitle);
 
         return {
-            decryptedNoteTitle: decryptedNoteTitle,
-            decryptedNoteText: decryptedNoteText,
-            // decryptedNoteCreated: decryptedNoteCreated,
-            // decryptedNoteUpdated: decryptedNoteUpdated,
-            // decryptedNoteAccessed: decryptedNoteAccessed
+            userNoteID: userNoteID,
+            userNoteTitle: decryptedNoteTitle,
+            userNoteText: decryptedNoteText,
+            userNoteCreated: userNoteCreated,
+            userNoteAccessed: userNoteAccessed,
+            userNoteUpdated: userNoteUpdated,
+            userID: userID
         };
     } catch (error) {
         console.error('Decryption failed:', error);
