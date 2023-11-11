@@ -22,3 +22,4 @@
 /application-microservices/user-login-microservice/package-lock.json
 database/db-connector.js
 application-backend/db-connector.mjs
+/.idea
