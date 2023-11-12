@@ -131,6 +131,24 @@ const getDecryptedData = async (options) => {
             let decryptedPassword = decipherPassword.update(userLoginItemPassword, 'hex', 'utf8');
             decryptedPassword += decipherPassword.final('utf8');
 
+            const hmac = crypto.createHmac('sha256', userKey);
+            hmac.update(decryptedWebsite + decryptedUsername + decryptedPassword );
+            const reconstructedAuthTag = hmac.digest('hex');
+
+            if(authTag !== reconstructedAuthTag){
+                console.error("Something fishy is going on!");
+                return {
+                    userLoginItemID: userLoginItemID,
+                    userLoginItemWebsite: "DATA COMPROMISED!!!!",
+                    userLoginItemUsername: "DATA COMPROMISED!!!!",
+                    userLoginItemPassword: "DATA COMPROMISED!!!!",
+                    userLoginItemDateCreated: userLoginItemDateCreated,
+                    userLoginItemDateUpdated: userLoginItemDateUpdated,
+                    userLoginItemDateAccessed: userLoginItemDateAccessed,
+                    userID: userID,
+                }
+            }
+
 
             return {
                 userLoginItemID: userLoginItemID,
@@ -148,7 +166,7 @@ const getDecryptedData = async (options) => {
             throw error;
         }
     }
-    else
+    else if(userNoteTitle && userNoteText)
     {
         try {
 
