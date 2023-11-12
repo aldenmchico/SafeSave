@@ -104,7 +104,7 @@ const getDecryptedData = async (options) => {
     const {
         userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
         userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV
+        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV
     } = options;
 
 
@@ -149,13 +149,14 @@ const getDecryptedData = async (options) => {
 
 
             const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
+            const userNoteTextIVBuffer = Buffer.from(userNoteTextIV, 'hex');
 
             const userKey = crypto.scryptSync(userHash, 'salt', 32);
 
             console.log(userKey)
 
             const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-            const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
+            const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteTextIVBuffer);
 
             let decryptedNoteTitle = decipherTitle.update(userNoteTitle, 'hex', 'utf8');
             decryptedNoteTitle += decipherTitle.final('utf8');

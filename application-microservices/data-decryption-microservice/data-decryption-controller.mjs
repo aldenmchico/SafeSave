@@ -55,7 +55,7 @@ app.use(express.json());
 
 app.post('/decrypttext', async (req, res) => {
     const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed,
-        userID, userNoteIV, userHash, userLoginItemID, userLoginItemWebsite, userLoginItemPassword,
+        userID, userNoteIV, userNoteTextIV, userHash, userLoginItemID, userLoginItemWebsite, userLoginItemPassword,
     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userLoginItemUsername, IV} = req.body
 
     if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
@@ -88,6 +88,7 @@ app.post('/decrypttext', async (req, res) => {
                 userNoteAccessed: userNoteAccessed,
                 userID: userID,
                 userNoteIV: userNoteIV,
+                userNoteTextIV: userNoteTextIV,
                 userHash: userHash
             });
             res.status(201).json(result);

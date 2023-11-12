@@ -71,11 +71,11 @@ app.post('/ciphertext', async (req, res) => {
             const response = {
                 encryptedTitleData: encryptedData.encryptedTitleData,
                 encryptedNoteData: encryptedData.encryptedNoteData,
-                encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
-                encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
-                encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
+                encryptednoteCreatedDate: encryptedData.noteCreatedDate,
+                encryptednoteAccessedDate: encryptedData.noteAccessedDate,
+                encryptednoteUpdatedDate: encryptedData.noteUpdatedDate,
                 iv: encryptedData.iv,
-                key: encryptedData.key.toString('hex')
+                userNoteTextIV: encryptedData.userNoteTextIV
             };
             res.status(201).json(response);
         }
