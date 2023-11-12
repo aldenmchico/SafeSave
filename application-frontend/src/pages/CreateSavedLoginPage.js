@@ -1,19 +1,37 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const getCurrentUserID = () => {
-    // Placeholder
-    return 1;
-};
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function CreateSavedLoginPage() {
-    const [website, setWebsite] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [loginDetails, setLoginDetails] = useState({
+        website: '',
+        username: '',
+        password: '',
+        userID: null, // Initialized as null
+        userPassword: ''
+    });
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Update state with userID and unencrypted password
+    React.useEffect(() => {
+        if (location.state) {
+            setLoginDetails(prevState => ({
+                ...prevState,
+                userID: location.state.userID,
+                userPassword: location.state.password
+            }));
+        }
+    }, [location.state]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setLoginDetails(prevState => ({ ...prevState, [name]: value }));
+    };
 
     const handleSaveLogin = async (e) => {
         e.preventDefault();
+
+        const { website, username, password, userID } = loginDetails;
 
         const loginItemData = {
             userLoginItemWebsite: website,
@@ -22,7 +40,7 @@ function CreateSavedLoginPage() {
             userLoginItemDateCreated: new Date().toISOString(),
             userLoginItemDateUpdated: new Date().toISOString(),
             userLoginItemDateAccessed: new Date().toISOString(),
-            userID: getCurrentUserID()
+            userID: userID // Using the userID from state
         };
 
         try {
@@ -34,13 +52,8 @@ function CreateSavedLoginPage() {
 
             if (response.ok) {
                 alert('Login details saved successfully!');
-                // Resetting the form fields after successful submission
-                setWebsite('');
-                setUsername('');
-                setPassword('');
-                navigate('/savedlogins'); // Redirect to the saved logins page
+                navigate('/savedlogins', { state: { userID: userID, password: loginDetails.userPassword } });
             } else {
-                // Error handling for non-200 responses
                 const errorMessage = await response.text();
                 alert(`Failed to save login details. Error: ${errorMessage}`);
             }
@@ -57,9 +70,10 @@ function CreateSavedLoginPage() {
                 <label>
                     Website/Service:
                     <input
-                        type="txt"
-                        value={website}
-                        onChange={e => setWebsite(e.target.value)}
+                        type="text"
+                        name="website"
+                        value={loginDetails.website}
+                        onChange={handleInputChange}
                         placeholder="Website or Service name"
                         required
                     />
@@ -68,9 +82,10 @@ function CreateSavedLoginPage() {
                 <label>
                     Username:
                     <input
-                        type="txt"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
+                        type="text"
+                        name="username"
+                        value={loginDetails.username}
+                        onChange={handleInputChange}
                         placeholder="Enter username"
                         required
                     />
@@ -79,9 +94,10 @@ function CreateSavedLoginPage() {
                 <label>
                     Password:
                     <input
-                        type="pwd"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
+                        type="password"
+                        name="password"
+                        value={loginDetails.password}
+                        onChange={handleInputChange}
                         placeholder="Enter password"
                         required
                     />

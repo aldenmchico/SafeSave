@@ -1,15 +1,14 @@
-import React, { createContext, useState, useEffect, useContext, Suspense, lazy } from 'react';
+import React, { createContext, useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import './App.css'; 
-import { useNavigate } from 'react-router-dom';
+import './App.css';
 
 // Lazy-loaded components
 const Navigation = lazy(() => import('./components/Navigation'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
 const TwoFactorAuthenticationPage = lazy(() => import('./pages/TwoFactorAuthenticationPage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const NotesPage = lazy(() => import('./pages/SavedNotesPage'));
+const SavedLoginsPage = lazy(() => import('./pages/LoginPage'));
+const SavedNotesPage = lazy(() => import('./pages/SavedNotesPage'));
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
 const PersonalInfoPage = lazy(() => import('./pages/PersonalInfoPage'));
 const IDsPage = lazy(() => import('./pages/IDsPage'));
@@ -18,10 +17,10 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const CreateAccountPage = lazy(() => import('./pages/CreateAccountPage'));
 const CreateSavedLoginPage = lazy(() => import('./pages/CreateSavedLoginPage'));
 const CreateSavedNotePage = lazy(() => import('./pages/CreateSavedNotePage'));
-const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
+const NotFound = lazy(() => import('./pages/NotFound')); // 404 page
 
 // Authentication context
-const AuthContext = createContext();
+export const AuthContext = createContext(); 
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,20 +38,6 @@ function useAuth() {
 
   return { isAuthenticated, login, logout };
 }
-
-// Protected route
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
-
-  return isAuthenticated ? <Route {...rest} element={<Component />} /> : null;
-};
 
 // Error boundary
 class ErrorBoundary extends React.Component {
@@ -87,8 +72,8 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/twofactorauth" element={<TwoFactorAuthenticationPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/notes" element={<NotesPage />} />
+                <Route path="/savedlogins" element={<SavedLoginsPage />} />
+                <Route path="/savednotes" element={<SavedNotesPage />} />
                 <Route path="/payments" element={<PaymentsPage />} />
                 <Route path="/personalinfo" element={<PersonalInfoPage />} />
                 <Route path="/ids" element={<IDsPage />} />

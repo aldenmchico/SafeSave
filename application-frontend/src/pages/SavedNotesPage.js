@@ -1,64 +1,78 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-
-// Import React components
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SavedNoteList from '../components/SavedNoteList';
 
-function SavedNotesPage({setNote}) {
-
-    // Use state variable exercises to bring in the data
+function SavedNotesPage({ setNote }) {
     const [savedNotes, setSavedNotes] = useState([]);
-
-    // When the homepage is loaded, the userID and userHash to be used for encryption/decryption are defined
-    const [userID, setUserID] = useState(1);
-    const [userHash, setUserHash] = useState('pass1');
-    const [username, setUsername] = useState('Guest');
+    const [searchTerm, setSearchTerm] = useState('');
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { userID, password } = location.state || {};
 
     // Load saved notes from the backend
-    const loadSavedNotes = async () => {
-        const response = await fetch(`/notes/users/${userID}`);
-        const notesData = await response.json();
-        setSavedNotes(notesData);
-    }
+    const loadSavedNotes = async (searchParam = '') => {
+        if (userID) {
+            const url = `http://localhost:8008/notes/users/${userID}` + (searchParam ? `?title=${searchParam}` : '');
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const notesData = await response.json();
+                    setSavedNotes(notesData);
+                } else {
+                    throw new Error('Failed to fetch notes');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    };
 
     useEffect(() => {
         loadSavedNotes();
-    }, []);
+    }, [userID]);
 
-    // DELETE a row (Working functionality to be updated later)
-    const deleteNoteRow = async _id => {
-        const response = await fetch(`/notes/${_id}`, { method: 'DELETE' });
-        if (response.status === 204) {
-            loadSavedNotes();
-            alert('Deleted Note Entry');
-        } else {
-            alert('Failed to Delete Note Entry');
+    const handleSearch = () => {
+        loadSavedNotes(searchTerm);
+    };
+
+    const deleteNoteRow = async noteID => {
+        try {
+            const response = await fetch(`http://localhost:8008/notes/${noteID}`, { method: 'DELETE' });
+            if (response.status === 204) {
+                loadSavedNotes();
+                alert('Deleted Note Entry');
+            } else {
+                throw new Error('Failed to delete note entry');
+            }
+        } catch (error) {
+            alert(error.message);
         }
-    }
+    };
 
-    // UPDATE a row (Working functionality to be updated later)
-    const history = useNavigate();
-    const editNoteRow = async note => {
-        setNote(note);
-        history.push("/edit-note");
-    }
-
+const history = useNavigate();
+const editNoteRow = note => {
+    setNote(note);
+    history.push("/edit-note");
+};
 
     return (
         <div>
             <h1>Your Saved Notes</h1>
-            <p>Below is the list of your saved notes. Click on any item to view or edit details.</p>
-            
+            <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search notes..."
+            />
+            <button onClick={handleSearch}>Search</button>
             <div className="note-list">
                 <SavedNoteList
                     notes={savedNotes}
                     editNote={editNoteRow}
-                    deleteNote = {deleteNoteRow}
+                    deleteNote={deleteNoteRow}
                 />
             </div>
-            
-            <Link to="/createsavednote">Add New Note</Link>
+            <Link to="/createsavednote" state={{ userID, password }}>Add New Note</Link>
         </div>
     );
 }

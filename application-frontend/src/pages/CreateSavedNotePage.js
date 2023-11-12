@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const getCurrentUserID = () => {
-    return 1; // Temporary userID of 1
-};
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function CreateSavedNotePage() {
-    const currentUserID = getCurrentUserID(); 
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [noteDetails, setNoteDetails] = useState({
+        title: '',
+        content: '',
+        userID: null,
+        userPassword: ''
+    });
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state) {
+            setNoteDetails(prevState => ({
+                ...prevState,
+                userID: location.state.userID,
+                userPassword: location.state.password
+            }));
+        }
+    }, [location.state]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNoteDetails(prevState => ({ ...prevState, [name]: value }));
+    };
 
     const handleNoteCreation = async (e) => {
         e.preventDefault();
+
+        const { title, content, userID } = noteDetails;
 
         const newNote = {
             title,
             content,
             userNoteDateCreated: new Date().toISOString(),
             userNoteDateUpdated: new Date().toISOString(),
-            userID: currentUserID 
+            userID: userID 
         };
 
         try {
@@ -33,9 +50,7 @@ function CreateSavedNotePage() {
 
             if (response.ok) {
                 alert('Note saved successfully!');
-                setTitle('');
-                setContent('');
-                navigate('/savednotes');
+                navigate('/savednotes', { state: { userID: userID, password: noteDetails.userPassword } });
             } else {
                 const errorMessage = await response.text();
                 alert(`Failed to save note. Error: ${errorMessage}`);
@@ -52,9 +67,10 @@ function CreateSavedNotePage() {
                 <label>
                     Title:
                     <input 
-                        type="txt" 
-                        value={title} 
-                        onChange={e => setTitle(e.target.value)} 
+                        type="text" 
+                        name="title"
+                        value={noteDetails.title} 
+                        onChange={handleInputChange} 
                         placeholder="Note title"
                         required
                     />
@@ -63,8 +79,9 @@ function CreateSavedNotePage() {
                 <label>
                     Content:
                     <textarea 
-                        value={content} 
-                        onChange={e => setContent(e.target.value)} 
+                        name="content"
+                        value={noteDetails.content} 
+                        onChange={handleInputChange} 
                         placeholder="Write your note here..."
                         required
                     />
