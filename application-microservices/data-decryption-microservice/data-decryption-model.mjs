@@ -104,19 +104,23 @@ const getDecryptedData = async (options) => {
     const {
         userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
         userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, authTag
+        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, websiteIV, usernameIV, passwordIV,
+        authTag
     } = options;
 
 
     if(userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated
-    && userLoginItemDateUpdated && userLoginItemDateAccessed && IV && userHash){
+    && userLoginItemDateUpdated && userLoginItemDateAccessed && websiteIV && userHash){
         try {
-            const userLoginIVBuffer = Buffer.from(IV, 'hex');
+            const userWebsiteIVBuffer = Buffer.from(websiteIV, 'hex');
             const userKey = crypto.scryptSync(userHash, 'salt', 32);
+            const userUsernameIVBuffer = Buffer.from(usernameIV, 'hex');
+            const userPasswordIVBuffer = Buffer.from(passwordIV, 'hex');
 
-            const decipherWebsite = crypto.createDecipheriv('aes-256-cbc', userKey, userLoginIVBuffer)
-            const decipherUsername = crypto.createDecipheriv('aes-256-cbc', userKey, userLoginIVBuffer)
-            const decipherPassword = crypto.createDecipheriv('aes-256-cbc', userKey, userLoginIVBuffer)
+
+            const decipherWebsite = crypto.createDecipheriv('aes-256-cbc', userKey, userWebsiteIVBuffer)
+            const decipherUsername = crypto.createDecipheriv('aes-256-cbc', userKey, userUsernameIVBuffer)
+            const decipherPassword = crypto.createDecipheriv('aes-256-cbc', userKey, userPasswordIVBuffer)
 
             let decryptedWebsite = decipherWebsite.update(userLoginItemWebsite, 'hex', 'utf8');
             decryptedWebsite += decipherWebsite.final('utf8');

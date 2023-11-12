@@ -96,7 +96,10 @@ app.post('/ciphertext', async (req, res) => {
                 encryptedWebsite: encryptedData.encryptedWebsiteData,
                 encryptedUsername: encryptedData.encryptedUsernameData,
                 encryptedPassword: encryptedData.encryptedPasswordData,
-                iv: encryptedData.iv,
+                websiteIV: encryptedData.websiteIV,
+                usernameIV: encryptedData.usernameIV,
+                passwordIV: encryptedData.passwordIV,
+                authTag: encryptedData.authTag
             };
 
             res.status(201).json(response);

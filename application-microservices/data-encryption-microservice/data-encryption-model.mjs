@@ -59,26 +59,36 @@ const getEncryptedData = async (options) => {
 
         else if(website && username && password && userHash){
 
-            const iv = crypto.randomBytes(16);
+            const websiteIV = crypto.randomBytes(16);
             const key = crypto.scryptSync(userHash, 'salt', 32);
 
-            const websiteCipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+            const websiteCipher = crypto.createCipheriv('aes-256-cbc', key, websiteIV);
             let encryptedWebsiteData = websiteCipher.update(website, 'utf8', 'hex');
             encryptedWebsiteData += websiteCipher.final('hex');
 
-            const usernameCipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+            const userNameIV = crypto.randomBytes(16);
+
+            const usernameCipher = crypto.createCipheriv('aes-256-cbc', key, userNameIV);
             let encryptedUsernameData = usernameCipher.update(username, 'utf8', 'hex');
             encryptedUsernameData += usernameCipher.final('hex');
 
-            const passwordCipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+            const passwordIV = crypto.randomBytes(16);
+            const passwordCipher = crypto.createCipheriv('aes-256-cbc', key, passwordIV);
             let encryptedPasswordData = passwordCipher.update(password, 'utf8', 'hex');
             encryptedPasswordData += passwordCipher.final('hex');
 
+            const hmac = crypto.createHmac('sha256', key);
+            hmac.update(website + username + password);
+            const authTag = hmac.digest('hex');
+
             const encryptedData = {
-                iv: iv.toString('hex'),
+                websiteIV: websiteIV.toString('hex'),
+                usernameIV: userNameIV.toString("hex"),
+                passwordIV: passwordIV.toString('hex'),
                 encryptedWebsiteData,
                 encryptedUsernameData,
-                encryptedPasswordData
+                encryptedPasswordData,
+                authTag: authTag
             }
             return encryptedData
 

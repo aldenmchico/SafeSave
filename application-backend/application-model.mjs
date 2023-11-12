@@ -75,10 +75,10 @@ const createUserLoginItem = function (reqBody, callback) {
 
             //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, IV)
+                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, websiteIV, usernameIV, passwordIV, authTag)
           VALUES ("${responseData.encryptedWebsite}", "${responseData.encryptedUsername}", 
           "${responseData.encryptedPassword}", 
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}")`;
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.websiteIV}", "${responseData.usernameIV}", "${responseData.passwordIV}", "${responseData.authTag}")`;
 
             con.query(q, (err, result) => {
                 if (err) callback(err, null);
