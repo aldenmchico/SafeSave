@@ -38,10 +38,10 @@ function SavedNotesPage({setNote}) {
     }
 
     // UPDATE a row (Working functionality to be updated later)
-    const history = useNavigate();
+    const navigate = useNavigate();
     const editNoteRow = async note => {
         setNote(note);
-        history.push("/edit-note");
+        navigate("/edit-note");
     }
 
 

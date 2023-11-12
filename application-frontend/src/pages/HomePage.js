@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 
 
-function HomePage({setLogin}) {
+function HomePage({setLoginItem}) {
 
     // Use state variable exercises to bring in the data
     const [savedLogins, setSavedLogins] = useState([]);
@@ -39,7 +39,7 @@ function HomePage({setLogin}) {
     }, []);
 
     const deleteLoginRow = async _id => {
-        const response = await fetch(`/logins/${_id}`, { method: 'DELETE' });
+        const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
         if (response.status === 204) {
             loadSavedLogins();
             alert('Deleted Login Entry');
@@ -49,10 +49,14 @@ function HomePage({setLogin}) {
     }
 
     // UPDATE a row
-    const history = useNavigate();
+    const navigate = useNavigate();
     const editLoginRow = async login => {
-        setLogin(login);
-        history.push("/edit-login");
+        setLoginItem(login);
+        navigate("/edit-login");
+    }
+
+    const favoriteLoginRow = async login => {
+        
     }
 
     return (
@@ -66,6 +70,7 @@ function HomePage({setLogin}) {
                     loginItems={savedLogins}
                     editLoginItem={editLoginRow}
                     deleteLoginItem = {deleteLoginRow}
+                    favoriteLoginItem = {favoriteLoginRow}
                 />
                 </div>
                 <Link to="/createsavedlogin">Add New Login</Link>

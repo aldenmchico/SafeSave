@@ -9,6 +9,7 @@ const HomePage = lazy(() => import('./pages/HomePage'));
 const FavoritesPage = lazy(() => import('./pages/FavoritesPage'));
 const TwoFactorAuthenticationPage = lazy(() => import('./pages/TwoFactorAuthenticationPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SavedLoginsPage = lazy(() => import('./pages/SavedLoginsPage'));
 const NotesPage = lazy(() => import('./pages/SavedNotesPage'));
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
 const PersonalInfoPage = lazy(() => import('./pages/PersonalInfoPage'));
@@ -18,6 +19,8 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const CreateAccountPage = lazy(() => import('./pages/CreateAccountPage'));
 const CreateSavedLoginPage = lazy(() => import('./pages/CreateSavedLoginPage'));
 const CreateSavedNotePage = lazy(() => import('./pages/CreateSavedNotePage'));
+const EditSavedLoginPage = lazy(() => import('./pages/EditSavedLoginPage'));
+const EditSavedNotePage = lazy(() => import('./pages/EditSavedNotePage'));
 const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
 
 // Authentication context
@@ -75,6 +78,8 @@ class ErrorBoundary extends React.Component {
 
 function App() {
   const auth = useAuth();
+  const [loginItem, setLoginItem] = useState([]);
+  const [note, setNote] = useState([]);
 
   return (
     <AuthContext.Provider value={auth}>
@@ -84,17 +89,20 @@ function App() {
             <Suspense fallback={<div>Loading...</div>}>
               <Navigation />
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<HomePage setLoginItem={setLoginItem} />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/twofactorauth" element={<TwoFactorAuthenticationPage />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/notes" element={<NotesPage />} />
+                <Route path="/savedlogins" element={<SavedLoginsPage setLoginItem={setLoginItem} />} />
+                <Route path="/savednotes" element={<NotesPage setNote={setNote} />} />
                 <Route path="/payments" element={<PaymentsPage />} />
                 <Route path="/personalinfo" element={<PersonalInfoPage />} />
                 <Route path="/ids" element={<IDsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/createaccount" element={<CreateAccountPage />} />
+                <Route path="/edit-login" element={<EditSavedLoginPage loginItem={loginItem} />} />
+                <Route path="/edit-note" element={<EditSavedNotePage note={note} />} />
                 <Route path="/createsavedlogin" element={<CreateSavedLoginPage />} />
                 <Route path="/createsavednote" element={<CreateSavedNotePage />} />
                 <Route path="*" element={<NotFound />} />

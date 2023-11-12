@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 // Import React components
 import SavedLoginList from '../components/SavedLoginList';
 
-function SavedLoginsPage() {
+function SavedLoginsPage({setLoginItem}) {
+    const [userID, setUserID] = useState(1); // Will be edited once login functionality is done
     const [savedLogins, setSavedLogins] = useState([]);
 
     // Load saved logins from the backend
@@ -21,7 +22,7 @@ function SavedLoginsPage() {
     }, []);
 
     const deleteLoginRow = async _id => {
-        const response = await fetch(`/logins/${_id}`, { method: 'DELETE' });
+        const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
         if (response.status === 204) {
             loadSavedLogins();
             alert('Deleted Login Entry');
@@ -31,10 +32,10 @@ function SavedLoginsPage() {
     }
 
     // UPDATE a row
-    const history = useNavigate();
+    const navigate = useNavigate();
     const editLoginRow = async login => {
-        setLogin(login);
-        history.push("/edit-login");
+        setLoginItem(login);
+        navigate("/edit-login");
     }
 
     return (
