@@ -33,6 +33,12 @@ const getEncryptedData = async (options) => {
             let encryptedNoteData = noteTextCipher.update(noteText, 'utf8', 'hex');
             encryptedNoteData += noteTextCipher.final('hex');
 
+            const hmac = crypto.createHmac('sha256', key);
+            hmac.update(noteTitle + noteText)
+            const authTag = hmac.digest('hex');
+
+            console.log("authtag is", authTag);
+
 
 
             const encryptedData = {
@@ -44,6 +50,7 @@ const getEncryptedData = async (options) => {
                 userNoteUpdated: noteUpdatedDate,
                 userNoteAccessed: noteAccessedDate,
                 userID,
+                authTag: authTag
             };
 
             // Return the encrypted data to the client

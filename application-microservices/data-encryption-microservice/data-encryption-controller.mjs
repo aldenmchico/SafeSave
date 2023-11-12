@@ -75,7 +75,8 @@ app.post('/ciphertext', async (req, res) => {
                 encryptednoteAccessedDate: encryptedData.noteAccessedDate,
                 encryptednoteUpdatedDate: encryptedData.noteUpdatedDate,
                 iv: encryptedData.iv,
-                userNoteTextIV: encryptedData.userNoteTextIV
+                userNoteTextIV: encryptedData.userNoteTextIV,
+                authTag: encryptedData.authTag
             };
             res.status(201).json(response);
         }

@@ -104,7 +104,7 @@ const getDecryptedData = async (options) => {
     const {
         userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
         userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV
+        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, authTag
     } = options;
 
 
@@ -126,6 +126,7 @@ const getDecryptedData = async (options) => {
 
             let decryptedPassword = decipherPassword.update(userLoginItemPassword, 'hex', 'utf8');
             decryptedPassword += decipherPassword.final('utf8');
+
 
             return {
                 userLoginItemID: userLoginItemID,
@@ -164,8 +165,23 @@ const getDecryptedData = async (options) => {
             let decryptedNoteText = decipherText.update(userNoteText, 'hex', 'utf8');
             decryptedNoteText += decipherText.final('utf8');
 
+            const hmac = crypto.createHmac('sha256', userKey);
+            hmac.update(decryptedNoteText + decryptedNoteTitle);
+            const reconstructedAuthTag = hmac.digest('hex');
 
-            console.log('Decrypted Data:', decryptedNoteTitle);
+            if(reconstructedAuthTag !== authTag){
+                console.log("Something fishy is going on!")
+                return {
+                    userNoteID: userNoteID,
+                    userNoteTitle: "DATA POTENTIALLY COMPROMISED",
+                    userNoteText: "DATA POTENTIALLY COMPROMISED",
+                    userNoteCreated: userNoteCreated,
+                    userNoteAccessed: userNoteAccessed,
+                    userNoteUpdated: userNoteUpdated,
+                    userID: userID
+                }
+            }
+
 
             return {
                 userNoteID: userNoteID,

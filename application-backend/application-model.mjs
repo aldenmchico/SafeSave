@@ -153,9 +153,9 @@ const createUserNote = function (reqBody, callback) {
 
             //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
-          userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV) 
+          userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag) 
           VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}", 
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}", "${responseData.userNoteTextIV}")`;
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}", "${responseData.userNoteTextIV}", "${responseData.authTag}")`;
 
             con.query(q, (err, result) => {
                 if (err) callback(err, null);
