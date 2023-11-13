@@ -526,21 +526,6 @@ const patchNoteFavorite = function(reqBody, callback) {
     }
 }
 
-const patchNoteFavorite = function(reqBody, callback) {
-    if (reqBody.noteID === undefined) {
-        callback({ "code": "NO_ID" }, null);
-    }
-    else {
-        let q = `UPDATE UserNotes SET favorited = "${reqBody.favorite}" WHERE userNoteID = ${reqBody.noteID}; `;
-        con.query(q, (err, result) => {
-            if (err) {
-                console.log(err);
-                callback(err, null);
-            }
-            else callback(null, result);
-        });
-    }
-}
 
 
 
