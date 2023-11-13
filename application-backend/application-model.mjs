@@ -7,6 +7,13 @@ var con = mysql.createConnection(db.dbConfig);
 import fetch from 'node-fetch';
 import https from 'https';
 
+//Date stuff
+const currentDate = new Date();
+const year = currentDate.getFullYear();
+const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+const day = currentDate.getDate().toString().padStart(2, '0');
+const formattedDate = year + '-' + month + '-' + day;
+
 // CREATE (POST) MODEL FUNCTIONS *****************************************
 
 // POST Users Table Model Functions *****************************************
@@ -25,13 +32,6 @@ const createUser = function (reqBody, callback) {
 
 // POST UserLoginItems Table Model Functions  *****************************************
 const createUserLoginItem = function (reqBody, callback) {
-
-    // if (reqBody.website === undefined || reqBody.username === undefined || reqBody.password === undefined ||
-    //     reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
-    //     reqBody.userID === undefined) {
-    //     callback({ "code": "EMPTY_FIELD" }, null);
-    // }
-    // else {
 
     var currentDate = new Date();
     var year = currentDate.getFullYear();
@@ -98,19 +98,6 @@ const createUserLoginItem = function (reqBody, callback) {
 
 const createUserNote = function (reqBody, callback) {
 
-    //     // if (reqBody.title === undefined || reqBody.text === undefined ||
-//     //     reqBody.dateCreated === undefined || reqBody.dateUpdated === undefined || reqBody.dateAccessed === undefined ||
-//     //     reqBody.userID === undefined) {
-//     //     callback({ "code": "EMPTY_FIELD" }, null);
-//     // }
-//     // else {
-//
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    var day = currentDate.getDate().toString().padStart(2, '0');
-    var formattedDate = year + '-' + month + '-' + day;
-
     let noteTitle = reqBody.title;
     let noteText = reqBody.content;
     let noteCreatedDate = formattedDate;
@@ -153,8 +140,8 @@ const createUserNote = function (reqBody, callback) {
 
             //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
-          userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag) 
-          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}", 
+          userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag)
+          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}",
           '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}", "${responseData.userNoteTextIV}", "${responseData.authTag}")`;
 
             con.query(q, (err, result) => {
@@ -395,23 +382,76 @@ const patchNote = function (reqBody, callback) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
-        let q = '';
-        // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
-        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        if (reqBody.title !== undefined) q = `UPDATE UserNotes SET userNoteTitle = "${reqBody.title}" WHERE userNoteID = ${reqBody.noteID}; `;
-        if (reqBody.text !== undefined) q += `UPDATE UserNotes SET userNoteText = "${reqBody.text}" WHERE userNoteID = ${reqBody.noteID}; `;
-        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserNotes SET userNoteUpdated = "${reqBody.dateUpdated}" WHERE userNoteID = ${reqBody.noteID}; `;
-        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserNotes SET userNoteAccessed = "${reqBody.dateAccessed}" WHERE userNoteID = ${reqBody.noteID}; `;
-        if (q === '') callback({ "code": "NO_CHANGE" }, null)
-        else {
-            con.query(q, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    callback(err, null);
+
+        let noteTitle = reqBody.title;
+        let noteText = reqBody.text;
+        let noteCreatedDate = formattedDate;
+        let noteUpdatedDate = formattedDate;
+        let noteAccessedDate = formattedDate;
+        let userID = 1;
+        let userHash = "pass1";
+
+        const agent = new https.Agent({
+            rejectUnauthorized: false
+        });
+
+        let responseData; // Variable to store the JSON response
+
+        fetch('https://127.0.0.1:8002/ciphertext', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                noteTitle,
+                noteText,
+                noteCreatedDate,
+                noteUpdatedDate,
+                noteAccessedDate,
+                userID,
+                userHash,
+            }),
+            agent, // Include the custom agent here
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                else callback(null, result);
-            });
-        }
+                return response.json();
+            })
+            .then(data => {
+                responseData = data;
+                console.log("data is", data);
+
+                let q = `UPDATE UserNotes SET`;
+
+                if (reqBody.title !== undefined) {
+                    q += ` userNoteTitle = "${responseData.encryptedTitleData}",`;
+                }
+
+                if (reqBody.text !== undefined) {
+                    q += ` userNoteText = "${responseData.encryptedNoteData}",`;
+                }
+
+                q += ` userNoteAccessed = "${formattedDate}",`;
+                q += ` userNoteUpdated = "${formattedDate}",`;
+                q += ` userNoteIV = "${responseData.iv}",`;
+                q += ` userNoteTextIV = "${responseData.userNoteTextIV}",`;
+                q += ` authTag = "${responseData.authTag}"`;
+
+                q += ` WHERE userNoteID = ${reqBody.noteID}`;
+
+                    console.log(q)
+                    con.query(q, (err, result) => {
+                        if (err) callback(err, null);
+                        else callback(null, result);
+                    })
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+                callback(error, null);
+            })
+
     }
 }
 

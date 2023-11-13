@@ -34,7 +34,7 @@ const getEncryptedData = async (options) => {
             encryptedNoteData += noteTextCipher.final('hex');
 
             const hmac = crypto.createHmac('sha256', key);
-            hmac.update(noteTitle + noteText)
+            hmac.update(noteText + noteTitle);
             const authTag = hmac.digest('hex');
 
             console.log("authtag is", authTag);
