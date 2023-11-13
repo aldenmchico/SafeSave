@@ -105,7 +105,7 @@ const getDecryptedData = async (options) => {
         userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
         userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
         userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, websiteIV, usernameIV, passwordIV,
-        authTag
+        authTag, favorited
     } = options;
 
 
@@ -146,6 +146,7 @@ const getDecryptedData = async (options) => {
                     userLoginItemDateUpdated: userLoginItemDateUpdated,
                     userLoginItemDateAccessed: userLoginItemDateAccessed,
                     userID: userID,
+                    favorited: favorited
                 }
             }
 
@@ -159,6 +160,7 @@ const getDecryptedData = async (options) => {
                 userLoginItemDateUpdated: userLoginItemDateUpdated,
                 userLoginItemDateAccessed: userLoginItemDateAccessed,
                 userID: userID,
+                favorited: favorited
             };
 
         } catch (error){
@@ -200,7 +202,8 @@ const getDecryptedData = async (options) => {
                     userNoteCreated: userNoteCreated,
                     userNoteAccessed: userNoteAccessed,
                     userNoteUpdated: userNoteUpdated,
-                    userID: userID
+                    userID: userID,
+                    favorited: favorited
                 }
             }
 
@@ -212,7 +215,8 @@ const getDecryptedData = async (options) => {
                 userNoteCreated: userNoteCreated,
                 userNoteAccessed: userNoteAccessed,
                 userNoteUpdated: userNoteUpdated,
-                userID: userID
+                userID: userID,
+                favorited: favorited
             };
         } catch (error) {
             console.error('Decryption failed:', error);

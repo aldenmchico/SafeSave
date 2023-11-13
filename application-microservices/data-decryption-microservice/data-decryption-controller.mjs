@@ -57,7 +57,7 @@ app.post('/decrypttext', async (req, res) => {
     const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed,
         userID, userNoteIV, userNoteTextIV, userHash, userLoginItemID, userLoginItemWebsite, userLoginItemPassword,
     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userLoginItemUsername, websiteIV,
-        usernameIV, passwordIV, authTag} = req.body
+        usernameIV, passwordIV, authTag, favorited} = req.body
 
     if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
     && userLoginItemDateAccessed && websiteIV){
@@ -73,7 +73,8 @@ app.post('/decrypttext', async (req, res) => {
             websiteIV: websiteIV,
             usernameIV: usernameIV,
             passwordIV: passwordIV,
-            authTag: authTag
+            authTag: authTag,
+            favorited: favorited
         });
         res.status(201).json(result);
     }
@@ -94,7 +95,8 @@ app.post('/decrypttext', async (req, res) => {
                 userNoteIV: userNoteIV,
                 userNoteTextIV: userNoteTextIV,
                 userHash: userHash,
-                authTag: authTag
+                authTag: authTag,
+                favorited: favorited
             });
             res.status(201).json(result);
         } catch (error) {
