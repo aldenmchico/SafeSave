@@ -30,8 +30,8 @@ function SettingsPage() {
                 <h2>Security</h2>
                 <div>
                     <label>
-                        <input 
-                            type="checkbox" 
+                        <input
+                            type="checkbox"
                             checked={twoFactorEnabled}
                             onChange={toggleTwoFactorAuthentication}
                         />

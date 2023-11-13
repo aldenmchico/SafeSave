@@ -49,6 +49,7 @@ function EditSavedNotePage({note}) {
             <form onSubmit={handleNoteCreation}>
                 <label>
                     Title:
+
                     <input 
                         type="txt" 
                         value={title} 
@@ -73,5 +74,6 @@ function EditSavedNotePage({note}) {
         </div>
     );
 }
+
 
 export default EditSavedNotePage;

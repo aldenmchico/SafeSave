@@ -34,9 +34,15 @@ function SavedNoteRow({note, editNote, deleteNote}) {
         <td>{note.userNoteAccessed.substring(0,10)}</td>
         <td><AiFillEdit onClick={() => editNote(note)}/></td>
         <td><AiFillDelete onClick={() => deleteNote(note.userNoteID)}/></td>
+
+            <td>
+                {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> : <AiOutlineHeart onClick={toggleFavorite}/>}
+            </td>
+
         <td>
             {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> : <AiOutlineHeart onClick={toggleFavorite}/>} 
         </td>
+
         </tr>
     );
 }

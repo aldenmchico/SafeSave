@@ -54,16 +54,55 @@ app.use(express.json());
 
 
 app.post('/decrypttext', async (req, res) => {
-    const { userNoteID, userHash } = req.body;
+    const {userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed,
+        userID, userNoteIV, userNoteTextIV, userHash, userLoginItemID, userLoginItemWebsite, userLoginItemPassword,
+    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userLoginItemUsername, websiteIV,
+        usernameIV, passwordIV, authTag, favorited} = req.body
 
-    try {
-
-        // Perform the decryption with the hexadecimal IV
-        const result = await dataDecryptionModel.getDecryptedData(userNoteID, userHash);
+    if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
+    && userLoginItemDateAccessed && websiteIV){
+        const result = await dataDecryptionModel.getDecryptedData({
+            userLoginItemID: userLoginItemID,
+            userLoginItemWebsite: userLoginItemWebsite,
+            userLoginItemUsername: userLoginItemUsername,
+            userLoginItemPassword: userLoginItemPassword,
+            userLoginItemDateCreated: userLoginItemDateCreated,
+            userLoginItemDateUpdated: userLoginItemDateUpdated,
+            userLoginItemDateAccessed: userLoginItemDateAccessed,
+            userHash: userHash,
+            websiteIV: websiteIV,
+            usernameIV: usernameIV,
+            passwordIV: passwordIV,
+            authTag: authTag,
+            favorited: favorited
+        });
         res.status(201).json(result);
-    } catch (error) {
-        console.error('Decryption failed:', error);
-        res.status(400).json({ error: error.message });
+    }
+
+    else
+    {
+        try {
+
+            // Perform the decryption with the hexadecimal IV
+            const result = await dataDecryptionModel.getDecryptedData({
+                userNoteID: userNoteID,
+                userNoteTitle: userNoteTitle,
+                userNoteText: userNoteText,
+                userNoteCreated: userNoteCreated,
+                userNoteUpdated: userNoteUpdated,
+                userNoteAccessed: userNoteAccessed,
+                userID: userID,
+                userNoteIV: userNoteIV,
+                userNoteTextIV: userNoteTextIV,
+                userHash: userHash,
+                authTag: authTag,
+                favorited: favorited
+            });
+            res.status(201).json(result);
+        } catch (error) {
+            console.error('Decryption failed:', error);
+            res.status(400).json({error: error.message});
+        }
     }
 });
 

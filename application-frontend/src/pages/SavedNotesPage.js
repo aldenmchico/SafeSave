@@ -49,7 +49,7 @@ function SavedNotesPage({setNote}) {
         <div>
             <h1>Your Saved Notes</h1>
             <p>Below is the list of your saved notes. Click on any item to view or edit details.</p>
-            
+
             <div className="note-list">
                 <SavedNoteList
                     notes={savedNotes}
@@ -57,7 +57,7 @@ function SavedNotesPage({setNote}) {
                     deleteNote = {deleteNoteRow}
                 />
             </div>
-            
+
             <Link to="/createsavednote">Add New Note</Link>
         </div>
     );

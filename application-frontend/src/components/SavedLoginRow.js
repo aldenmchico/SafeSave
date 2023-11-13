@@ -29,6 +29,7 @@ function SavedLoginRow({loginItem, editLoginItem, deleteLoginItem}) {
 
     return (
         <tr>
+
         <td>{loginItem.userLoginItemWebsite}</td>
         <td>{loginItem.userLoginItemUsername}</td>
         <td>{loginItem.userLoginItemPassword}</td>

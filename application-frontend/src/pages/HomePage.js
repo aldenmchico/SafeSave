@@ -56,16 +56,16 @@ function HomePage({setLoginItem}) {
     }
 
     const favoriteLoginRow = async login => {
-        
     }
 
     return (
         <div>
-        <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
-        <p>Your secure vault for online credentials and notes.</p>
-        <div className="content-section">
-            <h2>Your Saved Logins</h2>
+            <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
+            <p>Your secure vault for online credentials and notes.</p>
+            <div className="content-section">
+                <h2>Your Saved Logins</h2>
                 <div className="login-item-list">
+
                 <SavedLoginList
                     loginItems={savedLogins}
                     editLoginItem={editLoginRow}
@@ -77,12 +77,12 @@ function HomePage({setLoginItem}) {
             </div>
 
             <div className="content-section">
-            <h2>Quick Summary</h2>
+                <h2>Quick Summary</h2>
                 <p>You have {savedLogins.length} saved logins and {savedNotes.length} saved notes.</p>
             </div>
 
             <section className="content-section">
-            <h2>Why Use SafeSave?</h2>
+                <h2>Why Use SafeSave?</h2>
                 <p>With SafeSave, you can securely store your passwords and ensure they're always at your fingertips. Never forget a password again!</p>
             </section>
         </div>
