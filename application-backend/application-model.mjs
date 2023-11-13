@@ -33,21 +33,16 @@ const createUser = function (reqBody, callback) {
 // POST UserLoginItems Table Model Functions  *****************************************
 const createUserLoginItem = function (reqBody, callback) {
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    var day = currentDate.getDate().toString().padStart(2, '0');
-    var formattedDate = year + '-' + month + '-' + day;
 
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
 
     let responseData;
-    var userLoginWebsite = reqBody.website;
-    var userLoginUsername = reqBody.username;
-    var userLoginPassword = reqBody.password;
-    var userHash = "pass1";
+    let userLoginWebsite = reqBody.website;
+    let userLoginUsername = reqBody.username;
+    let userLoginPassword = reqBody.password;
+    let userHash = "pass1";
 
 
     fetch('https://127.0.0.1:8002/ciphertext', {
@@ -338,25 +333,81 @@ const patchLoginItem = function (reqBody, callback) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
-        let q = '';
-        // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
-        // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        if (reqBody.website !== undefined) q = `UPDATE UserLoginItems SET userLoginItemWebsite = "${reqBody.website}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        if (reqBody.username !== undefined) q += `UPDATE UserLoginItems SET userLoginItemUsername = "${reqBody.username}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        if (reqBody.password !== undefined) q += `UPDATE UserLoginItems SET userLoginItemPassword = "${reqBody.password}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateUpdated = "${reqBody.dateUpdated}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateAccessed = "${reqBody.dateAccessed}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        if (q === '') callback({ "code": "NO_CHANGE" }, null)
-        else {
-            con.query(q, (err, result) => {
-                if (err) {
-                    console.log(err);
-                    callback(err, null);
+
+        const agent = new https.Agent({
+            rejectUnauthorized: false
+        });
+
+        let responseData;
+        let userLoginWebsite = reqBody.website;
+        let userLoginUsername = reqBody.username;
+        let userLoginPassword = reqBody.password;
+        var userHash = "pass1";
+
+        fetch('https://127.0.0.1:8002/ciphertext', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userLoginWebsite,
+                userLoginUsername,
+                userLoginPassword,
+                userHash
+            }),
+            agent, // to get rid of self-signed errors on SSL cert
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                else callback(null, result);
-            });
+                return response.json();
+            })
+            .then(data => {
+                responseData = data;
+                console.log("data is", data);
+
+                //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
+                let q = `UPDATE UserLoginItems SET`;
+
+                if (reqBody.website !== undefined) {
+                    q += ` userLoginItemWebsite = "${responseData.encryptedWebsite}",`;
+                }
+
+                if(reqBody.password !== undefined) {
+                    q += ` userLoginItemPassword = "${responseData.encryptedPassword}",`;
+                }
+
+                if(reqBody.username !== undefined){
+                    q += ` userLoginItemUsername = "${responseData.encryptedUsername}",`;
+                }
+
+                q += ` userLoginItemDateUpdated = "${formattedDate}",`;
+                q += ` userLoginItemDateAccessed = "${formattedDate}",`;
+
+                q += ` websiteIV = "${responseData.websiteIV}",`;
+                q += ` usernameIV = "${responseData.usernameIV}",`;
+                q += ` passwordIV = "${responseData.passwordIV}",`;
+                q += ` authTag = "${responseData.authTag}"`;
+
+                q += ` WHERE userLoginItemID = ${reqBody.loginItemID}`;
+
+                if (q === '') callback({ "code": "NO_CHANGE" }, null);
+
+
+                else {
+                    con.query(q, (err, result) => {
+                        if (err) callback(err, null);
+                        else callback(null, result);
+                    })
+                }
+
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+                callback(error, null);
+            })
         }
-    }
 }
 
 const patchLoginItemFavorite = function(reqBody, callback) {
