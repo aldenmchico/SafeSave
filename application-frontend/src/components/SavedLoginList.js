@@ -1,7 +1,10 @@
 import React from 'react';
 import SavedLoginRow from './SavedLoginRow';
 
-function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem}) {    return (
+
+
+function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem}) {
+    return (
         <div className="wrapper">
         <table>
             <thead>

@@ -52,10 +52,13 @@ function EditSavedLoginPage({loginItem}) {
             <form onSubmit={handleSaveLogin}>
                 <label>
                     Website/Service:
-                    <input
-                        type="txt"
-                        value={website}
-                        onChange={e => setWebsite(e.target.value)}
+
+
+                    <input 
+                        type="txt" 
+                        value={website} 
+                        onChange={e => setWebsite(e.target.value)} 
+
                         placeholder="Website or Service name"
                         required
                     />
@@ -63,10 +66,11 @@ function EditSavedLoginPage({loginItem}) {
                 <br/>
                 <label>
                     Username:
-                    <input
-                        type="txt"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
+
+                    <input 
+                        type="txt" 
+                        value={username} 
+                        onChange={e => setUsername(e.target.value)} 
                         placeholder="Enter username"
                         required
                     />
@@ -74,10 +78,11 @@ function EditSavedLoginPage({loginItem}) {
                 <br/>
                 <label>
                     Password:
-                    <input
-                        type="pwd"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
+
+                    <input 
+                        type="pwd" 
+                        value={password} 
+                        onChange={e => setPassword(e.target.value)} 
                         placeholder="Enter password"
                         required
                     />
@@ -89,4 +94,6 @@ function EditSavedLoginPage({loginItem}) {
     );
 }
 
+
 export default EditSavedLoginPage;
+

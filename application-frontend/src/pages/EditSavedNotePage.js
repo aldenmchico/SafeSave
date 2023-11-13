@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,10 +49,11 @@ function EditSavedNotePage({note}) {
             <form onSubmit={handleNoteCreation}>
                 <label>
                     Title:
-                    <input
-                        type="txt"
-                        value={title}
-                        onChange={e => setTitle(e.target.value)}
+
+                    <input 
+                        type="txt" 
+                        value={title} 
+                        onChange={e => setTitle(e.target.value)} 
                         placeholder="Note title"
                         required
                     />
@@ -61,9 +61,9 @@ function EditSavedNotePage({note}) {
                 <br/>
                 <label>
                     Content:
-                    <textarea
-                        value={content}
-                        onChange={e => setContent(e.target.value)}
+                    <textarea 
+                        value={content} 
+                        onChange={e => setContent(e.target.value)} 
                         placeholder="Write your note here..."
                         required
                     />
@@ -74,5 +74,6 @@ function EditSavedNotePage({note}) {
         </div>
     );
 }
+
 
 export default EditSavedNotePage;

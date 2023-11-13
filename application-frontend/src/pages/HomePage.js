@@ -56,7 +56,6 @@ function HomePage({setLoginItem}) {
     }
 
     const favoriteLoginRow = async login => {
-
     }
 
     return (
@@ -66,12 +65,13 @@ function HomePage({setLoginItem}) {
             <div className="content-section">
                 <h2>Your Saved Logins</h2>
                 <div className="login-item-list">
-                    <SavedLoginList
-                        loginItems={savedLogins}
-                        editLoginItem={editLoginRow}
-                        deleteLoginItem = {deleteLoginRow}
-                        favoriteLoginItem = {favoriteLoginRow}
-                    />
+
+                <SavedLoginList
+                    loginItems={savedLogins}
+                    editLoginItem={editLoginRow}
+                    deleteLoginItem = {deleteLoginRow}
+                    favoriteLoginItem = {favoriteLoginRow}
+                />
                 </div>
                 <Link to="/createsavedlogin">Add New Login</Link>
             </div>

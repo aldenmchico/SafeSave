@@ -318,8 +318,6 @@ loginItemRouter.patch('/favorite', (req, res) => {
 });
 
 
-
-
 notesRouter.patch('/', (req, res) => {
     appModel.patchNote(req.body, (err, result) => {
         if (err !== null) {
@@ -374,7 +372,7 @@ loginItemRouter.delete('/:loginItemId', (req, res) => {
     appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.affectedRows === 0) res.status(404).send({ "error": "No login items found for specified user ID with given login item ID" });
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No login items with given login item ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');

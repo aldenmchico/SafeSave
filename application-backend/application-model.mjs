@@ -334,6 +334,7 @@ const patchLoginItem = function (reqBody, callback) {
     }
     else {
 
+
         const agent = new https.Agent({
             rejectUnauthorized: false
         });
@@ -428,11 +429,14 @@ const patchLoginItemFavorite = function(reqBody, callback) {
 
 
 
+
+
 const patchNote = function (reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
+
 
         let noteTitle = reqBody.title;
         let noteText = reqBody.text;
@@ -503,6 +507,22 @@ const patchNote = function (reqBody, callback) {
                 callback(error, null);
             })
 
+    }
+}
+
+const patchNoteFavorite = function(reqBody, callback) {
+    if (reqBody.noteID === undefined) {
+        callback({ "code": "NO_ID" }, null);
+    }
+    else {
+        let q = `UPDATE UserNotes SET favorited = "${reqBody.favorite}" WHERE userNoteID = ${reqBody.noteID}; `;
+        con.query(q, (err, result) => {
+            if (err) {
+                console.log(err);
+                callback(err, null);
+            }
+            else callback(null, result);
+        });
     }
 }
 
