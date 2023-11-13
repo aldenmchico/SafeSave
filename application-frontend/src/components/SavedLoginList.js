@@ -1,8 +1,7 @@
 import React from 'react';
 import SavedLoginRow from './SavedLoginRow';
 
-function SavedLoginList({loginItems, editLoginItem, deleteLoginItem}) {
-    return (
+function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem}) {    return (
         <div className="wrapper">
         <table>
             <thead>
@@ -22,6 +21,7 @@ function SavedLoginList({loginItems, editLoginItem, deleteLoginItem}) {
                     key={i}
                     editLoginItem={editLoginItem}
                     deleteLoginItem={deleteLoginItem}
+                    favoriteLoginItem={favoriteLoginItem}
                 />)}
             </tbody>
         </table>

@@ -303,11 +303,55 @@ loginItemRouter.patch('/', (req, res) => {
     })
 });
 
+loginItemRouter.patch('/favorite', (req, res) => {
+    appModel.patchLoginItemFavorite(req.body, (err, result) => {
+        if (err !== null) {
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        }
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).end();
+        }
+    })
+});
+
+loginItemRouter.patch('/favorite', (req, res) => {
+    appModel.patchLoginItemFavorite(req.body, (err, result) => {
+        if (err !== null) {
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        }
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).end();
+        }
+    })
+});
+
+
+
 notesRouter.patch('/', (req, res) => {
     appModel.patchNote(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        }
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).end();
+        }
+    })
+});
+
+notesRouter.patch('/favorite', (req, res) => {
+    appModel.patchNoteFavorite(req.body, (err, result) => {
+        if (err !== null) {
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
@@ -339,8 +383,8 @@ userRouter.delete('/:userId', (req, res) => {
     })
 });
 
-loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req, res) => {
-    appModel.deleteUserLoginItem(req.params.userId, req.params.loginItemId, (err, result) => {
+loginItemRouter.delete('/:loginItemId', (req, res) => {
+    appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No login items found for specified user ID with given login item ID" });
@@ -354,8 +398,8 @@ loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req, res) => 
 });
 
 
-notesRouter.delete('/users/:userId/notes/:noteId', (req, res) => {
-    appModel.deleteNote(req.params.userId, req.params.noteId, (err, result) => {
+notesRouter.delete('/:noteId', (req, res) => {
+    appModel.deleteNote(req.params.noteId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No notes found for specified user ID with given note ID" });

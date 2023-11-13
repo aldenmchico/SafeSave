@@ -347,18 +347,18 @@ const patchUser = function (reqBody, callback) {
 }
 
 const patchLoginItem = function (reqBody, callback) {
-    if (reqBody.loginItemID === undefined || reqBody.userID === undefined) {
+    if (reqBody.loginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
         let q = '';
         // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
         // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        if (reqBody.website !== undefined) q = `UPDATE UserLoginItems SET userLoginItemWebsite = "${reqBody.website}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.username !== undefined) q += `UPDATE UserLoginItems SET userLoginItemUsername = "${reqBody.username}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.password !== undefined) q += `UPDATE UserLoginItems SET userLoginItemPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateUpdated = "${reqBody.dateUpdated}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateAccessed = "${reqBody.dateAccessed}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.website !== undefined) q = `UPDATE UserLoginItems SET userLoginItemWebsite = "${reqBody.website}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
+        if (reqBody.username !== undefined) q += `UPDATE UserLoginItems SET userLoginItemUsername = "${reqBody.username}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
+        if (reqBody.password !== undefined) q += `UPDATE UserLoginItems SET userLoginItemPassword = "${reqBody.password}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
+        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateUpdated = "${reqBody.dateUpdated}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
+        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserLoginItems SET userLoginItemDateAccessed = "${reqBody.dateAccessed}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {
             con.query(q, (err, result) => {
@@ -372,18 +372,36 @@ const patchLoginItem = function (reqBody, callback) {
     }
 }
 
+const patchLoginItemFavorite = function(reqBody, callback) {
+    if (reqBody.loginItemID === undefined) {
+        callback({ "code": "NO_ID" }, null);
+    }
+    else {
+        let q = `UPDATE UserLoginItems SET favorited = "${reqBody.favorite}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
+        con.query(q, (err, result) => {
+            if (err) {
+                console.log(err);
+                callback(err, null);
+            }
+            else callback(null, result);
+        });
+    }
+}
+
+
+
 const patchNote = function (reqBody, callback) {
-    if (reqBody.userNoteID === undefined || reqBody.userID === undefined) {
+    if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
         let q = '';
         // UPDATE: Need to call encryption microservice here to encrypt data before saving to DB.
         // UPDATE: Need to update the SQL query to include the IV values when saving to DB.
-        if (reqBody.title !== undefined) q = `UPDATE UserNotes SET userNoteTitle = "${reqBody.title}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.text !== undefined) q += `UPDATE UserNotes SET userNoteText = "${reqBody.text}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserNotes SET userNoteUpdated = "${reqBody.dateUpdated}" WHERE userID = ${reqBody.userID}; `;
-        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserNotes SET userNoteAccessed = "${reqBody.dateAccessed}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.title !== undefined) q = `UPDATE UserNotes SET userNoteTitle = "${reqBody.title}" WHERE userNoteID = ${reqBody.noteID}; `;
+        if (reqBody.text !== undefined) q += `UPDATE UserNotes SET userNoteText = "${reqBody.text}" WHERE userNoteID = ${reqBody.noteID}; `;
+        if (reqBody.dateUpdated !== undefined) q += `UPDATE UserNotes SET userNoteUpdated = "${reqBody.dateUpdated}" WHERE userNoteID = ${reqBody.noteID}; `;
+        if (reqBody.dateAccessed !== undefined) q += `UPDATE UserNotes SET userNoteAccessed = "${reqBody.dateAccessed}" WHERE userNoteID = ${reqBody.noteID}; `;
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {
             con.query(q, (err, result) => {
@@ -396,6 +414,24 @@ const patchNote = function (reqBody, callback) {
         }
     }
 }
+
+const patchNoteFavorite = function(reqBody, callback) {
+    if (reqBody.noteID === undefined) {
+        callback({ "code": "NO_ID" }, null);
+    }
+    else {
+        let q = `UPDATE UserNotes SET favorited = "${reqBody.favorite}" WHERE userNoteID = ${reqBody.noteID}; `;
+        con.query(q, (err, result) => {
+            if (err) {
+                console.log(err);
+                callback(err, null);
+            }
+            else callback(null, result);
+        });
+    }
+}
+
+
 
 
 // DELETE (DELETE) MODEL FUNCTIONS  *****************************************
@@ -408,16 +444,16 @@ const deleteUser = function (userId, callback) {
     });
 }
 
-const deleteUserLoginItem = function (userId, userLoginItemId, callback) {
-    let q = `DELETE FROM UserLoginItems WHERE userID = ${userId} AND userLoginItemID = ${userLoginItemId}`;
+const deleteUserLoginItem = function (userLoginItemId, callback) {
+    let q = `DELETE FROM UserLoginItems WHERE userLoginItemID = ${userLoginItemId}`;
     con.query(q, (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
 }
 
-const deleteNote = function (userId, userNoteId, callback) {
-    let q = `DELETE FROM UserNotes WHERE userID = ${userId} AND userNoteID = ${userNoteId}`;
+const deleteNote = function (userNoteId, callback) {
+    let q = `DELETE FROM UserNotes WHERE userNoteID = ${userNoteId}`;
     con.query(q, (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
@@ -431,6 +467,6 @@ export {
     getAllUsers, getUserByUsername, getUserByEmail,
     getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite,
     getAllUserNotes, getSingleUserNotes, getUserNoteByTitle,
-    patchUser, patchLoginItem, patchNote,
+    patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
     deleteNote, deleteUserLoginItem, deleteUser
 };

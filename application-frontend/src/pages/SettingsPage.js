@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 function SettingsPage() {
+    const [userID, setUserID] = useState(1);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');
 
-    const toggleTwoFactorAuthentication = () => {
+    const toggleTwoFactorAuthentication = async () => {
         setTwoFactorEnabled(prevState => !prevState);
         // Account update logic
     };
@@ -29,8 +30,8 @@ function SettingsPage() {
                 <h2>Security</h2>
                 <div>
                     <label>
-                        <input 
-                            type="checkbox" 
+                        <input
+                            type="checkbox"
                             checked={twoFactorEnabled}
                             onChange={toggleTwoFactorAuthentication}
                         />

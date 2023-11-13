@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 
 
-function HomePage({setLogin}) {
+function HomePage({setLoginItem}) {
 
     // Use state variable exercises to bring in the data
     const [savedLogins, setSavedLogins] = useState([]);
@@ -39,7 +39,7 @@ function HomePage({setLogin}) {
     }, []);
 
     const deleteLoginRow = async _id => {
-        const response = await fetch(`/logins/${_id}`, { method: 'DELETE' });
+        const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
         if (response.status === 204) {
             loadSavedLogins();
             alert('Deleted Login Entry');
@@ -49,35 +49,40 @@ function HomePage({setLogin}) {
     }
 
     // UPDATE a row
-    const history = useNavigate();
+    const navigate = useNavigate();
     const editLoginRow = async login => {
-        setLogin(login);
-        history.push("/edit-login");
+        setLoginItem(login);
+        navigate("/edit-login");
+    }
+
+    const favoriteLoginRow = async login => {
+
     }
 
     return (
         <div>
-        <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
-        <p>Your secure vault for online credentials and notes.</p>
-        <div className="content-section">
-            <h2>Your Saved Logins</h2>
+            <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
+            <p>Your secure vault for online credentials and notes.</p>
+            <div className="content-section">
+                <h2>Your Saved Logins</h2>
                 <div className="login-item-list">
-                <SavedLoginList
-                    loginItems={savedLogins}
-                    editLoginItem={editLoginRow}
-                    deleteLoginItem = {deleteLoginRow}
-                />
+                    <SavedLoginList
+                        loginItems={savedLogins}
+                        editLoginItem={editLoginRow}
+                        deleteLoginItem = {deleteLoginRow}
+                        favoriteLoginItem = {favoriteLoginRow}
+                    />
                 </div>
                 <Link to="/createsavedlogin">Add New Login</Link>
             </div>
 
             <div className="content-section">
-            <h2>Quick Summary</h2>
+                <h2>Quick Summary</h2>
                 <p>You have {savedLogins.length} saved logins and {savedNotes.length} saved notes.</p>
             </div>
 
             <section className="content-section">
-            <h2>Why Use SafeSave?</h2>
+                <h2>Why Use SafeSave?</h2>
                 <p>With SafeSave, you can securely store your passwords and ensure they're always at your fingertips. Never forget a password again!</p>
             </section>
         </div>
