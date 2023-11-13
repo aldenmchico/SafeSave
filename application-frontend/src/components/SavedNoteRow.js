@@ -38,11 +38,6 @@ function SavedNoteRow({note, editNote, deleteNote}) {
             <td>
                 {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> : <AiOutlineHeart onClick={toggleFavorite}/>}
             </td>
-
-        <td>
-            {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> : <AiOutlineHeart onClick={toggleFavorite}/>} 
-        </td>
-
         </tr>
     );
 }
