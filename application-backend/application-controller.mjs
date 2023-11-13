@@ -5,36 +5,6 @@ import * as appModel from './application-model.mjs';
 const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
-import path from 'path';
-
-import https from 'https';
-
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
-
-let privateKey;
-let certificate;
-
-try {
-    privateKey = readFileSync(privateKeyPath, 'utf8');
-    certificate = readFileSync(certificatePath, 'utf8');
-} catch (error) {
-    console.error('Error reading SSL certificate files:', error);
-    process.exit(1);
-}
-
-const passphrase = process.env.SSL_PASSPHRASE;
-const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
-
-const httpsServer = https.createServer(creds, app);
-
 
 const userRouter = express.Router();
 const loginItemRouter = express.Router();
@@ -398,17 +368,7 @@ notesRouter.delete('/:noteId', (req, res) => {
 
 /*
     LISTENER
-
-
 */
-
-//HTTPS
-
-
-// app.listen(PORT, function () {
-//     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
-// });
-
-httpsServer.listen(PORT, () => {
-    console.log(`Express server started listening on port ${PORT}...`);
+app.listen(PORT, function () {
+    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });

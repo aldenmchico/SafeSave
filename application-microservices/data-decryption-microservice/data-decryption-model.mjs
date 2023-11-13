@@ -99,125 +99,70 @@ const getNoteAccessed = async (noteAccessedQuery) => {
     });
 };
 
-const getDecryptedData = async (options) => {
-
-    const {
-        userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
-        userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-        userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, websiteIV, usernameIV, passwordIV,
-        authTag
-    } = options;
-
-
-    if(userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated
-    && userLoginItemDateUpdated && userLoginItemDateAccessed && websiteIV && userHash){
-        try {
-            const userWebsiteIVBuffer = Buffer.from(websiteIV, 'hex');
-            const userKey = crypto.scryptSync(userHash, 'salt', 32);
-            const userUsernameIVBuffer = Buffer.from(usernameIV, 'hex');
-            const userPasswordIVBuffer = Buffer.from(passwordIV, 'hex');
-
-
-            const decipherWebsite = crypto.createDecipheriv('aes-256-cbc', userKey, userWebsiteIVBuffer)
-            const decipherUsername = crypto.createDecipheriv('aes-256-cbc', userKey, userUsernameIVBuffer)
-            const decipherPassword = crypto.createDecipheriv('aes-256-cbc', userKey, userPasswordIVBuffer)
-
-            let decryptedWebsite = decipherWebsite.update(userLoginItemWebsite, 'hex', 'utf8');
-            decryptedWebsite += decipherWebsite.final('utf8');
-
-            let decryptedUsername = decipherUsername.update(userLoginItemUsername, 'hex', 'utf8');
-            decryptedUsername += decipherUsername.final('utf8');
-
-            let decryptedPassword = decipherPassword.update(userLoginItemPassword, 'hex', 'utf8');
-            decryptedPassword += decipherPassword.final('utf8');
-
-            const hmac = crypto.createHmac('sha256', userKey);
-            hmac.update(decryptedWebsite + decryptedUsername + decryptedPassword );
-            const reconstructedAuthTag = hmac.digest('hex');
-
-            if(authTag !== reconstructedAuthTag){
-                console.error("Something fishy is going on!");
-                return {
-                    userLoginItemID: userLoginItemID,
-                    userLoginItemWebsite: "DATA COMPROMISED!!!!",
-                    userLoginItemUsername: "DATA COMPROMISED!!!!",
-                    userLoginItemPassword: "DATA COMPROMISED!!!!",
-                    userLoginItemDateCreated: userLoginItemDateCreated,
-                    userLoginItemDateUpdated: userLoginItemDateUpdated,
-                    userLoginItemDateAccessed: userLoginItemDateAccessed,
-                    userID: userID,
-                }
-            }
-
-
-            return {
-                userLoginItemID: userLoginItemID,
-                userLoginItemWebsite: decryptedWebsite,
-                userLoginItemUsername: decryptedUsername,
-                userLoginItemPassword: decryptedPassword,
-                userLoginItemDateCreated: userLoginItemDateCreated,
-                userLoginItemDateUpdated: userLoginItemDateUpdated,
-                userLoginItemDateAccessed: userLoginItemDateAccessed,
-                userID: userID,
-            };
-
-        } catch (error){
-            console.log("decryption failed: ", error)
-            throw error;
+const getDecryptedData = async (userNoteID, userHash) => {
+    try {
+        if (!userNoteID || !userHash ) {
+            console.log("Checking to see if we received the userNote ID ", userNoteID, userHash)
+            throw new Error('Note ID and user hash are required');
         }
-    }
-    else if(userNoteTitle && userNoteText)
-    {
-        try {
+
+        const userNoteIDBuffer = Buffer.from(userNoteID, 'utf8')
+
+        //SQL queries
+        const noteIVQuery = `SELECT userNoteIV FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        const noteTitleQuery = `SELECT userNoteTitle FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        const noteTextQuery = `SELECT userNoteText FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        const userNoteCreatedQuery = `SELECT userNoteCreated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        const userNoteUpdatedQuery = `SELECT userNoteUpdated FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
+        const userNoteAccessedQuery = `SELECT userNoteAccessed FROM UserNotes where UserNoteID = '${userNoteIDBuffer}'`;
 
 
-            const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
-            const userNoteTextIVBuffer = Buffer.from(userNoteTextIV, 'hex');
+        const userNoteIV = await getUserNoteIV(noteIVQuery);
+        const userNoteTitle = await getNoteTitle(noteTitleQuery);
+        const userNoteText = await getNoteText(noteTextQuery);
+        const userNoteCreated = await getNoteCreated(userNoteCreatedQuery);
+        const userNoteUpdated = await getNoteUpdated(userNoteUpdatedQuery);
+        const userNoteAccessed = await getNoteAccessed(userNoteAccessedQuery);
 
-            const userKey = crypto.scryptSync(userHash, 'salt', 32);
+        const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
 
-            console.log(userKey)
+        const userKey = crypto.scryptSync(userHash, 'salt', 32);
 
-            const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-            const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteTextIVBuffer);
+        console.log(userKey)
 
-            let decryptedNoteTitle = decipherTitle.update(userNoteTitle, 'hex', 'utf8');
-            decryptedNoteTitle += decipherTitle.final('utf8');
+        const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
+        const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
+        const decipherCreated = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
+        const decipherUpdated = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
+        const decipherAccessed = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
 
-            let decryptedNoteText = decipherText.update(userNoteText, 'hex', 'utf8');
-            decryptedNoteText += decipherText.final('utf8');
+        let decryptedNoteTitle = decipherTitle.update(userNoteTitle, 'hex', 'utf8');
+        decryptedNoteTitle += decipherTitle.final('utf8');
 
-            const hmac = crypto.createHmac('sha256', userKey);
-            hmac.update(decryptedNoteText + decryptedNoteTitle);
-            const reconstructedAuthTag = hmac.digest('hex');
+        let decryptedNoteText = decipherText.update(userNoteText, 'hex', 'utf8');
+        decryptedNoteText += decipherText.final('utf8');
 
-            if(reconstructedAuthTag !== authTag){
-                console.log("Something fishy is going on!")
-                return {
-                    userNoteID: userNoteID,
-                    userNoteTitle: "DATA POTENTIALLY COMPROMISED",
-                    userNoteText: "DATA POTENTIALLY COMPROMISED",
-                    userNoteCreated: userNoteCreated,
-                    userNoteAccessed: userNoteAccessed,
-                    userNoteUpdated: userNoteUpdated,
-                    userID: userID
-                }
-            }
+        let decryptedNoteCreated = decipherCreated.update(userNoteCreated, 'hex', 'utf8');
+        decryptedNoteCreated += decipherCreated.final('utf8')
 
+        let decryptedNoteUpdated = decipherUpdated.update(userNoteUpdated, 'hex', 'utf8');
+        decryptedNoteUpdated += decipherUpdated.final('utf8');
 
-            return {
-                userNoteID: userNoteID,
-                userNoteTitle: decryptedNoteTitle,
-                userNoteText: decryptedNoteText,
-                userNoteCreated: userNoteCreated,
-                userNoteAccessed: userNoteAccessed,
-                userNoteUpdated: userNoteUpdated,
-                userID: userID
-            };
-        } catch (error) {
-            console.error('Decryption failed:', error);
-            throw error;
-        }
+        let decryptedNoteAccessed = decipherAccessed.update(userNoteAccessed, 'hex', 'utf8');
+        decryptedNoteAccessed += decipherAccessed.final('utf8')
+
+        console.log('Decrypted Data:', decryptedNoteTitle);
+
+        return {
+            decryptedNoteTitle: decryptedNoteTitle,
+            decryptedNoteText: decryptedNoteText,
+            decryptedNoteCreated: decryptedNoteCreated,
+            decryptedNoteUpdated: decryptedNoteUpdated,
+            decryptedNoteAccessed: decryptedNoteAccessed
+        };
+    } catch (error) {
+        console.error('Decryption failed:', error);
+        throw error;
     }
 };
 

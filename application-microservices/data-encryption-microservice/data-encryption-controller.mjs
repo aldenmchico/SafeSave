@@ -54,61 +54,49 @@ app.post('/ciphertext', async (req, res) => {
 
     try {
 
-        if (req.body.noteTitle && req.body.noteText && req.body.noteCreatedDate && req.body.noteUpdatedDate && req.body.noteAccessedDate
-        && req.body.userID) {
-            const encryptedData = await dataEncryptionModel.getEncryptedData(
-                {
-                    noteTitle: noteTitle,
-                    noteText: noteText,
-                    noteCreatedDate: noteCreatedDate,
-                    noteUpdatedDate: noteUpdatedDate,
-                    noteAccessedDate: noteAccessedDate,
-                    userID: userID,
-                    userHash: userHash,
-                }
-            );
+        const encryptedData = await dataEncryptionModel.getEncryptedData(
+            noteTitle,
+            noteText,
+            noteCreatedDate,
+            noteUpdatedDate,
+            noteAccessedDate,
+            userID,
+            userHash,
+        );
 
-            const response = {
-                encryptedTitleData: encryptedData.encryptedTitleData,
-                encryptedNoteData: encryptedData.encryptedNoteData,
-                encryptednoteCreatedDate: encryptedData.noteCreatedDate,
-                encryptednoteAccessedDate: encryptedData.noteAccessedDate,
-                encryptednoteUpdatedDate: encryptedData.noteUpdatedDate,
-                iv: encryptedData.iv,
-                userNoteTextIV: encryptedData.userNoteTextIV,
-                authTag: encryptedData.authTag
-            };
-            res.status(201).json(response);
-        }
 
-        else if (req.body.userLoginWebsite && req.body.userLoginUsername && req.body.userLoginPassword){
+        const query = `
+            INSERT INTO UserNotes
+            (userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
 
-            const encryptedData = await dataEncryptionModel.getEncryptedData(
-                {
-                    website: req.body.userLoginWebsite,
-                    username: req.body.userLoginUsername,
-                    password: req.body.userLoginPassword,
-                    userHash: req.body.userHash
-                }
-            );
-
-            const response = {
-                encryptedWebsite: encryptedData.encryptedWebsiteData,
-                encryptedUsername: encryptedData.encryptedUsernameData,
-                encryptedPassword: encryptedData.encryptedPasswordData,
-                websiteIV: encryptedData.websiteIV,
-                usernameIV: encryptedData.usernameIV,
-                passwordIV: encryptedData.passwordIV,
-                authTag: encryptedData.authTag
-            };
-
-            res.status(201).json(response);
-        }
-        else{
-            console.log("Invalid query");
-            res.status(400).json({error: error.message});
-        }
-
+        db.pool.query(query, [
+            encryptedData.encryptedTitleData,
+            encryptedData.encryptedNoteData,
+            encryptedData.encryptednoteCreatedDate,
+            encryptedData.encryptednoteUpdatedDate,
+            encryptedData.encryptednoteAccessedDate,
+            encryptedData.userID,
+            encryptedData.iv
+        ], (error, result) => {
+            if (error) {
+                res.status(400).json({ error: error.message });
+            } else {
+                const response = {
+                    encryptedTitleData: encryptedData.encryptedTitleData,
+                    encryptedNoteData: encryptedData.encryptedNoteData,
+                    encryptednoteCreatedDate: encryptedData.encryptednoteCreatedDate,
+                    encryptednoteAccessedDate: encryptedData.encryptednoteAccessedDate,
+                    encryptednoteUpdatedDate: encryptedData.encryptednoteUpdatedDate,
+                    iv: encryptedData.iv,
+                    key: encryptedData.key.toString('hex')
+                };
+                res.status(201).json(response);
+                // const htmlFilePath = path.resolve(__dirname, 'public', 'index.html');
+                // res.sendFile(htmlFilePath);
+            }
+        });
 
 
     } catch (error) {
