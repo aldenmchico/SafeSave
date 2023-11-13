@@ -26,20 +26,21 @@ function SavedLoginRow({loginItem, editLoginItem, deleteLoginItem}) {
             body: JSON.stringify(postData)
         });
     }
+
     return (
         <tr>
-        <td>{loginItem.userLoginItemWebsite}</td>
-        <td>{loginItem.userLoginItemUsername}</td>
-        <td>{loginItem.userLoginItemPassword}</td>
-        <td>{loginItem.userLoginItemDateCreated.substring(0,10)}</td>
-        <td>{loginItem.userLoginItemDateUpdated.substring(0,10)}</td>
-        <td>{loginItem.userLoginItemDateAccessed.substring(0,10)}</td>
-        <td><AiFillEdit onClick={() => editLoginItem(loginItem)}/></td>
-        <td><AiFillDelete onClick={() => deleteLoginItem(loginItem.userLoginItemID)}/></td>
-        <td>
-            {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> :
-                <AiOutlineHeart onClick={toggleFavorite}/>}
-        </td>
+            <td>{loginItem.userLoginItemWebsite}</td>
+            <td>{loginItem.userLoginItemUsername}</td>
+            <td>{loginItem.userLoginItemPassword}</td>
+            <td>{loginItem.userLoginItemDateCreated.substring(0,10)}</td>
+            <td>{loginItem.userLoginItemDateUpdated.substring(0,10)}</td>
+            <td>{loginItem.userLoginItemDateAccessed.substring(0,10)}</td>
+            <td><AiFillEdit onClick={() => editLoginItem(loginItem)}/></td>
+            <td><AiFillDelete onClick={() => deleteLoginItem(loginItem.userLoginItemID)}/></td>
+            <td>
+                {isFavorite ? <AiFillHeart onClick={toggleFavorite}/> :
+                    <AiOutlineHeart onClick={toggleFavorite}/>}
+            </td>
         </tr>
     );
 }

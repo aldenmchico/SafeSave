@@ -317,21 +317,6 @@ loginItemRouter.patch('/favorite', (req, res) => {
     })
 });
 
-loginItemRouter.patch('/favorite', (req, res) => {
-    appModel.patchLoginItemFavorite(req.body, (err, result) => {
-        if (err !== null) {
-            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
-            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        }
-        else {
-            console.log(result);
-            res.set('Content-Type', 'application/json');
-            res.status(200).end();
-        }
-    })
-});
-
-
 
 notesRouter.patch('/', (req, res) => {
     appModel.patchNote(req.body, (err, result) => {
