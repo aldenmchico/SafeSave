@@ -40,7 +40,7 @@ function CreateSavedNotePage() {
         };
 
         try {
-            const response = await fetch('http://localhost:8008/notes', {
+            const response = await fetch('/notes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

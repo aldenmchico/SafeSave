@@ -44,7 +44,7 @@ function CreateSavedLoginPage() {
         };
 
         try {
-            const response = await fetch('http://localhost:8008/login_items', {
+            const response = await fetch('/login_items', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginItemData)
