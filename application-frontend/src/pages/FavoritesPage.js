@@ -9,28 +9,28 @@ function FavoritesPage() {
 
     // Load favorite logins from the backend
     const loadFavoriteLogins = async () => {
-        const response = await fetch('http://localhost:8008/favorites/logins');
+        const response = await fetch('/favorites/logins');
         const logins = await response.json();
         setFavoriteLogins(logins);
     }
 
     // Load favorite notes from the backend
     const loadFavoriteNotes = async () => {
-        const response = await fetch('http://localhost:8008/favorites/notes');
+        const response = await fetch('/favorites/notes');
         const notesData = await response.json();
         setFavoriteNotes(notesData);
     }
 
     // Load favorite payments from the backend
     const loadFavoritePayments = async () => {
-        const response = await fetch('http://localhost:8008/favorites/payments');
+        const response = await fetch('/favorites/payments');
         const paymentData = await response.json();
         setFavoritePayments(paymentData);
     }
 
     // Load favorite IDs from the backend
     const loadFavoriteIDs = async () => {
-        const response = await fetch('http://localhost:8008/favorites/ids');
+        const response = await fetch('/favorites/ids');
         const idsData = await response.json();
         setFavoriteIDs(idsData);
     }
