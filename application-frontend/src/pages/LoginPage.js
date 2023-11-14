@@ -23,13 +23,18 @@ function LoginPage() {
         }
 
         try {
+            //  login authentication, JWT generation and stored in client cookie 
             const response = await fetch('http://localhost:8008/login/validation', {
                 method: 'POST',
+                credentials: 'include', // Include credentials in the request
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(credentials),
             });
 
             if (response.ok) {
+                alert('Logged in successfully!');
+                // navigate('/');
+
                 const { userID: fetchedUserID } = await response.json(); // Get userID
                 setUserID(fetchedUserID); // Set the userID in state
                 setPassword(credentials.password); // Set the unencrypted password in state
@@ -67,8 +72,8 @@ function LoginPage() {
                     <input 
                         type="text" 
                         name="username"
-                        value={credentials.username} 
-                        onChange={handleInputChange} 
+                        value={credentials.username}
+                        onChange={handleInputChange}
                         placeholder="Enter your username"
                         required
                     />
@@ -78,8 +83,8 @@ function LoginPage() {
                     <input 
                         type={showPassword ? "text" : "password"} 
                         name="password"
-                        value={credentials.password} 
-                        onChange={handleInputChange} 
+                        value={credentials.password}
+                        onChange={handleInputChange}
                         placeholder="Enter your password"
                         required
                     />

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function TwoFactorAuthenticationPage() {
@@ -7,8 +7,77 @@ function TwoFactorAuthenticationPage() {
     const [successMsg, setSuccessMsg] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(false);
+    const [is2FAEnabled, setIs2FAEnabled] = useState(true); // New state variable
+    const [qrCode, setQRCode] = useState('');
+
     const navigate = useNavigate();
     const cooldownTimer = useRef(null);
+
+
+    // check if current User has 2FA enabled on mounting 
+    useEffect(() => {
+        const check2FAStatus = async () => {
+            const isEnabledAndNoSecret = await locateUserAndConfirm2FAEnabledAndNoSecret();
+            setIs2FAEnabled(isEnabledAndNoSecret); // Set the state based on the 2FA status
+
+            if (!isEnabledAndNoSecret) {
+                // If 2FA is not enabled, handle accordingly, e.g., navigate back or show a message.
+                setErrorMsg('Two-factor authentication is not enabled or you are already set up. Please check the Settings tab. Otherwise, please disable and enable 2-FA again.');
+                // navigate('/settings'); // Uncomment this line to navigate to the settings page.
+            }
+
+            // display the QR code here
+            generateAndDisplayQRCode();
+        };
+        check2FAStatus();
+    }, []); // The empty dependency array means this effect will run once when the component mounts.
+
+    const generateAndDisplayQRCode = async () => {
+        // Assume you have the necessary data like mfaSecret and username
+        const mfaSecret = 'M257554WD2K2MSK773XAXPIN3EQZA74A' // The secret generated for the user's 2FA
+        const username = 'port11' // The username for the authenticator
+        const twoFactorEnabled = 1
+
+        try {
+            const response = await fetch('http://localhost:8006/api/generate-mfa-qr-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include other headers as required, such as authentication tokens
+                },
+                body: JSON.stringify({ mfaEnabled: twoFactorEnabled, mfaSecret: mfaSecret, username: username }),
+            });
+
+            if (response.ok) {
+                const qrCodeImageBlob = await response.blob();
+                setQRCode(URL.createObjectURL(qrCodeImageBlob));
+            } else {
+                throw new Error('Failed to generate QR code');
+            }
+        } catch (error) {
+            console.error('Error generating QR code:', error);
+            setErrorMsg('An error occurred while generating the QR code for two-factor authentication.');
+        }
+    };
+
+    const locateUserAndConfirm2FAEnabledAndNoSecret = async () => {
+        const username = 'port11'
+        try {
+            const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+            if (!response.ok) {
+                throw new Error('Network response was not ok in twoFactorAuthenticationPage');
+            }
+            const data = await response.json();
+            console.log(`user data found in twoFactorAuthenticationPage: `, data);
+
+            const twoFactor = data[0].user2FAEnabled
+            const secret = data[0].userSecret
+            if (!twoFactor || secret) return false // if FA disabled or official Secret already exists 
+            return true
+        } catch (error) {
+            console.log('There was a problem with the fetch operation:', error.message);
+        }
+    }
 
     const handleResendCode = async () => {
         setIsLoading(true);
@@ -38,7 +107,7 @@ function TwoFactorAuthenticationPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        
+
         if (!/^[0-9]{6}$/.test(code)) {
             setErrorMsg('The 2FA code should be 6 digits. Please enter a valid code.');
             setIsLoading(false);
@@ -46,16 +115,26 @@ function TwoFactorAuthenticationPage() {
         }
 
         try {
-            const response = await fetch('/verify-2fa', {
+
+            const secret = 'M257554WD2K2MSK773XAXPIN3EQZA74A'
+            const userId = 87
+
+            console.log(`token is ${code}`)
+
+            const response = await fetch('http://localhost:8006/api/verify-2fa-setup-token', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include other headers as required, such as authentication tokens
+                },
+                body: JSON.stringify({ userId: userId, token: code, secret: secret }),
             });
 
             const responseData = await response.json();
-            
-            if (response.ok) {
-                navigate('/home');  // Navigate to home page
+            console.log(`responseData is`, responseData)
+
+            if (response.ok && responseData.verified) {
+                setErrorMsg('It worked!')
             } else {
                 setErrorMsg(responseData.message || 'Invalid 2FA code. Please try again.');
             }
@@ -70,24 +149,38 @@ function TwoFactorAuthenticationPage() {
     return (
         <div>
             <h1>Two Factor Authentication</h1>
-            <p>We've sent a 6-digit 2FA code to your email. Please enter it below to proceed. If you haven't received it, check your spam folder or click the resend button below.</p>
-            <form onSubmit={handleSubmit}>
-                <input 
-                    type="text" 
-                    maxLength="6"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Enter 2FA code" 
-                    required
-                />
-                {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
-                {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
-                <button type="submit" disabled={isLoading}>Verify</button>
-            </form>
-            <button onClick={handleResendCode} disabled={resendCooldown || isLoading}>
-                Resend Code
-            </button>
-            {isLoading && <p>Loading...</p>}
+            {!is2FAEnabled ? (
+                // If 2FA is not enabled, display only the error message.
+                <p style={{ color: 'red' }}>{errorMsg}</p>
+            ) : (
+                // If 2FA is enabled, display the form and other elements.
+                <>
+                    <p>We've sent a 6-digit 2FA code to your email. Please enter it below to proceed. If you haven't received it, check your spam folder or click the resend button below.</p>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            maxLength="6"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            placeholder="Enter 2FA code"
+                            required
+                        />
+                        {errorMsg && <p style={{ color: 'red' }}>{errorMsg}</p>}
+                        {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
+                        <button type="submit" disabled={isLoading}>Verify</button>
+                    </form>
+                    <button onClick={handleResendCode} disabled={resendCooldown || isLoading}>
+                        Resend Code
+                    </button>
+                    {qrCode && (
+                        <div>
+                            <p>Scan this QR code with your 2FA app:</p>
+                            <img src={qrCode} alt="2FA QR Code" />
+                        </div>
+                    )}
+                    {isLoading && <p>Loading...</p>}
+                </>
+            )}
         </div>
     );
 }

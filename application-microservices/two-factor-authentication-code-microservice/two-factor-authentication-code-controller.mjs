@@ -2,33 +2,66 @@ import 'dotenv/config';
 import express from 'express';
 import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
+import cors from 'cors';
+
+import { checkAuth } from '../middlewares/checkAuth.mjs';
+
+import cookieparser from 'cookie-parser';
 
 // Configure express server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const app = express();
 
+app.use(cookieparser());
 app.use(express.json());
 
-app.get('/api', (req, res) => {
+// Enable All CORS Requests from any origin and allow server to accept cookies from client
+app.use(cors({ origin: true, credentials: true }));
+
+app.get('/api', checkAuth, cors(), (req, res) => {
     /*
     Dummy /api endpoint 
     */
+
+    console.log(req.user);
+
     res.status(200).json({ message: 'Welcome to 2FA controller!' });
 })
 
-app.post('/api/2fa-registration', async (req, res) => {
+app.post('/api/2fa-registration', checkAuth, cors(), async (req, res) => {
     /*
     generates and stores a temporary secret given a userId
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
+    // grab user from stored Cookie
+    const { userUsername, userID } = req.user
 
-    // temporary solution to emulate a user
-    const { userId } = req.body;
+    /* req.user schema: {
+        userUsername,
+        userID,
+        user2FAEnabled
+        }
+    */
+
+    const { enableTwoFactor } = req.body
+
+    console.log(`enableTwoFactor is: ${enableTwoFactor}`);
+
+    // If the request is to disable 2FA
+    if (!enableTwoFactor) {
+        try {
+            const twoFADisabled = twoFACodeModel.disableTwoFactor(userID);
+            if (!twoFADisabled) {
+                return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userID ${userID}` });
+            }
+            return res.status(200).json({ message: `2FA was disabled for userId ${userID}` });
+        } catch (error) {
+            return res.status(500).json({ message: "Error in process of disabling 2FA." });
+        }
+    }
 
     try {
-        const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userId);
+        const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userID);
         if (!temp_secret) {
             return res.status(400).json({ message: 'Something went wrong trying to generate and store temp token' });
         }
@@ -41,21 +74,23 @@ app.post('/api/2fa-registration', async (req, res) => {
     }
 })
 
-app.post('/api/verify-2fa-setup-token', async (req, res) => {
+app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     /*
     Verifies temporary secret token.
 
     On success, overwrites 'temp_secret' --> 'secret'.
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
-    const { userId, token, secret } = req.body;
+    // grab user's ID from Cookie
+    const { userID } = req.user
+
+    // grab token / secret from client 
+    const { token, secret } = req.body;
 
     try {
 
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = twoFACodeModel.verifyTemporaryTOTP(userId, token, secret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, secret)
 
         if (verified) {
             return res.status(200).json({ verified: true });
@@ -82,7 +117,7 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     const { mfaEnabled, mfaSecret, username } = req.body;
 
     // For security, we no longer show the QR code if already verified
-    if (mfaEnabled) return res.status(404).json({ message: "mfa is already enabled " });
+    // if (mfaEnabled) return res.status(404).json({ message: "mfa is already enabled " });
 
     // Ensure that the mfaSecret is provided
     if (!mfaSecret) {
@@ -90,7 +125,7 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     }
 
     // qr code config 
-    const issuer = 'SafeSave';
+    const issuer = 'port11';
     const algorithm = 'SHA1';
     const digits = '6';
     const period = '30';
@@ -102,15 +137,14 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     return qrcode.toFileStream(res, configUri);
 });
 
-app.post('/api/verify-2fa-login-token', (req, res) => {
+app.post('/api/verify-2fa-login-token', checkAuth, (req, res) => {
     /*  
     Verifies the token received when user tries logging into app.
     Assumes 2FA is already set up and user has an account setup.
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
-    const { userId, token, secret, user2FAEnabled } = req.body;
+    const { token, secret } = req.body;
+    const { userID, user2FAEnabled } = req.user
 
     // check if 2FA is even enabled
     if (!user2FAEnabled) {
@@ -118,7 +152,7 @@ app.post('/api/verify-2fa-login-token', (req, res) => {
     }
 
     // Check for required fields
-    if (!userId || !token || !secret) {
+    if (!userID || !token || !secret) {
         return res.status(400).json({ message: "UserId and token and secret are required." });
     }
 
@@ -145,7 +179,6 @@ app.listen(PORT, () => {
 
 Eugene's Notes: (Will remove later) 
 
-// import { JsonDB, Config } from 'node-json-db';
 // import { v4 as uuidv4 } from 'uuid';
   // const id = uuidv4();
 

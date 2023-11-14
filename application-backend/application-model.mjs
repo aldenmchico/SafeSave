@@ -308,12 +308,17 @@ const patchUser = function (reqBody, callback) {
         }
         // Additional fields for userSecret and userTempSecret
         if (reqBody.userSecret !== undefined) {
-            q += `UPDATE Users SET userSecret = "${reqBody.userSecret}" WHERE userID = ${reqBody.userID}; `;
+            const secretValue = reqBody.userSecret === null ? null : `"${reqBody.userSecret}"`;
+            q += `UPDATE Users SET userSecret = ${secretValue} WHERE userID = ${reqBody.userID}; `;
         }
         if (reqBody.userTempSecret !== undefined) {
             // If userTempSecret is explicitly set to null, construct the SQL without quotes
-            const tempSecretValue = reqBody.userTempSecret === null ? 'NULL' : `"${reqBody.userTempSecret}"`;
+            const tempSecretValue = reqBody.userTempSecret === null ? null : `"${reqBody.userTempSecret}"`;
             q += `UPDATE Users SET userTempSecret = ${tempSecretValue} WHERE userID = ${reqBody.userID}; `;
+        }
+        // Additional fields for user2FAEnabled
+        if (reqBody.user2FAEnabled !== undefined) {
+            q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
         }
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {

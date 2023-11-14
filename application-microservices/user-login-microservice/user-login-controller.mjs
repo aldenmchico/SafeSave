@@ -1,20 +1,22 @@
 import 'dotenv/config';
 import express from 'express';
 import * as userLoginModel from './user-login-model.mjs';
+import bcrypt from 'bcrypt';
+import cors from 'cors';
+import cookieparser from 'cookie-parser';
 
 
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
 app.use(express.json());
+app.use(cookieparser());
 
-// GET /login/validation
-// Request: Request body is a JSON object with the user's entered login credentials
-// Response: Success - Response contains JSON object with true if the login credentials match what is in the DB, false o.w.
-// Status Code: 201
-// Response: Failure - Request is invalid
-// Body: JSON object Error
-// Status Code: 400
+// Enable COR requests from localhost:3000 only
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with frontend's actual domain later
+    credentials: true
+}));
 
 
 app.post('/login/validation', async (req, res) => {
@@ -41,11 +43,39 @@ app.post('/login/validation', async (req, res) => {
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
-        // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
+        // fetch user from DB using username
+        const fetchedUser = await userLoginModel.fetchUserFromUsername(username);
+        if (fetchedUser) {
+            console.log('user in api endpoint is: ', fetchedUser);
 
-        // If all validations pass, send a success response.
-        return res.status(200).json({ message: "Login successful." });
+            // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
+            const { userID, userUsername, user2FAEnabled } = fetchedUser[0]
 
+            console.log(`userID is ${userID}, username is ${userUsername}, user2FAEnabled is ${user2FAEnabled}`);
+
+            const user = { userID, userUsername, user2FAEnabled };
+
+            try {
+                const tokenResponse = await userLoginModel.signJwtToken(user);
+
+                if (tokenResponse && tokenResponse.token) {
+                    // If all validations pass, send a success response.
+
+                    return res.cookie("access_token", tokenResponse.token, { httpOnly: true }).status(200).json({
+                        message: "Login successful.",
+                        user,  // Directly use the user object
+                        token: tokenResponse.token  // Use the token string
+                    });
+                } else {
+                    throw new Error('Token creation failed');
+                }
+
+            } catch (error) {
+                // current implementation - model file handles nonexistent user... this catch block never hits 
+                console.error(`Error validating credentials for ${username}: ${error.message}`);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+        }
     } catch (error) {
         // current implementation - model file handles nonexistent user... this catch block never hits 
         console.error(`Error validating credentials for ${username}: ${error.message}`);
@@ -70,10 +100,14 @@ app.post('/create/account', async (req, res) => {
             return res.status(401).json({ message: "Username or email already exists." });
         }
 
-        // UPDATE: Need to hash the password here using bcrypt.
+        // hash the password here using bcrypt.
+        const saltRounds = 10;
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
 
         // create a new user entry in db 
-        const createdUser = await userLoginModel.createUser(username, email, password);
+        const createdUser = await userLoginModel.createUser(username, email, hashedPassword);
         if (!createdUser) {
             console.log('Error creating a user');
             return res.status(400).json({ message: "Error while creating a user" });
@@ -89,28 +123,28 @@ app.post('/create/account', async (req, res) => {
     }
 });
 
-app.patch('/users/', async (req, res) => {
+// app.patch('/users/', async (req, res) => {
 
-    const { password, userId } = req.body;
+//     const { password, userId } = req.body;
 
-    try {
+//     try {
 
-        // Update the user's password with the new hashed password
-        const result = await userLoginModel.hashPasswordAndUpdateExistingUser(password, userId);
+//         // Update the user's password with the new hashed password
+//         const result = await userLoginModel.hashPasswordAndUpdateExistingUser(password, userId);
 
-        if (result) {
-            res.status(200).json({ message: 'User password updated successfully' });
-        } else {
-            res.status(500).json({ message: 'Error updating user password' });
-        }
-    } catch (error) {
-        console.error('Error updating user:', error.message);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
+//         if (result) {
+//             res.status(200).json({ message: 'User password updated successfully' });
+//         } else {
+//             res.status(500).json({ message: 'Error updating user password' });
+//         }
+//     } catch (error) {
+//         console.error('Error updating user:', error.message);
+//         res.status(500).json({ message: 'Internal server error' });
+//     }
+// });
 
 
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
+app.listen(PORT, function () {
+    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });

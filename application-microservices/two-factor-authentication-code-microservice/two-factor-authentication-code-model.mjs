@@ -14,11 +14,14 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
         // Prepare data for the PATCH request
         const patchData = {
             userTempSecret: cleanedSecret,
-            userID: userId
+            userID: userId,
+            user2FAEnabled: 1
         };
 
+        console.log(`UserID is ${userId}`);
+
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`http://localhost:4000/users/`, {
+        const response = await fetch(`http://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,6 +96,8 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
         for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
             const totp = generateTOTP(secret, errorWindow);
 
+            console.log(`token is ${token}`)
+            console.log(`totp is ${totp}`)
             // token matches totp from auth
             if (token == totp) {
 
@@ -104,7 +109,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
                 };
 
                 // Send PATCH request to update user's primary secret field
-                const response = await fetch(`http://localhost:4000/users/`, {
+                const response = await fetch(`http://localhost:3001/users/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -117,15 +122,17 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
                 }
                 const data = await response.json();
                 console.log(`User updated: `, data);
-                return data;
+                return true; // Return true only if the token matches
             }
         }
 
     } catch (error) {
-        console.error('Error in generating and storing secret: ', error.message);
+        console.error('Error in verifying temporary secret: ', error.message);
+        return false; // Return false if there is an exception
     }
 
-    return false;
+
+    return false; // Return false if the token never matches
 }
 
 // token is the TOTP from Google Authenticator
@@ -145,5 +152,35 @@ const verifyAuthenticatedTOTP = async (token, secret, window = 1) => {
     return false;
 }
 
+const disableTwoFactor = async (userId) => {
+
+    // Prepare data for the PATCH request
+    const patchData = {
+        userID: userId,
+        user2FAEnabled: 0,
+        userSecret: null,
+        userTempSecret: null
+    };
+    try {
+        // Send PATCH request to update user's primary secret field
+        const response = await fetch(`http://localhost:3001/users/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(patchData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(`User information updated - 2FA disabled: `, data);
+        return data;
+    } catch (error) {
+        console.error('Error in disabling 2FA in model: ', error.message);
+    }
+};
+
 // Exports for genre-microservice-controller
-export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP };
+export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP, disableTwoFactor };
