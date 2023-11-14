@@ -4,7 +4,7 @@ function IDsPage() {
     const [savedIDs, setSavedIDs] = useState([]);
 
     const loadSavedIDs = async () => {
-        const response = await fetch('/ids');
+        const response = await fetch('http://localhost:8008/ids');
         const idsData = await response.json();
         setSavedIDs(idsData);
     }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 function CreateAccountPage() {
     const [formData, setFormData] = useState({
         username: '',
@@ -21,7 +22,8 @@ function CreateAccountPage() {
         return regex.test(password);
     };
 
-    const handleAccountCreation = async () => {
+    const handleAccountCreation = async (e) => {
+        e.preventDefault(); 
         let valid = true;
         let errs = {};
 
@@ -50,7 +52,8 @@ function CreateAccountPage() {
             };
 
             try {
-                const response = await fetch('/createaccount', {
+                const response = await fetch('http://localhost:8008/create/account', {
+
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -59,14 +62,15 @@ function CreateAccountPage() {
                 });
 
                 if (response.ok) {
-                    alert('Account created successfully! Please check your email for a confirmation link.');
+                    alert('Account created successfully! Please login.');
                     navigate('/login');
                 } else {
-                    const responseData = await response.json();
-                    alert(responseData.message || 'Failed to create account. Please try again.');
+                    const errorData = await response.json();
+                    setErrors({ ...errs, server: errorData.message });
                 }
             } catch (error) {
-                console.error('There was an error creating the account:', error);
+                console.error('Error during account creation:', error);
+                setErrors({ ...errs, server: 'Failed to create account. Please try again.' });
             }
         }
     };
@@ -83,12 +87,11 @@ function CreateAccountPage() {
         <div className="login-container">
             <h1>Create a New SafeSave Account</h1>
             <p>Enter your desired credentials to create a new account.</p>
-            {/* Removed onSubmit from form and applied onClick to button below */}
             <form className="login-form">
                 <div className="input-group">
                     <label>Username</label>
                     <input
-                        type="txt"
+                        type="text"
                         name="username"
                         value={formData.username}
                         onChange={handleChange}
@@ -111,11 +114,11 @@ function CreateAccountPage() {
                 <div className="input-group">
                     <label>Password</label>
                     <input
-                        type="pwd"
+                        type="password"
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        placeholder="Enter a strong password  "
+                        placeholder="Enter a strong password"
                         required
                     />
                     {errors.password && <p>{errors.password}</p>}
@@ -123,7 +126,7 @@ function CreateAccountPage() {
                 <div className="input-group">
                     <label>Confirm Password</label>
                     <input
-                        type="pwd"
+                        type="password"
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
@@ -132,10 +135,11 @@ function CreateAccountPage() {
                     />
                     {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
                 </div>
+                {errors.server && <p className="error-message">{errors.server}</p>}
+                <div className="submit-button">
+                    <button className="login-button" onClick={handleAccountCreation}>Create Account</button>
+                </div>
             </form>
-            <div className="submit-button">
-                <button className="login-button" onClick={handleAccountCreation}>Create Account</button>
-            </div>
         </div>
     );
 }

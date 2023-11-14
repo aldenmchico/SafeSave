@@ -4,7 +4,7 @@ function PersonalInfoPage() {
     const [personalInfo, setPersonalInfo] = useState({});
 
     const loadPersonalInfo = async () => {
-        const response = await fetch('/personalinfo');
+        const response = await fetch('http://localhost:8008/personalinfo');
         const infoData = await response.json();
         setPersonalInfo(infoData);
     }

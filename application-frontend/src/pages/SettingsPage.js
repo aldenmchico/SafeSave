@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 function SettingsPage() {
+    const [userID, setUserID] = useState(1);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [pendingTwoFactorEnabled, setPendingTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');

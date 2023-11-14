@@ -6,7 +6,7 @@ function PaymentsPage() {
     const [searchTerm, setSearchTerm] = useState('');
 
     const loadSavedPayments = async () => {
-        const response = await fetch('/payments');
+        const response = await fetch('http://localhost:8008/payments');
         const paymentsData = await response.json();
         setSavedPayments(paymentsData);
     }
