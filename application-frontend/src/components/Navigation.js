@@ -23,11 +23,14 @@ const Navigation = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <img src={logo} alt="Logo" width={120} />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {(
-                        <NavLink to="/create">
-                            <button type>Create New</button>
-                        </NavLink>
-                    )}
+                    <div className="dropdown">
+                        <button className="dropbtn">Create New</button>
+                        <div className="dropdown-content">
+                            <NavLink to="/createsavedlogin">Create Saved Login</NavLink>
+                            <NavLink to="/createsavednote">Create Saved Note</NavLink>
+                            <NavLink to="/createaccount">Create Account</NavLink>
+                        </div>
+                    </div>
                     <form onSubmit={handleSearch} style={{ position: 'relative', marginLeft: '80px' }}>
                         <input 
                             type="search" 
