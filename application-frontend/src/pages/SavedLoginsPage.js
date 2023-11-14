@@ -1,25 +1,39 @@
-// SavedLoginsPage.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-
-// Import React components
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 
-function SavedLoginsPage({setLoginItem}) {
-    const [userID, setUserID] = useState(1); // Will be edited once login functionality is done
+function SavedLoginsPage({ setLoginItem }) {
+    const [localUserID, setLocalUserID] = useState(1); // Temporary 
     const [savedLogins, setSavedLogins] = useState([]);
+
+    const location = useLocation();
+    const navigate = useNavigate(); 
+    const { userID: locationUserID, password } = location.state || {};
+
+    // Use userID from location.state if available, otherwise use localUserID
+    const userID = locationUserID || localUserID;
 
     // Load saved logins from the backend
     const loadSavedLogins = async () => {
-        const response = await fetch(`/login_items/users/${userID}`);
-        const logins = await response.json();
-        setSavedLogins(logins);
-    }
+        if (userID) {
+            const url = `/login_items/users/${userID}`;
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const logins = await response.json();
+                    setSavedLogins(logins);
+                } else {
+                    throw new Error('Failed to fetch login items');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    };
 
     useEffect(() => {
         loadSavedLogins();
-    }, []);
+    }, [userID]);
 
     const deleteLoginRow = async _id => {
         const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
@@ -29,11 +43,9 @@ function SavedLoginsPage({setLoginItem}) {
         } else {
             alert('Failed to Delete Login Entry');
         }
-    }
-
-    // UPDATE a row
-    const navigate = useNavigate();
-    const editLoginRow = async login => {
+    };
+    
+    const editLoginRow = login => {
         setLoginItem(login);
         navigate("/edit-login");
     }
@@ -45,10 +57,10 @@ function SavedLoginsPage({setLoginItem}) {
                 <SavedLoginList
                     loginItems={savedLogins}
                     editLoginItem={editLoginRow}
-                    deleteLoginItem = {deleteLoginRow}
+                    deleteLoginItem={deleteLoginRow}
                 />
             </div>
-            <Link to="/createsavedlogin">Add New Login</Link>
+            <Link to="/createsavedlogin" state={{ userID, password }}>Add New Login</Link>
         </div>
     );
 }

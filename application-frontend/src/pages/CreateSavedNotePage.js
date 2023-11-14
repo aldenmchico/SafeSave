@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function CreateSavedNotePage() {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [noteDetails, setNoteDetails] = useState({
+        title: '',
+        content: '',
+        userID: null,
+        userPassword: ''
+    });
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state) {
+            setNoteDetails(prevState => ({
+                ...prevState,
+                userID: location.state.userID,
+                userPassword: location.state.password
+            }));
+        }
+    }, [location.state]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNoteDetails(prevState => ({ ...prevState, [name]: value }));
+    };
 
     const handleNoteCreation = async (e) => {
         e.preventDefault();
 
+        const { title, content, userID } = noteDetails;
+
         const newNote = {
             title,
-            content
+            content,
+            userNoteDateCreated: new Date().toISOString(),
+            userNoteDateUpdated: new Date().toISOString(),
+            userID: userID 
         };
 
         try {
@@ -25,30 +50,27 @@ function CreateSavedNotePage() {
 
             if (response.ok) {
                 alert('Note saved successfully!');
-                setTitle(''); // Reset the title field
-                setContent(''); // Reset the content field
-                navigate('/savednotes'); // Redirect to the saved notes page after creation
+                navigate('/savednotes', { state: { userID: userID, password: noteDetails.userPassword } });
             } else {
-                // Extract error message if any from the response
                 const errorMessage = await response.text();
-                alert(`Failed to save note. Please try again. Error: ${errorMessage}`);
+                alert(`Failed to save note. Error: ${errorMessage}`);
             }
         } catch (error) {
-            alert(`An error occurred while saving the note: ${error}`);
+            alert(`An error occurred: ${error}`);
         }
-    }
+    };
 
     return (
         <div>
             <h1>Create a New Note</h1>
-            <p>Fill out the details below to save a new note.</p>
             <form onSubmit={handleNoteCreation}>
                 <label>
                     Title:
                     <input 
-                        type="txt" 
-                        value={title} 
-                        onChange={e => setTitle(e.target.value)} 
+                        type="text" 
+                        name="title"
+                        value={noteDetails.title} 
+                        onChange={handleInputChange} 
                         placeholder="Note title"
                         required
                     />
@@ -57,8 +79,9 @@ function CreateSavedNotePage() {
                 <label>
                     Content:
                     <textarea 
-                        value={content} 
-                        onChange={e => setContent(e.target.value)} 
+                        name="content"
+                        value={noteDetails.content} 
+                        onChange={handleInputChange} 
                         placeholder="Write your note here..."
                         required
                     />

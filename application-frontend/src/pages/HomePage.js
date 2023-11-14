@@ -1,77 +1,83 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-
-// Import React components
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 
-
-function HomePage({setLoginItem}) {
-
-    // Use state variable exercises to bring in the data
+function HomePage({ setLoginItem }) {
     const [savedLogins, setSavedLogins] = useState([]);
     const [savedNotes, setSavedNotes] = useState([]);
 
-    // When the homepage is loaded, the userID and userHash to be used for encryption/decryption are defined
+    // Hardcoded default credentials
     const [userID, setUserID] = useState(1);
     const [userHash, setUserHash] = useState('pass1');
     const [username, setUsername] = useState('Guest');
 
-    // Load saved logins from the backend
-    const loadSavedLogins = async () => {
-        const response = await fetch(`/login_items/users/${userID}`);
-        const logins = await response.json();
-        setSavedLogins(logins);
-    }
+    const location = useLocation();
+    const history = useNavigate(); 
 
-    // Load saved notes from the backend
-    const loadSavedNotes = async () => {
-        const response = await fetch(`/notes/users/${userID}`);
-        const notesData = await response.json();
-        setSavedNotes(notesData);
-    }
-
+    // Update state with location.state if available
     useEffect(() => {
-        loadSavedLogins();
-        loadSavedNotes();
-        // Fetch username later
-        setUsername('John Doe'); // Placeholder
-    }, []);
+        if (location.state) {
+            if (location.state.userID) setUserID(location.state.userID);
+            if (location.state.password) setUserHash(location.state.password);
+            if (location.state.username) setUsername(location.state.username);
+            loadSavedLogins();
+            loadSavedNotes();
+        }
+    }, [location.state]);
+
+    const loadSavedLogins = async () => {
+        try {
+            const response = await fetch(`/login_items/users/${userID}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch logins');
+            }
+            const logins = await response.json();
+            setSavedLogins(logins);
+        } catch (error) {
+            console.error('Failed to load logins:', error);
+        }
+    };
+
+    const loadSavedNotes = async () => {
+        try {
+            const response = await fetch(`/notes/users/${userID}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch notes');
+            }
+            const notes = await response.json();
+            setSavedNotes(notes);
+        } catch (error) {
+            console.error('Failed to load notes:', error);
+        }
+    };
 
     const deleteLoginRow = async _id => {
         const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
         if (response.status === 204) {
             loadSavedLogins();
-            alert('Deleted Login Entry');
         } else {
             alert('Failed to Delete Login Entry');
         }
-    }
+    };
 
-    // UPDATE a row
-    const navigate = useNavigate();
-    const editLoginRow = async login => {
+    const editLoginRow = login => {
         setLoginItem(login);
-        navigate("/edit-login");
-    }
-
-    const favoriteLoginRow = async login => {
+        history.push("/edit-login");
     }
 
     return (
         <div>
-            <h1>Welcome to SafeSave, {username}!</h1> {/* Dynamic welcome message */}
+            <h1>Welcome to SafeSave, {username}!</h1>
             <p>Your secure vault for online credentials and notes.</p>
+
             <div className="content-section">
                 <h2>Your Saved Logins</h2>
                 <div className="login-item-list">
-
-                <SavedLoginList
-                    loginItems={savedLogins}
-                    editLoginItem={editLoginRow}
-                    deleteLoginItem = {deleteLoginRow}
-                    favoriteLoginItem = {favoriteLoginRow}
-                />
+                    <SavedLoginList
+                        loginItems={savedLogins}
+                        editLoginItem={editLoginRow}
+                        deleteLoginItem={deleteLoginRow}
+                    />
                 </div>
                 <Link to="/createsavedlogin">Add New Login</Link>
             </div>

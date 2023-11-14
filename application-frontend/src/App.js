@@ -1,7 +1,6 @@
-import React, { createContext, useState, useEffect, useContext, Suspense, lazy } from 'react';
+import React, { createContext, useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import './App.css'; 
-import { useNavigate } from 'react-router-dom';
+import './App.css';
 
 // Lazy-loaded components
 const Navigation = lazy(() => import('./components/Navigation'));
@@ -24,7 +23,7 @@ const EditSavedNotePage = lazy(() => import('./pages/EditSavedNotePage'));
 const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
 
 // Authentication context
-const AuthContext = createContext();
+export const AuthContext = createContext(); 
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,20 +41,6 @@ function useAuth() {
 
   return { isAuthenticated, login, logout };
 }
-
-// Protected route
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-  const { isAuthenticated } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
-
-  return isAuthenticated ? <Route {...rest} element={<Component />} /> : null;
-};
 
 // Error boundary
 class ErrorBoundary extends React.Component {
