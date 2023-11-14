@@ -2,9 +2,14 @@ import 'dotenv/config';
 import express from 'express';
 import * as appModel from './application-model.mjs';
 
+import cors from 'cors';
+
 const PORT = process.env.PORT;
 const app = express();
 app.use(express.json());
+
+// Enable CORS for all routes and origins
+app.use(cors());
 
 const userRouter = express.Router();
 const loginItemRouter = express.Router();
@@ -13,6 +18,8 @@ const notesRouter = express.Router();
 app.use('/users', userRouter);
 app.use('/login_items', loginItemRouter);
 app.use('/notes', notesRouter);
+
+
 
 // CREATE (POST) controller ******************************************
 

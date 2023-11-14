@@ -30,7 +30,10 @@ function LoginPage() {
 
             if (response.ok) {
                 alert('Logged in successfully!');
-                navigate('/');
+                
+                // generate JWT and store in client cookie 
+                
+                // navigate('/');
             } else {
                 if (response.status === 401) {
                     alert('Invalid username or password. Please try again.');

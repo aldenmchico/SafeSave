@@ -94,6 +94,8 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
         for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
             const totp = generateTOTP(secret, errorWindow);
 
+            console.log(`token is ${token}`)
+            console.log(`totp is ${totp}`)
             // token matches totp from auth
             if (token == totp) {
 
@@ -118,15 +120,17 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
                 }
                 const data = await response.json();
                 console.log(`User updated: `, data);
-                return data;
+                return true; // Return true only if the token matches
             }
         }
 
     } catch (error) {
-        console.error('Error in generating and storing secret: ', error.message);
+        console.error('Error in verifying temporary secret: ', error.message);
+        return false; // Return false if there is an exception
     }
 
-    return false;
+
+    return false; // Return false if the token never matches
 }
 
 // token is the TOTP from Google Authenticator

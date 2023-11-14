@@ -4,30 +4,39 @@ import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
 import cors from 'cors';
 
+import { checkAuth } from '../middlewares/checkAuth.mjs';
+
+import cookieparser from 'cookie-parser';
+
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
 
-
+app.use(cookieparser());
 app.use(express.json());
 
-// Enable All CORS Requests
-app.use(cors());
+// Enable All CORS Requests from any origin and allow server to accept cookies from client
+app.use(cors({ origin: true, credentials: true }));
 
-app.get('/api', (req, res) => {
+app.get('/api', checkAuth, cors(), (req, res) => {
     /*
     Dummy /api endpoint 
     */
+
+    console.log(req.user);
+
     res.status(200).json({ message: 'Welcome to 2FA controller!' });
 })
 
-app.post('/api/2fa-registration', cors(), async (req, res) => {
+app.post('/api/2fa-registration', checkAuth, cors(), async (req, res) => {
     /*
     generates and stores a temporary secret given a userId
     */
 
     // TODO: pull user from sql db using some form of persistent JWT token?
     // replace userId below with user from db  
+    const { username, userID, user2FAEnabled } = req.user
+
 
     // temporary solution to emulate a user
     const { enableTwoFactor, userId } = req.body;
@@ -75,7 +84,7 @@ app.post('/api/verify-2fa-setup-token', async (req, res) => {
     try {
 
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = twoFACodeModel.verifyTemporaryTOTP(userId, token, secret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userId, token, secret)
 
         if (verified) {
             return res.status(200).json({ verified: true });
@@ -110,7 +119,7 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     }
 
     // qr code config 
-    const issuer = 'SafeSave';
+    const issuer = 'port11';
     const algorithm = 'SHA1';
     const digits = '6';
     const period = '30';
