@@ -12,6 +12,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
 
     try {
         const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
+        console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
             console.log(`Username exists: `, usernameData);

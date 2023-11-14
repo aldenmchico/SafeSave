@@ -5,9 +5,38 @@ import cookieparser from 'cookie-parser';
 
 import * as jwtModel from './jwt-model.mjs';
 
+import https from 'https';
+import { readFileSync } from 'fs';
+ 
+// Obtain __dirname in an ES module
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+ 
+const privateKeyPath = path.resolve(__dirname, 'key.pem');
+const certificatePath = path.resolve(__dirname, 'cert.pem');
+
+let privateKey;
+let certificate;
+
+try {
+    privateKey = readFileSync(privateKeyPath, 'utf8');
+    certificate = readFileSync(certificatePath, 'utf8');
+} catch (error) {
+    console.error('Error reading SSL certificate files:', error);
+    process.exit(1);
+}
+
+const creds = { key: privateKey, cert: certificate };
+
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
+
+const httpsServer = https.createServer(creds, app);
 
 app.use(express.json());
 app.use(cookieparser());
@@ -56,6 +85,7 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
     }
 });
 
-app.listen(PORT, function () {
-    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
+//AT THE END
+httpsServer.listen(PORT, () => {
+    console.log(`Jwt server listening on port ${PORT}...`);
 });
