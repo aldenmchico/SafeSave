@@ -32,8 +32,8 @@ function HomePage({setLoginItem}) {
     }
 
     useEffect(() => {
-        loadSavedLogins();
-        loadSavedNotes();
+        if (savedLogins.length !==0) {loadSavedLogins()};
+        if (savedNotes.length !== 0) {loadSavedNotes()};
         // Fetch username later
         setUsername('John Doe'); // Placeholder
     }, []);

@@ -4,8 +4,8 @@ import SavedNoteRow from './SavedNoteRow';
 function SavedNoteList({notes, editNote, deleteNote}) {
     return (
         <div className="wrapper">
-        <table>
-            <thead>
+            <table>
+                <thead>
                 <tr>
                     <th>Title</th>
                     <th>Note</th>
@@ -13,19 +13,20 @@ function SavedNoteList({notes, editNote, deleteNote}) {
                     <th>Date Updated</th>
                     <th>Date Accessed</th>
                 </tr>
-            </thead>
-            <tbody>
-                {notes.map((note, i) =>
-                <SavedNoteRow
-                    note={note}
-                    key={i}
-                    editNote={editNote}
-                    deleteNote={deleteNote}
-                />)}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {notes && notes.map((note, i) => (
+                    <SavedNoteRow
+                        note={note}
+                        key={i}
+                        editNote={editNote}
+                        deleteNote={deleteNote}
+                    />
+                ))}
+                </tbody>
+            </table>
         </div>
     );
-}
+    }
 
 export default SavedNoteList;

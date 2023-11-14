@@ -50,7 +50,7 @@ function FavoritesPage() {
             <div>
                 <h2>Favorite Logins</h2>
                 <ul>
-                    {favoriteLogins.map(login => (
+                    {favoriteLogins && favoriteLogins.map(login => (
                         <li key={login._id}>
                             {login.name}
                             <Link to={`/logins/${login._id}`}>View</Link>
@@ -62,7 +62,7 @@ function FavoritesPage() {
             <div>
                 <h2>Favorite Notes</h2>
                 <ul>
-                    {favoriteNotes.map(note => (
+                    {favoriteNotes && favoriteNotes.map(note => (
                         <li key={note._id}>
                             {note.title}
                             <Link to={`/notes/${note._id}`}>View</Link>

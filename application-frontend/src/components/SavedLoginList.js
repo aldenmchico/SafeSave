@@ -1,13 +1,11 @@
 import React from 'react';
 import SavedLoginRow from './SavedLoginRow';
 
-
-
-function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem}) {
+function SavedLoginList({ loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem }) {
     return (
         <div className="wrapper">
-        <table>
-            <thead>
+            <table>
+                <thead>
                 <tr>
                     <th>Website</th>
                     <th>Username</th>
@@ -16,18 +14,23 @@ function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLog
                     <th>Date Updated</th>
                     <th>Date Accessed</th>
                 </tr>
-            </thead>
-            <tbody>
-                {loginItems.map((loginItem, i) =>
-                <SavedLoginRow
-                    loginItem={loginItem}
-                    key={i}
-                    editLoginItem={editLoginItem}
-                    deleteLoginItem={deleteLoginItem}
-                    favoriteLoginItem={favoriteLoginItem}
-                />)}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {loginItems && loginItems.length > 0 ? (
+                    loginItems.map((loginItem, i) => (
+                        <SavedLoginRow
+                            loginItem={loginItem}
+                            key={i}
+                            editLoginItem={editLoginItem}
+                            deleteLoginItem={deleteLoginItem}
+                            favoriteLoginItem={favoriteLoginItem}
+                        />
+                    ))
+                ) : (
+                    <p> </p>
+                )}
+                </tbody>
+            </table>
         </div>
     );
 }
