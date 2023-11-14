@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 
-function SavedLoginsPage( setLogin) {
+function SavedLoginsPage({ setLoginItem }) {
+    const [localUserID, setLocalUserID] = useState(1); // Temporary 
     const [savedLogins, setSavedLogins] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+
     const location = useLocation();
-    const history = useNavigate(); 
-    const { userID, password } = location.state || {};
+    const navigate = useNavigate(); 
+    const { userID: locationUserID, password } = location.state || {};
+
+    // Use userID from location.state if available, otherwise use localUserID
+    const userID = locationUserID || localUserID;
 
     // Load saved logins from the backend
-    const loadSavedLogins = async (searchParam = '') => {
+    const loadSavedLogins = async () => {
         if (userID) {
-            const url = `http://localhost:8008/login_items/users/${userID}` + (searchParam ? `?search=${searchParam}` : '');
+            const url = `/login_items/users/${userID}`;
             try {
                 const response = await fetch(url);
                 if (response.ok) {
@@ -31,40 +35,24 @@ function SavedLoginsPage( setLogin) {
         loadSavedLogins();
     }, [userID]);
 
-    const handleSearch = () => {
-        loadSavedLogins(searchTerm);
-    };
-
-    const deleteLoginRow = async loginID => {
-        try {
-            const response = await fetch(`http://localhost:8008/login_items/${loginID}`, { method: 'DELETE' });
-            if (response.status === 204) {
-                loadSavedLogins();
-                alert('Deleted Login Entry');
-            } else {
-                throw new Error('Failed to delete login entry');
-            }
-        } catch (error) {
-            alert(error.message);
+    const deleteLoginRow = async _id => {
+        const response = await fetch(`/login_items/${_id}`, { method: 'DELETE' });
+        if (response.status === 204) {
+            loadSavedLogins();
+            alert('Deleted Login Entry');
+        } else {
+            alert('Failed to Delete Login Entry');
         }
     };
     
-    // UPDATE a row
-    const editLoginRow = async login => {
-        setLogin(login);
-        history.push("/edit-login");
+    const editLoginRow = login => {
+        setLoginItem(login);
+        navigate("/edit-login");
     }
 
     return (
         <div>
             <h1>Your Saved Logins</h1>
-            <input 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search logins..."
-            />
-            <button onClick={handleSearch}>Search</button>
             <div className="login-item-list">
                 <SavedLoginList
                     loginItems={savedLogins}

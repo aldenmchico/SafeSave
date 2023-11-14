@@ -4,15 +4,21 @@ import SavedNoteList from '../components/SavedNoteList';
 
 function SavedNotesPage({ setNote }) {
     const [savedNotes, setSavedNotes] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
-    const { userID, password } = location.state || {};
+
+    // Default values
+    const defaultUserID = 1; 
+    const defaultPassword = 'pass1'; 
+
+    // Use location.state if available, otherwise fall back to default values
+    const userID = location.state?.userID || defaultUserID;
+    const password = location.state?.password || defaultPassword;
 
     // Load saved notes from the backend
-    const loadSavedNotes = async (searchParam = '') => {
+    const loadSavedNotes = async () => {
         if (userID) {
-            const url = `http://localhost:8008/notes/users/${userID}` + (searchParam ? `?title=${searchParam}` : '');
+            const url = `notes/users/${userID}`;
             try {
                 const response = await fetch(url);
                 if (response.ok) {
@@ -31,13 +37,9 @@ function SavedNotesPage({ setNote }) {
         loadSavedNotes();
     }, [userID]);
 
-    const handleSearch = () => {
-        loadSavedNotes(searchTerm);
-    };
-
     const deleteNoteRow = async noteID => {
         try {
-            const response = await fetch(`http://localhost:8008/notes/${noteID}`, { method: 'DELETE' });
+            const response = await fetch(`/notes/${noteID}`, { method: 'DELETE' });
             if (response.status === 204) {
                 loadSavedNotes();
                 alert('Deleted Note Entry');
@@ -49,22 +51,14 @@ function SavedNotesPage({ setNote }) {
         }
     };
 
-const history = useNavigate();
-const editNoteRow = note => {
-    setNote(note);
-    history.push("/edit-note");
-};
+    const editNoteRow = note => {
+        setNote(note);
+        navigate("/edit-note");
+    };
 
     return (
         <div>
             <h1>Your Saved Notes</h1>
-            <input 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search notes..."
-            />
-            <button onClick={handleSearch}>Search</button>
             <div className="note-list">
                 <SavedNoteList
                     notes={savedNotes}

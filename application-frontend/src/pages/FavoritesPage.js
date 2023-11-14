@@ -70,30 +70,6 @@ function FavoritesPage() {
                     ))}
                 </ul>
             </div>
-
-            <div>
-                <h2>Favorite Payments</h2>
-                <ul>
-                    {favoritePayments.map(payment => (
-                        <li key={payment._id}>
-                            {payment.cardName} - {payment.cardLastFourDigits}
-                            <Link to={`/payments/${payment._id}`}>View</Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            <div>
-                <h2>Favorite IDs</h2>
-                <ul>
-                    {favoriteIDs.map(id => (
-                        <li key={id._id}>
-                            {id.type} - {id.number}
-                            <Link to={`/ids/${id._id}`}>View</Link>
-                        </li>
-                    ))}
-                </ul>
-            </div>
         </div>
     );
 }

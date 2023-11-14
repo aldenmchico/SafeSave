@@ -2,9 +2,39 @@ import 'dotenv/config';
 import express from 'express';
 import * as appModel from './application-model.mjs';
 
-const PORT = process.env.PORT | 4000;
+const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
+import path from 'path';
+
+import https from 'https';
+
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const privateKeyPath = path.resolve(__dirname, 'key.pem');
+const certificatePath = path.resolve(__dirname, 'cert.pem');
+
+let privateKey;
+let certificate;
+
+try {
+    privateKey = readFileSync(privateKeyPath, 'utf8');
+    certificate = readFileSync(certificatePath, 'utf8');
+} catch (error) {
+    console.error('Error reading SSL certificate files:', error);
+    process.exit(1);
+}
+
+const passphrase = process.env.SSL_PASSPHRASE;
+const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
+
+const httpsServer = https.createServer(creds, app);
+
 
 const userRouter = express.Router();
 const loginItemRouter = express.Router();
@@ -273,11 +303,40 @@ loginItemRouter.patch('/', (req, res) => {
     })
 });
 
+loginItemRouter.patch('/favorite', (req, res) => {
+    appModel.patchLoginItemFavorite(req.body, (err, result) => {
+        if (err !== null) {
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        }
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).end();
+        }
+    })
+});
+
+
 notesRouter.patch('/', (req, res) => {
     appModel.patchNote(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        }
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).end();
+        }
+    })
+});
+
+notesRouter.patch('/favorite', (req, res) => {
+    appModel.patchNoteFavorite(req.body, (err, result) => {
+        if (err !== null) {
+            if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
@@ -309,11 +368,11 @@ userRouter.delete('/:userId', (req, res) => {
     })
 });
 
-loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req, res) => {
-    appModel.deleteUserLoginItem(req.params.userId, req.params.loginItemId, (err, result) => {
+loginItemRouter.delete('/:loginItemId', (req, res) => {
+    appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.affectedRows === 0) res.status(404).send({ "error": "No login items found for specified user ID with given login item ID" });
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No login items with given login item ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -324,8 +383,8 @@ loginItemRouter.delete('/users/:userId/login_items/:loginItemId', (req, res) => 
 });
 
 
-notesRouter.delete('/users/:userId/notes/:noteId', (req, res) => {
-    appModel.deleteNote(req.params.userId, req.params.noteId, (err, result) => {
+notesRouter.delete('/:noteId', (req, res) => {
+    appModel.deleteNote(req.params.noteId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No notes found for specified user ID with given note ID" });
@@ -340,7 +399,17 @@ notesRouter.delete('/users/:userId/notes/:noteId', (req, res) => {
 
 /*
     LISTENER
+
+
 */
-app.listen(PORT, function () {
-    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
+
+//HTTPS
+
+
+// app.listen(PORT, function () {
+//     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
+// });
+
+httpsServer.listen(PORT, () => {
+    console.log(`Express server started listening on port ${PORT}...`);
 });
