@@ -41,7 +41,7 @@ form button[type="submit"] {
   top: 80%;
   transform: translateY(-50%);
   border: none;
-  width: 200px; 
+  width: 100px; 
   height: 30px;
   cursor: pointer;
   background-color: #555;

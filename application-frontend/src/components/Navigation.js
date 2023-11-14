@@ -23,9 +23,9 @@ const Navigation = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <img src={logo} alt="Logo" width={120} />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {isAuthenticated && (
+                    {(
                         <NavLink to="/create">
-                            <button>Create New</button>
+                            <button type>Create New</button>
                         </NavLink>
                     )}
                     <form onSubmit={handleSearch} style={{ position: 'relative', marginLeft: '80px' }}>
@@ -34,9 +34,9 @@ const Navigation = () => {
                             placeholder="Search..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{ paddingLeft: '70px' }}
+                            style={{ paddingLeft: '50px' }}
                         />
-                        <button type="submit" style={{ position: 'absolute', left: '-80px', top: '2%', transform: 'translateY(-50%)', background: 'none', border: 'none' }}>
+                        <button type="submit" style={{ position: 'absolute', left: '-25px', top: '2%', transform: 'translateY(-50%)', background: 'none', border: 'none' }}>
                         <svg width="20" height="20" fill="grey" viewBox="0 0 16 16">
                                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                             </svg>
@@ -46,7 +46,7 @@ const Navigation = () => {
             </div>
             <ul style={{ marginTop: '5px', display: 'flex', justifyContent: 'space-around' }}>
                 <li><NavLink to="/">Home</NavLink></li>
-                {isAuthenticated ? (
+                {/* {isAuthenticated ? (
                     <>
                         <li><NavLink to="/favorites">Favorites</NavLink></li>
                         <li><NavLink to="/settings">Settings</NavLink></li>
@@ -62,9 +62,20 @@ const Navigation = () => {
                         <li><NavLink to="/createaccount">Create Account</NavLink></li>
                         <li><NavLink to="/login">Login</NavLink></li>
                     </>
-                )}
+                )} */}
+
+                <li><NavLink to="/favorites">Favorites</NavLink></li>
+                <li><NavLink to="/settings">Settings</NavLink></li>
+                <li><NavLink to="/personalinfo">Personal Info</NavLink></li>
+                <li><NavLink to="/ids">IDs</NavLink></li>
+                <li><NavLink to="/payments">Payments</NavLink></li>
+                <li><NavLink to="/createsavedlogin">Create Saved Login</NavLink></li>
+                <li><NavLink to="/createsavednote">Create Saved Note</NavLink></li>
+                <li onClick={handleLogout}>Logout</li>
                 <li><NavLink to="/about">About</NavLink></li>
                 <li><NavLink to="/twofactorauth">2FA</NavLink></li>
+                <li><NavLink to="/createaccount">Create Account</NavLink></li>
+                <li><NavLink to="/login">Login</NavLink></li>
                 {/* Dropdown for Saved Info */}
                 <div className="dropdown">
                     <NavLink to="#" className="dropbtn">Saved Info</NavLink>

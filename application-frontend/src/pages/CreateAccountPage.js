@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 function CreateAccountPage() {
     const [formData, setFormData] = useState({
         username: '',
@@ -21,7 +22,8 @@ function CreateAccountPage() {
         return regex.test(password);
     };
 
-    const handleAccountCreation = async () => {
+    const handleAccountCreation = async (e) => {
+        e.preventDefault(); 
         let valid = true;
         let errs = {};
 
