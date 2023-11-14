@@ -11,7 +11,7 @@ const signJwtToken = (user) => {
         userUsername,
         userID,
         user2FAEnabled
-    }, SECRET_KEY, { expiresIn: 60 * 5 }); // Adjust expiresIn as needed ... '1hr'
+    }, SECRET_KEY, { expiresIn: '1hr' }); // Adjust expiresIn as needed
     console.log(`token created at signJwtToken ${token}`);
 
     return token

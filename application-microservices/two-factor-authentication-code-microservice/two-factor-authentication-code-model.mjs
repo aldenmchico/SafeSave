@@ -18,6 +18,8 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
             user2FAEnabled: 1
         };
 
+        console.log(`UserID is ${userId}`);
+
         // Send PATCH request to update user's temp secret
         const response = await fetch(`http://localhost:3001/users/`, {
             method: 'PATCH',

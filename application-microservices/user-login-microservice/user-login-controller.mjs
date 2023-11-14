@@ -3,18 +3,23 @@ import express from 'express';
 import * as userLoginModel from './user-login-model.mjs';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
+import cookieparser from 'cookie-parser';
 
 
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
 app.use(express.json());
+app.use(cookieparser());
 
-// Enable All CORS Requests
-app.use(cors());
+// Enable COR requests from localhost:3000 only
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with frontend's actual domain later
+    credentials: true
+}));
 
 
-app.post('/login/validation', cors(), async (req, res) => {
+app.post('/login/validation', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -38,11 +43,39 @@ app.post('/login/validation', cors(), async (req, res) => {
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
-        // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
+        // fetch user from DB using username
+        const fetchedUser = await userLoginModel.fetchUserFromUsername(username);
+        if (fetchedUser) {
+            console.log('user in api endpoint is: ', fetchedUser);
 
-        // If all validations pass, send a success response.
-        return res.status(200).json({ message: "Login successful." });
+            // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
+            const { userID, userUsername, user2FAEnabled } = fetchedUser[0]
 
+            console.log(`userID is ${userID}, username is ${userUsername}, user2FAEnabled is ${user2FAEnabled}`);
+
+            const user = { userID, userUsername, user2FAEnabled };
+
+            try {
+                const tokenResponse = await userLoginModel.signJwtToken(user);
+
+                if (tokenResponse && tokenResponse.token) {
+                    // If all validations pass, send a success response.
+
+                    return res.cookie("access_token", tokenResponse.token, { httpOnly: true }).status(200).json({
+                        message: "Login successful.",
+                        user,  // Directly use the user object
+                        token: tokenResponse.token  // Use the token string
+                    });
+                } else {
+                    throw new Error('Token creation failed');
+                }
+
+            } catch (error) {
+                // current implementation - model file handles nonexistent user... this catch block never hits 
+                console.error(`Error validating credentials for ${username}: ${error.message}`);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+        }
     } catch (error) {
         // current implementation - model file handles nonexistent user... this catch block never hits 
         console.error(`Error validating credentials for ${username}: ${error.message}`);

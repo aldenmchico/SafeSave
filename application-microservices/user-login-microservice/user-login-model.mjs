@@ -34,7 +34,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
         }
 
         return usernameExists || emailExists;
-        
+
     } catch (error) {
         console.error('There was a problem with the fetch operation:', error);
         throw error; // Re-throw the error to handle it in the calling context.
@@ -88,11 +88,28 @@ const checkIfUsernameExists = async (username) => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`username found: `, data);
+        console.log(`username found in checkIfUsernameExists: `, data);
         if (data) {
             return true;
         }
         return false;
+    } catch (error) {
+        console.log('There was a problem with the fetch operation:', error.message);
+    }
+}
+
+const fetchUserFromUsername = async (username) => {
+    try {
+        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(`username found in fetchUser: `, data);
+        if (data) {
+            return data;
+        }
+        return null;
     } catch (error) {
         console.log('There was a problem with the fetch operation:', error.message);
     }
@@ -122,6 +139,32 @@ const validatePassword = async (username, plainTextPassword) => {
     } catch (error) {
         console.log('There was a problem with the fetch operation:', error.message);
     }
+}
+
+const signJwtToken = async (user) => {
+
+    try {
+
+        const jwtResponse = await fetch(`http://localhost:8015/jwt-api/sign`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user })
+        });
+
+        if (!jwtResponse.ok) {
+            throw new Error('Network response was not ok in signjwtToken');
+        }
+
+        const jwtData = await jwtResponse.json();
+        // console.log(`jwt data found in signJwtToken: `, jwtData);
+        return jwtData
+
+    } catch (error) {
+        console.log('There was a problem with the fetch operation:', error.message);
+    }
+
 }
 
 const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
@@ -159,4 +202,7 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
 
 
 // Exports for genre-microservice-controller
-export { validatePassword, checkIfUsernameExists, checkIfUsernameOrEmailExists, createUser };
+export {
+    validatePassword, checkIfUsernameExists, checkIfUsernameOrEmailExists,
+    createUser, fetchUserFromUsername, signJwtToken
+};

@@ -23,10 +23,10 @@ export const checkAuth = (req, res, next) => {
                 }
             }  
 
-            // Assuming the payload structure here
+            // set req.user payload schema 
             req.user = {
-                username: verifiedToken.userUsername,
-                id: verifiedToken.userID,
+                userUsername: verifiedToken.userUsername,
+                userID: verifiedToken.userID,
             };
             next();
         });

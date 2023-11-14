@@ -22,18 +22,18 @@ function LoginPage() {
         const userCredentials = { username: credentials.username, password: credentials.password };
 
         try {
+            //  login authentication, JWT generation and stored in client cookie 
             const response = await fetch('http://localhost:8008/login/validation', {
                 method: 'POST',
+                credentials: 'include', // Include credentials in the request
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userCredentials),
             });
 
             if (response.ok) {
                 alert('Logged in successfully!');
-                
-                // generate JWT and store in client cookie 
-                
                 // navigate('/');
+
             } else {
                 if (response.status === 401) {
                     alert('Invalid username or password. Please try again.');
@@ -55,27 +55,27 @@ function LoginPage() {
         <div className="login-container">
             <h1>Login to SafeSave</h1>
             <p>Enter your credentials to access your vault.</p>
-            
+
             {/* Form for username and password input */}
             <form onSubmit={handleLogin} className="login-form">
                 <div className="input-group">
                     <label>Username</label>
-                    <input 
-                        type="txt" 
+                    <input
+                        type="txt"
                         name="username"
-                        value={credentials.username} 
-                        onChange={handleInputChange} 
+                        value={credentials.username}
+                        onChange={handleInputChange}
                         placeholder="Enter your username"
                         required
                     />
                 </div>
                 <div className="input-group">
                     <label>Password</label>
-                    <input 
-                        type={showPassword ? "txt" : "pwd"} 
+                    <input
+                        type={showPassword ? "txt" : "pwd"}
                         name="password"
-                        value={credentials.password} 
-                        onChange={handleInputChange} 
+                        value={credentials.password}
+                        onChange={handleInputChange}
                         placeholder="Enter your password"
                         required
                     />
@@ -84,7 +84,7 @@ function LoginPage() {
                     </button>
                 </div>
             </form>
-            
+
             {/* Separate login button */}
             <div className="submit-button">
                 <button className="login-button" onClick={handleLogin}>Login</button>

@@ -33,31 +33,35 @@ app.post('/api/2fa-registration', checkAuth, cors(), async (req, res) => {
     generates and stores a temporary secret given a userId
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
-    const { username, userID, user2FAEnabled } = req.user
+    // grab user from stored Cookie
+    const { userUsername, userID } = req.user
 
+    /* req.user schema: {
+        userUsername,
+        userID,
+        user2FAEnabled
+        }
+    */
 
-    // temporary solution to emulate a user
-    const { enableTwoFactor, userId } = req.body;
+    const { enableTwoFactor } = req.body
 
     console.log(`enableTwoFactor is: ${enableTwoFactor}`);
 
     // If the request is to disable 2FA
     if (!enableTwoFactor) {
         try {
-            const twoFADisabled = twoFACodeModel.disableTwoFactor(userId);
+            const twoFADisabled = twoFACodeModel.disableTwoFactor(userID);
             if (!twoFADisabled) {
-                return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userId ${userId}` });
+                return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userID ${userID}` });
             }
-            return res.status(200).json({ message: `2FA was disabled for userId ${userId}` });
+            return res.status(200).json({ message: `2FA was disabled for userId ${userID}` });
         } catch (error) {
             return res.status(500).json({ message: "Error in process of disabling 2FA." });
         }
     }
 
     try {
-        const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userId);
+        const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userID);
         if (!temp_secret) {
             return res.status(400).json({ message: 'Something went wrong trying to generate and store temp token' });
         }
@@ -70,21 +74,23 @@ app.post('/api/2fa-registration', checkAuth, cors(), async (req, res) => {
     }
 })
 
-app.post('/api/verify-2fa-setup-token', async (req, res) => {
+app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     /*
     Verifies temporary secret token.
 
     On success, overwrites 'temp_secret' --> 'secret'.
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
-    const { userId, token, secret } = req.body;
+    // grab user's ID from Cookie
+    const { userID } = req.user
+
+    // grab token / secret from client 
+    const { token, secret } = req.body;
 
     try {
 
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = await twoFACodeModel.verifyTemporaryTOTP(userId, token, secret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, secret)
 
         if (verified) {
             return res.status(200).json({ verified: true });
@@ -131,15 +137,14 @@ app.post('/api/generate-mfa-qr-code', async (req, res) => {
     return qrcode.toFileStream(res, configUri);
 });
 
-app.post('/api/verify-2fa-login-token', (req, res) => {
+app.post('/api/verify-2fa-login-token', checkAuth, (req, res) => {
     /*  
     Verifies the token received when user tries logging into app.
     Assumes 2FA is already set up and user has an account setup.
     */
 
-    // TODO: pull user from sql db using some form of persistent JWT token?
-    // replace userId below with user from db  
-    const { userId, token, secret, user2FAEnabled } = req.body;
+    const { token, secret } = req.body;
+    const { userID, user2FAEnabled } = req.user
 
     // check if 2FA is even enabled
     if (!user2FAEnabled) {
@@ -147,7 +152,7 @@ app.post('/api/verify-2fa-login-token', (req, res) => {
     }
 
     // Check for required fields
-    if (!userId || !token || !secret) {
+    if (!userID || !token || !secret) {
         return res.status(400).json({ message: "UserId and token and secret are required." });
     }
 

@@ -35,7 +35,11 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
     Function to create, sign and return JWT in a cookie 
     */
 
-    const { user } = req.body   // grab User from client-side  .. should be done after user authentication
+    const { user } = req.body   // grab User from login-controller - only time I ask for User (curr only sending username, id and 2faenabled ) 
+
+    if (!user) {
+        return res.status(400).json({ error: "User data is required" });
+    }
 
     console.log(`Beginning JWT token creation for user:`, user);
 
@@ -44,9 +48,7 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
         const token = jwtModel.signJwtToken(user);
 
         // If all validations pass, send a success response.
-        return res.cookie("access_token", token, {
-            httpOnly: true
-        }).status(200).json({ message: "Token creation successful.", token: token });
+        return res.status(200).json({ message: "Token creation successful.", token: token });
 
     } catch (error) {
         console.error(`Error signing token ${username}: ${error.message}`);
