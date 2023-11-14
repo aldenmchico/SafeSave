@@ -4,7 +4,6 @@ import mysql from 'mysql';
 import * as db from './db-connector.mjs';
 var con = mysql.createConnection(db.dbConfig);
 
-import fetch from 'node-fetch';
 import https from 'https';
 
 //Date stuff

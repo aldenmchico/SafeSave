@@ -11,7 +11,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch(`http://localhost:3001/users/byUsername/${username}`);
+        const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
             console.log(`Username exists: `, usernameData);
@@ -22,7 +22,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
             throw new Error('An error occurred while checking the username.');
         }
 
-        const emailResponse = await fetch(`http://localhost:3001/users/byEmail/${email}`);
+        const emailResponse = await fetch(`https://localhost:3001/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
             console.log(`Email exists: `, emailData);
@@ -57,7 +57,7 @@ const createUser = async (username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`http://localhost:3001/users/`, {
+        const createResponse = await fetch(`https://localhost:3001/users/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const createUser = async (username, email, password) => {
 
 const checkIfUsernameExists = async (username) => {
     try {
-        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -100,7 +100,7 @@ const checkIfUsernameExists = async (username) => {
 
 const fetchUserFromUsername = async (username) => {
     try {
-        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -122,7 +122,7 @@ const validatePassword = async (username, plainTextPassword) => {
     - pass username externally
     */
     try {
-        const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -145,7 +145,7 @@ const signJwtToken = async (user) => {
 
     try {
 
-        const jwtResponse = await fetch(`http://localhost:8015/jwt-api/sign`, {
+        const jwtResponse = await fetch(`https://localhost:8015/jwt-api/sign`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
         };
 
         // Send PATCH request to update user's password
-        const response = await fetch(`http://localhost:3001/users/`, {
+        const response = await fetch(`https://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
