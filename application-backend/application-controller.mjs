@@ -133,6 +133,7 @@ userRouter.get('/', (req, res) => {
 
 userRouter.get('/byUsername/:username', (req, res) => {
     appModel.getUserByUsername(req.params.username, (err, result) => {
+        console.log(`byUsernameReq: ${req}`);
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.length == 0) res.status(404).send({ "error": "Username not found" });
