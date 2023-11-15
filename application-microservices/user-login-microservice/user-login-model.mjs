@@ -12,6 +12,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
 
     try {
         const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
+        console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
             console.log(`Username exists: `, usernameData);
@@ -131,6 +132,9 @@ const validatePassword = async (username, plainTextPassword) => {
         const hashedPassword = data[0].userPassword;
 
         console.log(`hashedPassword is ${hashedPassword}`);
+
+        const temp_password = await bcrypt.hash(plainTextPassword, 10);
+        console.log(`temp_password is ${temp_password}`); 
 
         // load hashed password field from username
         const hashesAreTheSame = await bcrypt.compare(plainTextPassword, hashedPassword);

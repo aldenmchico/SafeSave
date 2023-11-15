@@ -27,5 +27,4 @@
 database/db-connector.js
 application-backend/db-connector.mjs
 /.idea
-node_modules/
 

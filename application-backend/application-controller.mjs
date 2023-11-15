@@ -32,6 +32,8 @@ try {
     process.exit(1);
 }
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
 
@@ -39,7 +41,10 @@ const httpsServer = https.createServer(creds, app);
 
 
 // Enable CORS for all routes and origins
+// app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+
 app.use(cors());
+
 
 const userRouter = express.Router();
 const loginItemRouter = express.Router();
@@ -133,6 +138,7 @@ userRouter.get('/', (req, res) => {
 
 userRouter.get('/byUsername/:username', (req, res) => {
     appModel.getUserByUsername(req.params.username, (err, result) => {
+        console.log(`byUsernameReq: ${req}`);
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.length == 0) res.status(404).send({ "error": "Username not found" });

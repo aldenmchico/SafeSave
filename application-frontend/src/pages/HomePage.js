@@ -12,11 +12,17 @@ function HomePage({ setLoginItem }) {
     const [username, setUsername] = useState('Guest');
 
     const location = useLocation();
-    const history = useNavigate(); 
+    const history = useNavigate();
 
-    // Update state with location.state if available
+    console.log(location.state)
+
+    // change later 
     useEffect(() => {
-        if (location.state) {
+        if (!location.state) {
+            loadSavedLogins();
+            loadSavedNotes();
+            setUsername('John Doe'); // Placeholder
+        } else {
             if (location.state.userID) setUserID(location.state.userID);
             if (location.state.password) setUserHash(location.state.password);
             if (location.state.username) setUsername(location.state.username);
@@ -24,6 +30,7 @@ function HomePage({ setLoginItem }) {
             loadSavedNotes();
         }
     }, [location.state]);
+
 
     const loadSavedLogins = async () => {
         try {
