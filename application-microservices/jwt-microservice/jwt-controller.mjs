@@ -41,8 +41,27 @@ const httpsServer = https.createServer(creds, app);
 app.use(express.json());
 app.use(cookieparser());
 
-// Enable All CORS Requests
-app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+//Added local laptop IP for testing from different computers in my network
+//CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
+//which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
+//allowed origins will EVENTUALLY have our domain name at port 443 once we host!
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000']
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Check if the origin is in the list of allowed origins or if it's a browser preflight request
+        const isAllowed = allowedOrigins.some(allowedOrigin =>
+            new RegExp(allowedOrigin).test(origin)
+        );
+
+        if (isAllowed || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+}));
 
 // app.use(cors());
 
