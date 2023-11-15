@@ -1,0 +1,8 @@
+#!/bin/bash
+# Starts backend, encryption ms, decrypt ms, and frontend
+# Adjust to your needs
+
+cd ./application-backend/ && npm start &
+cd ./application-microservices/data-encryption-microservice/ && npm start &
+cd ./application-microservices/data-decryption-microservice/ && npm start &
+cd ./application-frontend/ && npm start &
