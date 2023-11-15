@@ -7,16 +7,53 @@ import cors from 'cors';
 import { checkAuth } from '../middlewares/checkAuth.mjs';
 
 import cookieparser from 'cookie-parser';
+import path from 'path';
+
+
+// HTTPS
+import https from 'https';
+import { readFileSync } from 'fs';
+
+// Obtain __dirname in an ES module
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const privateKeyPath = path.resolve(__dirname, 'key.pem');
+const certificatePath = path.resolve(__dirname, 'cert.pem');
+
+let privateKey;
+let certificate;
+
+try {
+    privateKey = readFileSync(privateKeyPath, 'utf8');
+    certificate = readFileSync(certificatePath, 'utf8');
+} catch (error) {
+    console.error('Error reading SSL certificate files:', error);
+    process.exit(1);
+}
+
+const creds = { key: privateKey, cert: certificate };
 
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
 
+
+
 app.use(cookieparser());
 app.use(express.json());
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+
+
 // Enable All CORS Requests from any origin and allow server to accept cookies from client
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+
 
 app.get('/api', checkAuth, cors(), (req, res) => {
     /*
@@ -170,10 +207,15 @@ app.post('/api/verify-2fa-login-token', checkAuth, (req, res) => {
 
 
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server listening on port ${PORT}...`);
+// });
 
+const httpsServer = https.createServer(creds, app);
+
+httpsServer.listen(PORT, () => {
+    console.log(`2Factor server listening on port ${PORT}...`);
+});
 
 /* 
 
