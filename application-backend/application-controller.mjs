@@ -410,19 +410,8 @@ notesRouter.delete('/:noteId', (req, res) => {
     })
 });
 
-/*
-    LISTENER
-
-
-*/
 
 //HTTPS
-
-
-// app.listen(PORT, function () {
-//     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
-// });
-
 httpsServer.listen(PORT, () => {
-    console.log(`Express server started listening on port ${PORT}...`);
+    console.log(`Express application-controller server started listening on port ${PORT}...`);
 });

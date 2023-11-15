@@ -2,8 +2,6 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 
-
-
 // HTTPS
 import https from 'https';
 import { readFileSync } from 'fs';
@@ -120,10 +118,6 @@ app.get('/', async (req, res) => {
         }
     });
 });
-
-// app.listen(PORT, () => {
-//     console.log('Server is running on port 3001');
-// });
 
 
 httpsServer.listen(PORT, () => {
