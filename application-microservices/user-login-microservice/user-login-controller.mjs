@@ -176,12 +176,6 @@ app.post('/create/account', async (req, res) => {
 // });
 
 
-
-// app.listen(PORT, function () {
-//     console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
-// });
-
-//AT THE END
 httpsServer.listen(PORT, () => {
-    console.log(`User login server listening on port ${PORT}...`);
+    console.log(`User login controller server listening on port ${PORT}...`);
 });

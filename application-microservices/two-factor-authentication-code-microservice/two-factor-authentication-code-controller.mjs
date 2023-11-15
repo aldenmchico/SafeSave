@@ -42,20 +42,16 @@ const creds = { key: privateKey, cert: certificate };
 const PORT = process.env.PORT;
 const app = express();
 
-
-
 app.use(cookieparser());
 app.use(express.json());
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-
-
 // Enable All CORS Requests from any origin and allow server to accept cookies from client
 app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
 
 
-app.get('/api', checkAuth, cors(), (req, res) => {
+app.get('/api', checkAuth, (req, res) => {
     /*
     Dummy /api endpoint 
     */
@@ -65,7 +61,7 @@ app.get('/api', checkAuth, cors(), (req, res) => {
     res.status(200).json({ message: 'Welcome to 2FA controller!' });
 })
 
-app.post('/api/2fa-registration', checkAuth, cors(), async (req, res) => {
+app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     /*
     generates and stores a temporary secret given a userId
     */
@@ -205,11 +201,6 @@ app.post('/api/verify-2fa-login-token', checkAuth, (req, res) => {
 
 });
 
-
-
-// app.listen(PORT, () => {
-//     console.log(`Server listening on port ${PORT}...`);
-// });
 
 const httpsServer = https.createServer(creds, app);
 
