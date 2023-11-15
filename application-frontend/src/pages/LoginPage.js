@@ -27,6 +27,7 @@ function LoginPage() {
             const response = await fetch('https://localhost:8008/login/validation', {
                 method: 'POST',
                 credentials: 'include', // Include credentials in the request
+                secure: true,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(credentials),
             });

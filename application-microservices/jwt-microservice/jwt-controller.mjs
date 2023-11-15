@@ -42,6 +42,8 @@ app.use(express.json());
 app.use(cookieparser());
 
 // Enable All CORS Requests
+// app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+
 app.use(cors());
 
 app.get('/jwt-api', cors(), async (req, res) => {

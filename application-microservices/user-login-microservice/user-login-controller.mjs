@@ -48,6 +48,8 @@ app.use(cors({
     credentials: true
 }));
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 
 app.post('/login/validation', async (req, res) => {
     const { username, password } = req.body;

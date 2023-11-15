@@ -41,7 +41,10 @@ const httpsServer = https.createServer(creds, app);
 
 
 // Enable CORS for all routes and origins
+// app.use(cors({ origin: 'https://localhost:3000', credentials: true }));
+
 app.use(cors());
+
 
 const userRouter = express.Router();
 const loginItemRouter = express.Router();

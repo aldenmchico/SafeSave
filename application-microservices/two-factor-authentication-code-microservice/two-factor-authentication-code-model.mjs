@@ -3,6 +3,12 @@ import 'dotenv/config';
 import crypto from 'crypto';
 import base32 from 'hi-base32';
 
+import https from 'https';
+
+const agent = new https.Agent({
+    rejectUnauthorized: false
+});
+
 // generate temp secret key for step 1 of 2FA 
 const generateAndStoreTempSecretToken = async (userId, length = 20) => {
 
@@ -21,7 +27,7 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
         console.log(`UserID is ${userId}`);
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`http://localhost:3001/users/`, {
+        const response = await fetch(`https://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,7 +115,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
                 };
 
                 // Send PATCH request to update user's primary secret field
-                const response = await fetch(`http://localhost:3001/users/`, {
+                const response = await fetch(`https://localhost:3001/users/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -163,12 +169,13 @@ const disableTwoFactor = async (userId) => {
     };
     try {
         // Send PATCH request to update user's primary secret field
-        const response = await fetch(`http://localhost:3001/users/`, {
+        const response = await fetch(`https://localhost:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(patchData)
+            body: JSON.stringify(patchData),
+            agent: agent
         });
 
         if (!response.ok) {

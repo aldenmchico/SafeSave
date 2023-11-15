@@ -11,16 +11,18 @@ function SettingsPage() {
 
     const updateTwoFactorSetting = async (newState) => {
         // Account update logic
-        const userId = 87; // TODO: Replace with actual user ID from session or JWT token
+        const userId = 5; // TODO: Replace with actual user ID from session or JWT token
 
         try {
-            const response = await fetch('http://localhost:8006/api/2fa-registration', {
+            const response = await fetch('https://localhost:8006/api/2fa-registration', {
                 method: 'POST',
+                credentials: 'include', // Include credentials in the request
+                secure: true,
                 headers: {
                     'Content-Type': 'application/json',
                     // Include other headers as required, such as authentication tokens
                 },
-                body: JSON.stringify({ enableTwoFactor: newState, userId: userId }),
+                body: JSON.stringify({ enableTwoFactor: newState }),
             });
 
             if (response.ok) {

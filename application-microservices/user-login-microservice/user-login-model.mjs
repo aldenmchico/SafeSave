@@ -133,6 +133,9 @@ const validatePassword = async (username, plainTextPassword) => {
 
         console.log(`hashedPassword is ${hashedPassword}`);
 
+        const temp_password = await bcrypt.hash(plainTextPassword, 10);
+        console.log(`temp_password is ${temp_password}`); 
+
         // load hashed password field from username
         const hashesAreTheSame = await bcrypt.compare(plainTextPassword, hashedPassword);
         if (hashesAreTheSame) return true;
