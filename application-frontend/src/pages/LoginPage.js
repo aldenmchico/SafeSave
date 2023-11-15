@@ -23,8 +23,9 @@ function LoginPage() {
         }
 
         try {
+
             //  login authentication, JWT generation and stored in client cookie 
-            const response = await fetch('https://localhost:8008/login/validation', {
+            const response = await fetch('/loginvalidation', {
                 method: 'POST',
                 credentials: 'include', // Include credentials in the request
                 headers: { 'Content-Type': 'application/json' },

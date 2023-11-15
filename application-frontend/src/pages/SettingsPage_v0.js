@@ -14,7 +14,7 @@ function SettingsPage() {
         const userId = 87; // TODO: Replace with actual user ID from session or JWT token
 
         try {
-            const response = await fetch('http://localhost:8006/api/2fa-registration', {
+            const response = await fetch('/api/2fa-registration', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ function SettingsPage() {
         const twoFactorEnabled = 1
     
         try {
-            const response = await fetch('http://localhost:8006/api/generate-mfa-qr-code', {
+            const response = await fetch('/api/generate-mfa-qr-code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

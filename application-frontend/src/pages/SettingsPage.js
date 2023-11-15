@@ -14,7 +14,8 @@ function SettingsPage() {
         const userId = 5; // TODO: Replace with actual user ID from session or JWT token
 
         try {
-            const response = await fetch('https://localhost:8006/api/2fa-registration', {
+            //            const response = await fetch('https://localhost:8006/api/2fa-registration', {
+            const response = await fetch('/api/2fa-registration', {
                 method: 'POST',
                 credentials: 'include', // Include credentials in the request
                 headers: {

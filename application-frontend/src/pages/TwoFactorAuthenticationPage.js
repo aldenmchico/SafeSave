@@ -39,7 +39,7 @@ function TwoFactorAuthenticationPage() {
         const twoFactorEnabled = 1
 
         try {
-            const response = await fetch('http://localhost:8006/api/generate-mfa-qr-code', {
+            const response = await fetch('/api/generate-mfa-qr-code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ function TwoFactorAuthenticationPage() {
 
             console.log(`token is ${code}`)
 
-            const response = await fetch('http://localhost:8006/api/verify-2fa-setup-token', {
+            const response = await fetch('/api/verify-2fa-setup-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ const Navigation = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/loginnavigation');
     };
 
     return (
@@ -78,7 +78,7 @@ const Navigation = () => {
                 <li><NavLink to="/about">About</NavLink></li>
                 <li><NavLink to="/twofactorauth">2FA</NavLink></li>
                 <li><NavLink to="/createaccount">Create Account</NavLink></li>
-                <li><NavLink to="/login">Login</NavLink></li>
+                <li><NavLink to="/loginnavigation">Login</NavLink></li>
                 {/* Dropdown for Saved Info */}
                 <div className="dropdown">
                     <NavLink to="#" className="dropbtn">Saved Info</NavLink>

@@ -44,7 +44,7 @@ const httpsServer = https.createServer(creds, app);
 //CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
 //which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
 //allowed origins will EVENTUALLY have our domain name at port 443 once we host!
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000']
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -151,6 +151,8 @@ userRouter.get('/', (req, res) => {
         }
     })
 });
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 userRouter.get('/byUsername/:username', (req, res) => {
     appModel.getUserByUsername(req.params.username, (err, result) => {

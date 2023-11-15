@@ -1,0 +1,65 @@
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+module.exports = function (app) {
+    // Proxy requests for /login/validation
+    app.use(
+        '/loginvalidation',
+        createProxyMiddleware({
+            target: 'https://localhost:8008',
+            changeOrigin: true,
+            secure: false
+        })
+    );
+
+    //Proxy server for 2fa api
+
+    app.use(
+        '/api',
+            createProxyMiddleware({
+                target: 'https://localhost:8006',
+                changeOrigin: true,
+                secure: false
+            })
+    )
+
+
+
+    // Proxy requests for /users/*
+    app.use(
+        '/users',
+        createProxyMiddleware({
+            target: 'https://localhost:3001',
+            changeOrigin: true,
+            secure: false
+        })
+    );
+
+    // Proxy requests for /jwt-api/sign
+    app.use(
+        '/jwt-api/sign',
+        createProxyMiddleware({
+            target: 'https://localhost:8015',
+            changeOrigin: true,
+            secure: false
+        })
+    );
+
+
+    app.use(
+        '/login_items',
+        createProxyMiddleware({
+            target: 'https://localhost:3001',
+            changeOrigin: true,
+            secure: false, // Ignore SSL certificate validation (for development only)
+        })
+    );
+
+    app.use(
+        '/notes',
+        createProxyMiddleware({
+            target: 'https://localhost:3001',
+            changeOrigin: true,
+            secure: false, // Ignore SSL certificate validation (for development only)
+        })
+    );
+};
