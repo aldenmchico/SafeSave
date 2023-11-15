@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const checkIfUsernameOrEmailExists = async (username, email) => {
     /*
     Error code 404 = entity does not exist ; not an system error.. interpret as a valid response
@@ -11,7 +11,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
+        const usernameResponse = await fetch('/users/byUsername/' + username);
         console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
@@ -23,7 +23,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
             throw new Error('An error occurred while checking the username.');
         }
 
-        const emailResponse = await fetch(`https://localhost:3001/users/byEmail/${email}`);
+        const emailResponse = await fetch(`/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
             console.log(`Email exists: `, emailData);
@@ -58,7 +58,7 @@ const createUser = async (username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`https://localhost:3001/users/`, {
+        const createResponse = await fetch(`/users/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -81,23 +81,28 @@ const createUser = async (username, email, password) => {
     }
 }
 
+let testingResponse;
 
-const checkIfUsernameExists = async (username) => {
-    try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+const checkIfUsernameExists = (username) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(`https://localhost:3001/users/byUsername/${username}`);
+            console.log('Response:', response);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log(`username found in checkIfUsernameExists: `, data);
+
+            resolve(!!data); // Resolving with a boolean value
+        } catch (error) {
+            console.log('There was a problem with the fetch operation:', error.message);
+            reject(error);
         }
-        const data = await response.json();
-        console.log(`username found in checkIfUsernameExists: `, data);
-        if (data) {
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.log('There was a problem with the fetch operation:', error.message);
-    }
-}
+    });
+};
+
 
 const fetchUserFromUsername = async (username) => {
     try {
@@ -185,7 +190,7 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
         };
 
         // Send PATCH request to update user's password
-        const response = await fetch(`https://localhost:3001/users/`, {
+        const response = await fetch(`/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

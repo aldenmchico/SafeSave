@@ -6,6 +6,8 @@ import cors from 'cors';
 import cookieparser from 'cookie-parser';
 
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 // Configure express server
 const PORT = process.env.PORT;
 const app = express();
@@ -48,7 +50,7 @@ app.use(cookieparser());
 //CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
 //which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
 //allowed origins will EVENTUALLY have our domain name at port 443 once we host!
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000']
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -66,10 +68,9 @@ app.use(cors({
     credentials: true,
 }));
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 
-app.post('/login/validation', async (req, res) => {
+app.post('/loginvalidation', async (req, res) => {
     console.log(req)
     const { username, password } = req.body;
 
@@ -81,14 +82,17 @@ app.post('/login/validation', async (req, res) => {
 
     try {
         // verify username exists
-        const userExists = await userLoginModel.checkIfUsernameExists(username);
-        if (!userExists) {
+        const usernameExists = await userLoginModel.checkIfUsernameExists(`${username}`);
+        console.log("Username exists:", usernameExists);
+
+        if (!usernameExists) {
             console.log(`User ${username} does not exist.`);
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
         // validate password against stored hash
         const passwordsMatch = await userLoginModel.validatePassword(username, password);
+
         if (!passwordsMatch) {
             console.log(`Invalid password attempt for ${username}.`);
             return res.status(401).json({ message: "Invalid username or password." });
@@ -96,12 +100,11 @@ app.post('/login/validation', async (req, res) => {
 
         // fetch user from DB using username
         const fetchedUser = await userLoginModel.fetchUserFromUsername(username);
+
         if (fetchedUser) {
             console.log('user in api endpoint is: ', fetchedUser);
 
-            // UPDATE: unencrypted password and user ID from the database needs to be saved in a token / .env file from application-backend or somewhere
-            const { userID, userUsername, user2FAEnabled } = fetchedUser[0]
-
+            const { userID, userUsername, user2FAEnabled } = fetchedUser[0];
             console.log(`userID is ${userID}, username is ${userUsername}, user2FAEnabled is ${user2FAEnabled}`);
 
             const user = { userID, userUsername, user2FAEnabled };
@@ -111,28 +114,26 @@ app.post('/login/validation', async (req, res) => {
 
                 if (tokenResponse && tokenResponse.token) {
                     // If all validations pass, send a success response.
-
                     return res.cookie("access_token", tokenResponse.token, { httpOnly: true }).status(200).json({
                         message: "Login successful.",
-                        user,  // Directly use the user object
-                        token: tokenResponse.token  // Use the token string
+                        user,
+                        token: tokenResponse.token
                     });
                 } else {
                     throw new Error('Token creation failed');
                 }
 
             } catch (error) {
-                // current implementation - model file handles nonexistent user... this catch block never hits 
                 console.error(`Error validating credentials for ${username}: ${error.message}`);
                 return res.status(500).json({ error: "Internal Server Error" });
             }
         }
     } catch (error) {
-        // current implementation - model file handles nonexistent user... this catch block never hits 
         console.error(`Error validating credentials for ${username}: ${error.message}`);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 app.post('/create/account', async (req, res) => {
     const { username, email, password } = req.body;

@@ -48,7 +48,7 @@ app.use(express.json());
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Enable All CORS Requests from any origin and allow server to accept cookies from client
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://107.181.189.57:7263', 'https://192.168.88.79:3000'];
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://107.181.189.57:7263', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263'];
 
 app.use(cors({
     origin: function (origin, callback) {

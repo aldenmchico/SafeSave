@@ -77,7 +77,7 @@ function App() {
                 <Route path="/" element={<HomePage setLoginItem={setLoginItem} />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/twofactorauth" element={<TwoFactorAuthenticationPage />} />
-                <Route path="/login" element={<LoginPage />} />
+                <Route path="/loginnavigation" element={<LoginPage />} />
                 <Route path="/savedlogins" element={<SavedLoginsPage setLoginItem={setLoginItem} />} />
                 <Route path="/savednotes" element={<NotesPage setNote={setNote} />} />
                 <Route path="/payments" element={<PaymentsPage />} />
