@@ -32,6 +32,8 @@ try {
     process.exit(1);
 }
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
 
