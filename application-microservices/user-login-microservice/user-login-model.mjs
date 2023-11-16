@@ -11,7 +11,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch('/users/byUsername/' + username);
+        const usernameResponse = await fetch('https://localhost:3001/users/byUsername/' + username);
         console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
@@ -23,7 +23,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
             throw new Error('An error occurred while checking the username.');
         }
 
-        const emailResponse = await fetch(`/users/byEmail/${email}`);
+        const emailResponse = await fetch(`https://localhost:3001/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
             console.log(`Email exists: `, emailData);
@@ -58,7 +58,7 @@ const createUser = async (username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`/users/`, {
+        const createResponse = await fetch(`https://localhost:3001/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
