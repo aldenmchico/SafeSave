@@ -84,14 +84,6 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
 
     // grab user from stored Cookie
     const { userUsername, userID } = req.user
-
-    /* req.user schema: {
-        userUsername,
-        userID,
-        user2FAEnabled
-        }
-    */
-
     const { enableTwoFactor } = req.body
 
     console.log(`enableTwoFactor is: ${enableTwoFactor}`);
@@ -123,10 +115,55 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     }
 })
 
+app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) => {
+    /*
+    Checks if Cookie user has 2FA enabled and Real Secret already established
+    - If no real secret, they have not yet verified 2fa setup. 
+    - If both enabled, then they are set up. 
+    */
+
+    const { userUsername } = req.user
+    try {
+        const verified = await twoFACodeModel.checkIfUserHas2FAEnabledAndRealSecret(userUsername);
+
+        if (!verified) {
+            return res.status(200).json({ verified: false });
+        }
+        return res.status(200).json({ verified: true });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error checking if User has 2FA Enabled and Real Secret." })
+    }
+})
+
+app.get('/api/check-2fa-enabled-and-no-secret', checkAuth, async (req, res) => {
+    /*
+    Checks if Cookie user has 2FA enabled and Real Secret already established
+    - If no real secret, they have not yet verified 2fa setup. 
+    - If both enabled, then they are set up. 
+    */
+
+    const { userUsername } = req.user
+    try {
+        const has2FAAndNoSecret = await twoFACodeModel.checkIfUserHas2FAEnabledAndNoSecret(userUsername);
+
+        if (!has2FAAndNoSecret) {
+            return res.status(200).json({ has2FAAndNoSecret: false });
+        }
+        return res.status(200).json({ has2FAAndNoSecret: true });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error checking if User has 2FA Enabled and No Secret." })
+    }
+})
+
+
+
 app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     /*
     Verifies temporary secret token.
-
     On success, overwrites 'temp_secret' --> 'secret'.
     */
 
@@ -152,15 +189,13 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     }
 })
 
-app.post('/api/generate-mfa-qr-code', async (req, res) => {
+app.post('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
     /*
     Generates QR code for 2FA setup so user doesn't have to use put in secret into authenticator. 
-
-    Assumes mfaEnabled variable is set and both secret and username are generated.
-    Checks if 2FA already set up.
-    
-    TODO??: if not, maybe generates a QR code that the user scans with their authenticator app.  
     */
+
+     // grab user's ID from Cookie
+     const { userID, userUsername } = req.user
 
     // username is from the authenticator - NOT user's username
     const { mfaEnabled, mfaSecret, username } = req.body;

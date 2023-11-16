@@ -24,6 +24,7 @@ function TwoFactorAuthenticationPage() {
                 // If 2FA is not enabled, handle accordingly, e.g., navigate back or show a message.
                 setErrorMsg('Two-factor authentication is not enabled or you are already set up. Please check the Settings tab. Otherwise, please disable and enable 2-FA again.');
                 // navigate('/settings'); // Uncomment this line to navigate to the settings page.
+                return;
             }
 
             // display the QR code here
@@ -34,10 +35,11 @@ function TwoFactorAuthenticationPage() {
 
     const generateAndDisplayQRCode = async () => {
         // Assume you have the necessary data like mfaSecret and username
-        const mfaSecret = 'M257554WD2K2MSK773XAXPIN3EQZA74A' // The secret generated for the user's 2FA
+        const mfaSecret = 'FYIJIK2TCJCCZXHAM5BXJS73TSIQX2WA' // The secret generated for the user's 2FA
         const username = 'port11' // The username for the authenticator
         const twoFactorEnabled = 1
 
+        // THIS WHOLE FUNCTION SHOULD BE A GET REQUEST (USER DOESNT NEED TO SEND ANY BODY DATA)
         try {
             const response = await fetch('/api/generate-mfa-qr-code', {
                 method: 'POST',
@@ -61,21 +63,22 @@ function TwoFactorAuthenticationPage() {
     };
 
     const locateUserAndConfirm2FAEnabledAndNoSecret = async () => {
-        const username = 'port11'
         try {
-            const response = await fetch(`http://localhost:3001/users/byUsername/${username}`)
+            const response = await fetch('/api/check-2fa-enabled-and-no-secret') // PORT 8006 
             if (!response.ok) {
-                throw new Error('Network response was not ok in twoFactorAuthenticationPage');
+                throw new Error('Something went wrong with fetch in TwoFactorAuthPage');
             }
-            const data = await response.json();
-            console.log(`user data found in twoFactorAuthenticationPage: `, data);
+            const responseData = await response.json();
+            console.log(`user data found in TwoFactorAuthPage, locateUserAndCheck2FAEnabledAndNoSecret: `, responseData);
 
-            const twoFactor = data[0].user2FAEnabled
-            const secret = data[0].userSecret
-            if (!twoFactor || secret) return false // if FA disabled or official Secret already exists 
-            return true
+            if (response.ok && !responseData.has2FAAndNoSecret) {
+                return false
+            } else if (response.ok && responseData.has2FAAndNoSecret) {
+                return true
+            }
+
         } catch (error) {
-            console.log('There was a problem with the fetch operation:', error.message);
+            console.error('There was a problem with the fetch operation in SettingsPage, locateUserAndCheck2FAEnabledAndNoSecret():', error.message);
         }
     }
 

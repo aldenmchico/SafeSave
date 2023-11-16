@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function SettingsPage() {
     const [userID, setUserID] = useState(1);
@@ -6,13 +6,39 @@ function SettingsPage() {
     const [pendingTwoFactorEnabled, setPendingTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');
 
-    // TODO: Add part where App looks for a session user (JWT) so that I can use that to look up their credentials in DB ... needs to be done to load their Settings (2FA enabled or not) 
+    // check if current User has 2FA enabled on mounting 
+    useEffect(() => {
+        const check2FAAndOfficialSecretStatus = async () => {
+            const isEnabled = await locateUserAndCheck2FAEnabled();
+            setPendingTwoFactorEnabled(isEnabled); // Set the state based on the 2FA/secret status
+            setTwoFactorEnabled(isEnabled);
+        };
+        check2FAAndOfficialSecretStatus();
+    }, []);
+
+    const locateUserAndCheck2FAEnabled = async () => {
+
+        try {
+            const response = await fetch('/api/check-2fa-enabled-and-real-secret') // PORT 8006 
+            if (!response.ok) {
+                throw new Error('Something went wrong with fetch in SettingsPage');
+            }
+            const responseData = await response.json();
+            console.log(`user data found in SettingsPage, locateUserAndCheck2FAEnabled: `, responseData);
+
+            if (response.ok && !responseData.verified) {
+                return false
+            } else if (response.ok && responseData.verified) {
+                return true
+            }
+
+        } catch (error) {
+            console.error('There was a problem with the fetch operation in locateUserAndCheck2FAEnabled() in SettingsPage:', error.message);
+        }
+    }
 
 
     const updateTwoFactorSetting = async (newState) => {
-        // Account update logic
-        const userId = 5; // TODO: Replace with actual user ID from session or JWT token
-
         try {
             //            const response = await fetch('https://localhost:8006/api/2fa-registration', {
             const response = await fetch('/api/2fa-registration', {
@@ -37,7 +63,7 @@ function SettingsPage() {
             console.error('Error updating 2FA settings:', error);
             setMessage('An error occurred while updating two-factor authentication settings.');
             // Revert the checkbox state in case of an error
-            setTwoFactorEnabled(!newState);
+            setPendingTwoFactorEnabled(!newState);
         }
     };
 
@@ -81,7 +107,7 @@ function SettingsPage() {
                         Enable Two-Factor Authentication
                     </label>
                     <p>Enhance your account security by requiring a second verification step during login.</p>
-                    {twoFactorEnabled && <p>Change over to the 2FA tab to finish the 2FA sign up process.</p>}
+                    {twoFactorEnabled && <p>If not already done, change over to the 2FA tab to finish the 2FA sign up process.</p>}
                 </div>
             </section>
             <section>

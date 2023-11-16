@@ -189,5 +189,46 @@ const disableTwoFactor = async (userId) => {
     }
 };
 
+const checkIfUserHas2FAEnabledAndRealSecret = async (username) => {
+    try {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabledAndRealSecret(). ');
+        }
+        const data = await response.json();
+        console.log(`user data found in checkIfUserHas2FAEnabled: `, data);
+
+        const twoFactor = data[0].user2FAEnabled
+        const secret = data[0].userSecret
+        if (!twoFactor || !secret) return false // if 2FA disabled or no Real secret 
+
+        return true
+    } catch (error) {
+        console.log('There was a problem with the fetch operation in checkIfUserHas2FAEnabled:', error.message);
+    }
+}
+
+const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
+    try {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAEnabledAndNoSecret');
+        }
+        const data = await response.json();
+        console.log(`user data found in checkIfUserHas2FAEnabledAndNoSecret(): `, data);
+
+        const twoFactor = data[0].user2FAEnabled
+        const secret = data[0].userSecret
+        if (!twoFactor || secret) return false // if FA disabled or official Secret already exists 
+        return true
+    } catch (error) {
+        console.log('There was a problem with the fetch operation in checkIfUserHas2FAEnabledAndNoSecret:', error.message);
+    }
+}
+
 // Exports for genre-microservice-controller
-export { generateAndStoreTempSecretToken, verifyTemporaryTOTP, verifyAuthenticatedTOTP, disableTwoFactor };
+export {
+    generateAndStoreTempSecretToken, verifyTemporaryTOTP,
+    verifyAuthenticatedTOTP, disableTwoFactor,
+    checkIfUserHas2FAEnabledAndRealSecret, checkIfUserHas2FAEnabledAndNoSecret
+};
