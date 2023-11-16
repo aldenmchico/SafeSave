@@ -52,7 +52,7 @@ function CreateAccountPage() {
             };
 
             try {
-                const response = await fetch('http://localhost:8008/create/account', {
+                const response = await fetch('/create/account', {
 
                     method: 'POST',
                     headers: {
