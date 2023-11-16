@@ -67,10 +67,15 @@ function HomePage({ setLoginItem }) {
         }
     };
 
-    const editLoginRow = login => {
+    const navigate = useNavigate();
+    const editLoginRow = async login => {
         setLoginItem(login);
-        history.push("/edit-login");
+        navigate("/edit-login");
     }
+
+    const favoriteLoginRow = async login => {
+    }
+
 
     return (
         <div>
