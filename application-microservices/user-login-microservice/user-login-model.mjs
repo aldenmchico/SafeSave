@@ -81,27 +81,22 @@ const createUser = async (username, email, password) => {
     }
 }
 
-let testingResponse;
-
-const checkIfUsernameExists = (username) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const response = await fetch(`https://localhost:3001/users/byUsername/${username}`);
-            console.log('Response:', response);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const data = await response.json();
-            console.log(`username found in checkIfUsernameExists: `, data);
-
-            resolve(!!data); // Resolving with a boolean value
-        } catch (error) {
-            console.log('There was a problem with the fetch operation:', error.message);
-            reject(error);
+const checkIfUsernameExists = async (username) => {
+    try {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-    });
-};
+        const data = await response.json();
+        console.log(`username found: `, data);
+        if (data) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.log('There was a problem with the fetch operation:', error.message);
+    }
+}
 
 
 const fetchUserFromUsername = async (username) => {
