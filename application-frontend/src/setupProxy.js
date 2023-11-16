@@ -15,13 +15,22 @@ module.exports = function (app) {
 
     app.use(
         '/api',
-            createProxyMiddleware({
-                target: 'https://localhost:8006',
-                changeOrigin: true,
-                secure: false
-            })
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            changeOrigin: true,
+            secure: false
+        })
     )
 
+    // proxy for /api/generate-mfa-qr-code (called from TwoFactorAuthPage)
+    app.use(
+        '/api/generate-mfa-qr-code',
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            changeOrigin: true,
+            secure: false,
+        })
+    )
 
 
     // Proxy requests for /users/*

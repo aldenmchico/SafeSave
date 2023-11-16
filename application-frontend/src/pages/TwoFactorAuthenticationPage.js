@@ -34,21 +34,10 @@ function TwoFactorAuthenticationPage() {
     }, []); // The empty dependency array means this effect will run once when the component mounts.
 
     const generateAndDisplayQRCode = async () => {
-        // Assume you have the necessary data like mfaSecret and username
-        const mfaSecret = 'FYIJIK2TCJCCZXHAM5BXJS73TSIQX2WA' // The secret generated for the user's 2FA
-        const username = 'port11' // The username for the authenticator
-        const twoFactorEnabled = 1
 
         // THIS WHOLE FUNCTION SHOULD BE A GET REQUEST (USER DOESNT NEED TO SEND ANY BODY DATA)
         try {
-            const response = await fetch('/api/generate-mfa-qr-code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Include other headers as required, such as authentication tokens
-                },
-                body: JSON.stringify({ mfaEnabled: twoFactorEnabled, mfaSecret: mfaSecret, username: username }),
-            });
+            const response = await fetch('/api/generate-mfa-qr-code');
 
             if (response.ok) {
                 const qrCodeImageBlob = await response.blob();
@@ -119,9 +108,6 @@ function TwoFactorAuthenticationPage() {
 
         try {
 
-            const secret = 'M257554WD2K2MSK773XAXPIN3EQZA74A'
-            const userId = 87
-
             console.log(`token is ${code}`)
 
             const response = await fetch('/api/verify-2fa-setup-token', {
@@ -130,7 +116,7 @@ function TwoFactorAuthenticationPage() {
                     'Content-Type': 'application/json',
                     // Include other headers as required, such as authentication tokens
                 },
-                body: JSON.stringify({ userId: userId, token: code, secret: secret }),
+                body: JSON.stringify({ token: code }),
             });
 
             const responseData = await response.json();

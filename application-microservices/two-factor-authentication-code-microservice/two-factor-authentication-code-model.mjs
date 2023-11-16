@@ -24,8 +24,6 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
             user2FAEnabled: 1
         };
 
-        console.log(`UserID is ${userId}`);
-
         // Send PATCH request to update user's temp secret
         const response = await fetch(`https://localhost:3001/users/`, {
             method: 'PATCH',
@@ -200,7 +198,7 @@ const checkIfUserHas2FAEnabledAndRealSecret = async (username) => {
 
         const twoFactor = data[0].user2FAEnabled
         const secret = data[0].userSecret
-        if (!twoFactor || !secret) return false // if 2FA disabled or no Real secret 
+        if (!twoFactor) return false // if 2FA disabled or no Real secret 
 
         return true
     } catch (error) {
@@ -226,9 +224,24 @@ const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
     }
 }
 
+const returnUserDataByUsername = async (username) => {
+    try {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok in twoFactorAuthenticationModel: returnUserDataByUsername');
+        }
+        const data = await response.json();
+        console.log(`user data found in returnUserDataByUsername(): `, data);
+        if (!data) return null
+        return data
+    } catch (error) {
+        console.log('There was a problem with the fetch operation in returnUserDataByUsername:', error.message);
+    }
+}
+
 // Exports for genre-microservice-controller
 export {
     generateAndStoreTempSecretToken, verifyTemporaryTOTP,
     verifyAuthenticatedTOTP, disableTwoFactor,
-    checkIfUserHas2FAEnabledAndRealSecret, checkIfUserHas2FAEnabledAndNoSecret
+    checkIfUserHas2FAEnabledAndRealSecret, checkIfUserHas2FAEnabledAndNoSecret, returnUserDataByUsername
 };

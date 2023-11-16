@@ -72,8 +72,6 @@ app.get('/api', checkAuth, (req, res) => {
     Dummy /api endpoint 
     */
 
-    console.log(req.user);
-
     res.status(200).json({ message: 'Welcome to 2FA controller!' });
 })
 
@@ -82,8 +80,8 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     generates and stores a temporary secret given a userId
     */
 
-    // grab user from stored Cookie
-    const { userUsername, userID } = req.user
+    // grab userID from stored Cookie
+    const { userID } = req.user
     const { enableTwoFactor } = req.body
 
     console.log(`enableTwoFactor is: ${enableTwoFactor}`);
@@ -91,7 +89,7 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     // If the request is to disable 2FA
     if (!enableTwoFactor) {
         try {
-            const twoFADisabled = twoFACodeModel.disableTwoFactor(userID);
+            const twoFADisabled = await twoFACodeModel.disableTwoFactor(userID);
             if (!twoFADisabled) {
                 return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userID ${userID}` });
             }
@@ -102,7 +100,7 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     }
 
     try {
-        const temp_secret = twoFACodeModel.generateAndStoreTempSecretToken(userID);
+        const temp_secret = await twoFACodeModel.generateAndStoreTempSecretToken(userID);
         if (!temp_secret) {
             return res.status(400).json({ message: 'Something went wrong trying to generate and store temp token' });
         }
@@ -168,87 +166,141 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     */
 
     // grab user's ID from Cookie
-    const { userID } = req.user
+    const { userID, userUsername } = req.user
 
-    // grab token / secret from client 
-    const { token, secret } = req.body;
+    // grab token from client 
+    const { token } = req.body;
 
     try {
 
+        // pull user data from db
+        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
+
+        if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
+
+        // get tempsecret , 2faenabled using Cookie
+        const tempSecret = userData[0].userTempSecret;
+        const user2FAEnabled = userData[0].user2FAEnabled;
+
+        console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
+
+
+        // check if 2FA is even enabled
+        if (!user2FAEnabled) {
+            return res.status(400).json({ message: "2FA is not enabled." });
+        }
+
+        // Check for required fields
+        if (!userID || !token || !tempSecret) {
+            return res.status(400).json({ message: "Username and token and tempSecret are required." });
+        }
+
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, secret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, tempSecret)
 
         if (verified) {
-            return res.status(200).json({ verified: true });
+            // Here you might also want to establish a session or generate an access token
+            return res.status(200).json({ message: "Token was validated.", verified: true });
         }
         return res.status(200).json({ verified: false });
+        // return res.status(401).json({ message: "Invalid 2FA token.", verified: false });
 
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Error verifying token" })
+        console.log('Error in returnUserDataByUsername in 2FA Setup Token , Controller');
+        res.status(500).json({ message: "Error verifying 2FA Setup token" })
     }
 })
 
-app.post('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
+app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
     /*
     Generates QR code for 2FA setup so user doesn't have to use put in secret into authenticator. 
     */
 
-     // grab user's ID from Cookie
-     const { userID, userUsername } = req.user
+    // grab user's ID from Cookie
+    const { userID, userUsername } = req.user
 
-    // username is from the authenticator - NOT user's username
-    const { mfaEnabled, mfaSecret, username } = req.body;
+    try {
+        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
 
-    // For security, we no longer show the QR code if already verified
-    // if (mfaEnabled) return res.status(404).json({ message: "mfa is already enabled " });
+        if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
-    // Ensure that the mfaSecret is provided
-    if (!mfaSecret) {
-        return res.status(400).json({ message: "No MFA secret provided" });
+        const mfaSecret = userData[0].userSecret;
+        const mfaTempSecret = userData[0].userTempSecret;
+        const mfaEnabled = userData[0].user2FAEnabled;
+
+        console.log(`mfaSecret is ${mfaSecret} mfaTempSecret is ${mfaTempSecret} and mfaEnabled is ${mfaEnabled}`);
+
+        // For security, we no longer show the QR code if already verified
+        if (mfaEnabled && mfaSecret) return res.status(404).json({ message: "2FA is already enabled " });
+
+        // Ensure that the mfaSecret is provided
+        if (!mfaTempSecret) {
+            return res.status(400).json({ message: "Invalid Temp Secret. Ensure User is logged in (Cookies)" });
+        }
+
+        // qr code config 
+        const issuer = 'SafeSave';
+        const algorithm = 'SHA1';
+        const digits = '6';
+        const period = '30';
+        const otpType = 'totp';
+        const configUri = `otpauth://${otpType}/${issuer}:${userUsername}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
+
+        // generate qr code
+        res.setHeader('Content-Type', 'image/png');
+        return qrcode.toFileStream(res, configUri);
+    } catch (error) {
+        console.error('Error in /api/generate-mfa-qr-code');
+        res.status(500).json({ message: "Error generating QR Code in Controller" })
     }
-
-    // qr code config 
-    const issuer = 'port11';
-    const algorithm = 'SHA1';
-    const digits = '6';
-    const period = '30';
-    const otpType = 'totp';
-    const configUri = `otpauth://${otpType}/${issuer}:${username}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaSecret}`;
-
-    // generate qr code
-    res.setHeader('Content-Type', 'image/png');
-    return qrcode.toFileStream(res, configUri);
 });
 
-app.post('/api/verify-2fa-login-token', checkAuth, (req, res) => {
+app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
     /*  
     Verifies the token received when user tries logging into app.
     Assumes 2FA is already set up and user has an account setup.
     */
 
-    const { token, secret } = req.body;
-    const { userID, user2FAEnabled } = req.user
+    // get secret , 2faenabled, id from req.user
+    // get token from user input in body
+    const { token } = req.body;
+    const { userUsername } = req.user
 
-    // check if 2FA is even enabled
-    if (!user2FAEnabled) {
-        return res.status(400).json({ message: "2FA is not enabled." });
+    try {
+
+        // pull user data from db
+        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
+
+        if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
+
+        const secret = userData[0].userSecret;
+        const user2FAEnabled = userData[0].user2FAEnabled;
+
+
+        // check if 2FA is even enabled
+        if (!user2FAEnabled) {
+            return res.status(400).json({ message: "2FA is not enabled." });
+        }
+
+        // Check for required fields
+        if (!userUsername || !token || !secret) {
+            return res.status(400).json({ message: "Username and token and secret are required." });
+        }
+
+        // Verify the provided token against the user's stored secret
+        const isValid = twoFACodeModel.verifyAuthenticatedTOTP(token, secret);
+
+        if (isValid) {
+            // If the 2FA verification is successful, respond accordingly
+            // Here you might also want to establish a session or generate an access token
+            return res.status(200).json({ message: "Token was validated.", verified: true });
+        }
+        return res.status(401).json({ message: "Invalid 2FA token.", verified: false });
+
+    } catch (error) {
+        console.log('Error in returnUserDataByUsername in 2FA Controller');
+        res.status(500).json({ message: "Error verifying 2-FA login token" });
     }
-
-    // Check for required fields
-    if (!userID || !token || !secret) {
-        return res.status(400).json({ message: "UserId and token and secret are required." });
-    }
-
-    // Verify the provided token against the user's stored secret
-    const isValid = twoFACodeModel.verifyAuthenticatedTOTP(token, secret);
-
-    if (isValid) {
-        // If the 2FA verification is successful, respond accordingly
-        // Here you might also want to establish a session or generate an access token
-        return res.status(200).json({ message: "Token was validated.", verified: true });
-    }
-    return res.status(401).json({ message: "Invalid 2FA token.", verified: false });
 
 });
 
