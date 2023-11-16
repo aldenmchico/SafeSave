@@ -25,13 +25,22 @@ module.exports = function (app) {
 
     app.use(
         '/api',
-            createProxyMiddleware({
-                target: 'https://localhost:8006',
-                changeOrigin: true,
-                secure: false
-            })
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            changeOrigin: true,
+            secure: false
+        })
     )
 
+    // proxy for /api/generate-mfa-qr-code (called from TwoFactorAuthPage)
+    app.use(
+        '/api/generate-mfa-qr-code',
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            changeOrigin: true,
+            secure: false,
+        })
+    )
 
 
     // Proxy requests for /users/*
@@ -72,4 +81,16 @@ module.exports = function (app) {
             secure: false, // Ignore SSL certificate validation (for development only)
         })
     );
+
+    // proxy for /api/check-2fa-enabled-and-real-secret (called from SettingsPage)
+    app.use(
+        '/api/check-2fa-enabled-and-real-secret',
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            changeOrigin: true,
+            secure: false,
+        })
+    )
+
+
 };

@@ -14,21 +14,21 @@ const app = express();
 
 import https from 'https';
 import { readFileSync } from 'fs';
- 
+
 // Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
- 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
- 
+
 const privateKeyPath = path.resolve(__dirname, 'key.pem');
 const certificatePath = path.resolve(__dirname, 'cert.pem');
- 
+
 let privateKey;
 let certificate;
- 
+
 try {
     privateKey = readFileSync(privateKeyPath, 'utf8');
     certificate = readFileSync(certificatePath, 'utf8');
@@ -36,9 +36,9 @@ try {
     console.error('Error reading SSL certificate files:', error);
     process.exit(1);
 }
- 
+
 const creds = { key: privateKey, cert: certificate };
- 
+
 const httpsServer = https.createServer(creds, app);
 
 app.use(express.json());
@@ -104,10 +104,10 @@ app.post('/loginvalidation', async (req, res) => {
         if (fetchedUser) {
             console.log('user in api endpoint is: ', fetchedUser);
 
-            const { userID, userUsername, user2FAEnabled } = fetchedUser[0];
-            console.log(`userID is ${userID}, username is ${userUsername}, user2FAEnabled is ${user2FAEnabled}`);
+            const { userID, userUsername } = fetchedUser[0];
+            console.log(`userID is ${userID}, username is ${userUsername}`);
 
-            const user = { userID, userUsername, user2FAEnabled };
+            const user = { userID, userUsername };
 
             try {
                 const tokenResponse = await userLoginModel.signJwtToken(user);
