@@ -72,7 +72,6 @@ app.use(cors({
 
 
 app.post('/loginvalidation', async (req, res) => {
-    console.log(req)
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -82,8 +81,15 @@ app.post('/loginvalidation', async (req, res) => {
     console.log(`Checking login validation for username:[${username}]...`);
 
     try {
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+
+
+
         // verify username exists
-        const usernameExists = await userLoginModel.checkIfUsernameExists(`${username}`);
+        const usernameExists = await userLoginModel.checkIfUsernameExists(digestedUserHMAC);
         console.log("Username exists:", usernameExists);
 
         if (!usernameExists) {
@@ -92,7 +98,7 @@ app.post('/loginvalidation', async (req, res) => {
         }
 
         // validate password against stored hash
-        const passwordsMatch = await userLoginModel.validatePassword(username, password);
+        const passwordsMatch = await userLoginModel.validatePassword(digestedUserHMAC, password);
 
         if (!passwordsMatch) {
             console.log(`Invalid password attempt for ${username}.`);
@@ -100,7 +106,7 @@ app.post('/loginvalidation', async (req, res) => {
         }
 
         // fetch user from DB using username
-        const fetchedUser = await userLoginModel.fetchUserFromUsername(username);
+        const fetchedUser = await userLoginModel.fetchUserFromUsername(digestedUserHMAC);
 
         if (fetchedUser) {
             console.log('user in api endpoint is: ', fetchedUser);

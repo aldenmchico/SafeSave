@@ -13,7 +13,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch('https://localhost:3001/users/byUsername/' + username);
+        const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
         console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
@@ -60,11 +60,22 @@ const createUser = async (username, email, password) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
+        //TODO: CHANGE KEYS UPON HOSTING
+        const pubKey = readFileSync("public-useremail.pem")
+        const privKey = readFileSync("private-useremail-key.pem")
+
+        const encryptedUsername =  crypto.publicEncrypt({key: pubKey, padding: crypto.constants.RSA_PKCS1_PADDING},
+            Buffer.from(username)).toString('hex');
+
+        const encryptedEmail = crypto.publicEncrypt({key: pubKey, padding: crypto.constants.RSA_PKCS1_PADDING},
+            Buffer.from(email)).toString('hex');
+
+
         // Prepare data for the POST request
         // TODO: assumption...data needs to be encrypted/hashed
         const postData = {
-            username: username,
-            email: email,
+            username: encryptedUsername,
+            email: encryptedEmail,
             password: password,
             userSalt: userSalt,
             userHMAC: digestedUserHMAC,
@@ -101,7 +112,7 @@ const checkIfUsernameExists = async (username) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
-        const response = await fetch(`https://localhost:3001/users/byUsername/${digestedUserHMAC}`)
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -119,8 +130,14 @@ const checkIfUsernameExists = async (username) => {
 
 const fetchUserFromUsername = async (username) => {
     try {
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+
         const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
+            console.log(`response was ${response.toString()}`)
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
@@ -156,8 +173,12 @@ const validatePassword = async (username, plainTextPassword) => {
 
         // load hashed password field from username
         const hashesAreTheSame = await bcrypt.compare(plainTextPassword, hashedPassword);
-        if (hashesAreTheSame) return true;
-        return false;
+        if (hashesAreTheSame === true) {
+            return true;
+        }
+        else {
+            return false;
+        }
     } catch (error) {
         console.log('There was a problem with the fetch operation:', error.message);
     }

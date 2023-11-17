@@ -179,7 +179,7 @@ const createUserNote = async function (reqBody, callback) {
 // GET Users Table Model Functions  *****************************************
 
 // GET User by Email Model Function *****************************************
-const getUserByEmail = function (email, callback) {
+const getUserByEmail = async function (email, callback) {
     let q = `SELECT * FROM Users WHERE userEmailHMAC = "${email}"`;
     con.query(q, (err, result) => {
         if (err) throw err;
@@ -196,8 +196,8 @@ const getAllUsers = function (callback) {
     });
 };
 
-const getUserByUsername = function (username, callback) {
-    let q = `SELECT * FROM Users WHERE userHMAC = '${username}'`;
+const getUserByUsername = async function (username, callback) {
+    let q = `SELECT * FROM Users WHERE userHMAC = "${username}"`;
     con.query(q, (err, result) => {
         if (err) throw err;
         callback(null, result);
