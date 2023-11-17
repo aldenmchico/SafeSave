@@ -29,6 +29,8 @@ try {
     process.exit(1);
 }
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
 
@@ -80,7 +82,7 @@ app.post('/ciphertext', async (req, res) => {
                 userNoteTextIV: encryptedData.userNoteTextIV,
                 authTag: encryptedData.authTag
             };
-            res.status(201).json(response);
+            return res.status(201).json(response);
         }
 
         else if (req.body.userLoginWebsite && req.body.userLoginUsername && req.body.userLoginPassword){
@@ -105,17 +107,17 @@ app.post('/ciphertext', async (req, res) => {
                 authTag: encryptedData.authTag
             };
 
-            res.status(201).json(response);
+            return res.status(201).json(response);
         }
         else{
             console.log("Invalid query");
-            res.status(400).json({error: error.message});
+            return res.status(400).json({error: error.message});
         }
 
 
 
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 });
 

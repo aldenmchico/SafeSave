@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function EditSavedLoginPage({loginItem}) {
+    console.log("Login item is on EditSavedLoginPage.js", loginItem)
     const [website, setWebsite] = useState(loginItem.userLoginItemWebsite);
     const [username, setUsername] = useState(loginItem.userLoginItemUsername);
     const [password, setPassword] = useState(loginItem.userLoginItemPassword);
@@ -12,7 +13,7 @@ function EditSavedLoginPage({loginItem}) {
 
         const currentDate = new Date();
         const loginDetails = {
-            loginItemID: loginItem.userLoginItemID,
+            userLoginItemID: loginItem.userLoginItemID,
             website: website,
             username: username,
             password: password,
@@ -54,10 +55,10 @@ function EditSavedLoginPage({loginItem}) {
                     Website/Service:
 
 
-                    <input 
-                        type="txt" 
-                        value={website} 
-                        onChange={e => setWebsite(e.target.value)} 
+                    <input
+                        type="txt"
+                        value={website}
+                        onChange={e => setWebsite(e.target.value)}
 
                         placeholder="Website or Service name"
                         required
@@ -67,10 +68,10 @@ function EditSavedLoginPage({loginItem}) {
                 <label>
                     Username:
 
-                    <input 
-                        type="txt" 
-                        value={username} 
-                        onChange={e => setUsername(e.target.value)} 
+                    <input
+                        type="txt"
+                        value={username}
+                        onChange={e => setUsername(e.target.value)}
                         placeholder="Enter username"
                         required
                     />
@@ -79,10 +80,10 @@ function EditSavedLoginPage({loginItem}) {
                 <label>
                     Password:
 
-                    <input 
-                        type="pwd" 
-                        value={password} 
-                        onChange={e => setPassword(e.target.value)} 
+                    <input
+                        type="pwd"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
                         placeholder="Enter password"
                         required
                     />

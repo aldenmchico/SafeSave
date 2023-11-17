@@ -5,7 +5,7 @@ import * as db from './db-connector.mjs';
 var con = mysql.createConnection(db.dbConfig);
 
 import https from 'https';
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 //Date stuff
 const currentDate = new Date();
 const year = currentDate.getFullYear();
@@ -318,7 +318,7 @@ const getUserNoteByTitle = function (id, title, callback) {
 
 // UPDATE (PATCH) MODEL FUNCTIONS *****************************************************
 
-const patchUser = function (reqBody, callback) {
+const patchUser =  function (reqBody, callback) {
     if (reqBody.userID === undefined) {
         callback({ "code": "NO_USER_ID" }, null);
     }
@@ -357,8 +357,8 @@ const patchUser = function (reqBody, callback) {
     }
 }
 
-const patchLoginItem = function (reqBody, callback) {
-    if (reqBody.loginItemID === undefined) {
+const patchLoginItem = async function (reqBody, callback) {
+    if (reqBody.userLoginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
@@ -374,16 +374,20 @@ const patchLoginItem = function (reqBody, callback) {
         let userLoginPassword = reqBody.password;
         var userHash = "pass1";
 
-        fetch('https://127.0.0.1:8002/ciphertext', {
+        const userSalt = await getUserSalt(84);
+
+
+        await fetch('https://localhost:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                userLoginWebsite,
+                userLoginWebsite: userLoginWebsite,
                 userLoginUsername,
                 userLoginPassword,
-                userHash
+                userHash,
+                userSalt
             }),
             agent, // to get rid of self-signed errors on SSL cert
         })
@@ -420,13 +424,13 @@ const patchLoginItem = function (reqBody, callback) {
                 q += ` passwordIV = "${responseData.passwordIV}",`;
                 q += ` authTag = "${responseData.authTag}"`;
 
-                q += ` WHERE userLoginItemID = ${reqBody.loginItemID}`;
+                q += ` WHERE userLoginItemID = ${reqBody.userLoginItemID}`;
 
                 if (q === '') callback({ "code": "NO_CHANGE" }, null);
 
 
                 else {
-                    con.query(q, (err, result) => {
+                    con.query(q, async (err, result) => {
                         if (err) callback(err, null);
                         else callback(null, result);
                     })
@@ -460,7 +464,7 @@ const patchLoginItemFavorite = function(reqBody, callback) {
 
 
 
-const patchNote = function (reqBody, callback) {
+const patchNote = async function (reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
@@ -481,7 +485,7 @@ const patchNote = function (reqBody, callback) {
 
         let responseData; // Variable to store the JSON response
 
-        fetch('https://127.0.0.1:8002/ciphertext', {
+        await fetch('https://127.0.0.1:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
