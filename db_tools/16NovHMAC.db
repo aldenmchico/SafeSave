@@ -1,0 +1,133 @@
+-- MySQL dump 10.13  Distrib 8.0.35, for Linux (x86_64)
+--
+-- Host: localhost    Database: capstone_2023_securepass1
+-- ------------------------------------------------------
+-- Server version	8.0.35
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `UserLoginItems`
+--
+
+DROP TABLE IF EXISTS `UserLoginItems`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `UserLoginItems` (
+  `userLoginItemID` int NOT NULL AUTO_INCREMENT,
+  `userLoginItemWebsite` varchar(145) NOT NULL,
+  `userLoginItemUsername` varchar(145) NOT NULL,
+  `userLoginItemPassword` varchar(145) NOT NULL,
+  `userLoginItemDateCreated` date NOT NULL,
+  `userLoginItemDateUpdated` date NOT NULL,
+  `userLoginItemDateAccessed` date NOT NULL,
+  `userID` int NOT NULL,
+  `websiteIV` varchar(32) DEFAULT NULL,
+  `usernameIV` varchar(32) DEFAULT NULL,
+  `passwordIV` varchar(32) DEFAULT NULL,
+  `authTag` varchar(64) DEFAULT NULL,
+  `favorited` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`userLoginItemID`),
+  KEY `fk_UserLoginItems_Users1_idx` (`userID`),
+  CONSTRAINT `fk_UserLoginItems_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UserLoginItems`
+--
+
+LOCK TABLES `UserLoginItems` WRITE;
+/*!40000 ALTER TABLE `UserLoginItems` DISABLE KEYS */;
+INSERT INTO `UserLoginItems` VALUES (66,'4954dcd559971195867437ea69be0221','5aacf89fcb0b5c3a71a619878c16e420','d418462216055636748d786bfd8b508b','2023-11-16','2023-11-16','2023-11-16',1,'d3d5c763e465a829613899448c1deeeb','f864b5ccd4056d6dc9ef9ebb68cfc0f2','abef59cd8604a749deebd03500655015','1d9bca5053387b78e5c0daa21131ab22afe703002f7c1f9fa12b792390b0b867',0),(67,'5fec3d3820f94d05057efbe4a7eead33','6a2ea7c1d9b64bc4f207787240839124','58754764ee4bef37c26ca79ca7ea5b47','2023-11-16','2023-11-16','2023-11-16',1,'d0b7972bf842e9be766de43bf42384d5','428b285515a6714aadaac6ca4b63855f','43057eb91d2c80c6462be24ed162f620','67fe28c5ecf9401e23495c529ad29bd5966ea3d7a09c59cad084843e6ff5f27a',0),(68,'3a2ddd9bda29bf8aa1f6064ab431398d','83c85f74721ca499e2c836518955269b','6493ff9c7b609c23b26228f69ba9417d','2023-11-16','2023-11-16','2023-11-16',1,'9f34465f3e7b9cd9bf64720cb6e0092b','1ed07759fc33b08e365108dc20fc8f19','9ab3147d170909aa4b77ca6c9185c6eb','a0d8236e81597a57459593772c0f9a0b26ba2b3954236543018bee5cc9da4c3f',0),(69,'ebc3ecdbd31b17a53207c1558dcd998e','4f0e3f9f0a9181f5086e903f2c8e62be','94115c8093bd91737f5bd4be2e2e47df','2023-11-16','2023-11-16','2023-11-16',1,'c9e22edf2950bb7f36753a8f15fe350c','de0d8bf8cfbfb8121a9385a79ca49303','4b2548219b7cb92b876f32e0e06dc8ed','1d9bca5053387b78e5c0daa21131ab22afe703002f7c1f9fa12b792390b0b867',0);
+/*!40000 ALTER TABLE `UserLoginItems` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `UserNotes`
+--
+
+DROP TABLE IF EXISTS `UserNotes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `UserNotes` (
+  `userNoteID` int NOT NULL AUTO_INCREMENT,
+  `userNoteTitle` varchar(14500) NOT NULL,
+  `userNoteText` longtext,
+  `userNoteCreated` varchar(200) NOT NULL,
+  `userNoteUpdated` varchar(200) NOT NULL,
+  `userNoteAccessed` varchar(200) NOT NULL,
+  `userID` int NOT NULL,
+  `userNoteIV` varchar(145) DEFAULT 'YourDefaultValueHere',
+  `userNoteTextIV` varchar(32) DEFAULT NULL,
+  `authTag` varchar(64) DEFAULT NULL,
+  `favorited` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`userNoteID`),
+  KEY `fk_UserNotes_Users1_idx` (`userID`),
+  CONSTRAINT `fk_UserNotes_Users1` FOREIGN KEY (`userID`) REFERENCES `Users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UserNotes`
+--
+
+LOCK TABLES `UserNotes` WRITE;
+/*!40000 ALTER TABLE `UserNotes` DISABLE KEYS */;
+INSERT INTO `UserNotes` VALUES (68,'d007640bdc15f804c8e0272c98ffbbc2','418ee092ca2686d2dd957edf662facc6','2023-11-16','2023-11-16','2023-11-16',1,'0fb5885700e79f8098d765ee17b06341','b614bbf89ec321846f0a62def6c6be08','0154b4ce238d10a2bfb81427278a41b436a0dc9f30e0ed6927b68fe898e05b2d',0),(69,'488e19a422e068292827e4aaf2ab99f0','bc40e09fa03504c472e8eb955b17a889','2023-11-16','2023-11-16','2023-11-16',1,'30e613c9f5164247b9fa06402b60af78','b8e8255671661929db4488128e502180','a8f760fa719e4bd348d75a93455a6a3db0205bba81e904962e38a2e6ba818ba3',0),(70,'eaadea28528b2f2068e561d2aee9d6b6','290608fa67f08995b2a41aedf84c5700','2023-11-16','2023-11-16','2023-11-16',1,'3da01aa198e04686800ce6485554a874','9839e94239b6cea5283af77d1f8d121e','1de0598d3287516ea2dac159d3778c9e25b2cc91dc9e281067ed73fefd78e25b',0);
+/*!40000 ALTER TABLE `UserNotes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `Users`
+--
+
+DROP TABLE IF EXISTS `Users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Users` (
+  `userID` int NOT NULL AUTO_INCREMENT,
+  `userUsername` longtext,
+  `userEmail` longtext,
+  `userPassword` varchar(145) NOT NULL,
+  `user2FAEnabled` tinyint(1) NOT NULL DEFAULT '0',
+  `userSecret` varchar(255) DEFAULT NULL,
+  `userTempSecret` varchar(255) DEFAULT NULL,
+  `userSalt` varchar(64) DEFAULT NULL,
+  `emailHMAC` varchar(255) DEFAULT NULL,
+  `userHMAC` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`userID`),
+  UNIQUE KEY `userEmail_UNIQUE` (`userEmail`(384)),
+  UNIQUE KEY `userUsername_UNIQUE` (`userUsername`(384))
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `Users`
+--
+
+LOCK TABLES `Users` WRITE;
+/*!40000 ALTER TABLE `Users` DISABLE KEYS */;
+INSERT INTO `Users` VALUES (1,'chicoa','chicoa@oregonstate.edu','$2b$10$E3LM21COWXMsW6CbiRwFv.8rFsdG8gmFQ3UMAoj5k5G/MUM98vo1i',1,NULL,'OJWLOGXNBPZPHMWB4WUHZIHQ222HEKXQ',NULL,NULL,NULL),(2,'songeu','songeu@oregonstate.edu','$2b$10$/LI0jobIMYYfgveHnetJPuRocOXuVh0DobmS0kNRzeEG67xefG9Oy',1,NULL,NULL,NULL,NULL,NULL),(3,'maddesea','maddesea@oregonstate.edu','pass3',1,NULL,NULL,NULL,NULL,NULL),(4,'mangela','mangela@oregonstate.edu','pass4',1,NULL,NULL,NULL,NULL,NULL),(5,'port11','oregonstate','$2b$10$2lsX9H7ksqdEl8hgq40xUOr5jxibthxswg8c4u1uBzg4GNFhkuNcq',1,NULL,'DNLLPIZCVAWCGBMLXZR27VRIYSULAMAP',NULL,NULL,NULL),(79,'austinm','andale@gmail.com','$2b$10$w07I6dOq/wJJwKS7IU1N3euaqnfMJWdXTwYNparAvPJpIIsWmTi9G',1,'WIU5CBBJG6LTOQUYLWFYMOLTGHBE5RTO',NULL,NULL,NULL,NULL),(80,'s','s@gmail.com','$2b$10$.Pb3Z29FI3EK2e5h3U74XOxwO1IXlKS9haYtWS2h/4pQfZwZH4u9q',1,NULL,NULL,'78e1ab1e21e2a717acf5e0b71d68e1c85cf66d86644a8988c93cca0e5511dbbe',NULL,NULL),(81,'mama','austin@gmail.com','$2b$10$X3jqlSY.9aDFCADrkSKGBOUy4gDugYzO9CvBRaovxkdhlL7Hm27Hm',1,NULL,NULL,'dd11d90de3e91a50f404f29803c661ea5da2764b41e1aec36af0b0a2925ef970',NULL,NULL),(82,'a','a@gmail.com','$2b$10$KO3mBEjoFKTIJYzWlrLr/upCCAH423hSKUFl3BWP8XGWQ0d9WYPv.',1,NULL,NULL,'ed4664cd3e3f3f079d2e3a2cfeebcb74babb5dcec285e0228ec1be8a7b7a2f7e',NULL,NULL),(83,'a21','a2@gmail.com','$2b$10$np/T8x6G0b8ZC1gLFXbVbOJt4ow9K2MGSrqhFnMrfXi2BJ8tHJzV.',1,'I2VTTEJ2576XHWKUYRTCYPWVW5YVQ5YL',NULL,'a2e859da02c97c17dd9a5e8fc581204c1ead5fb67f8d6e42d607fec33ae342e6',NULL,NULL),(102,'OW5MSqupxbydv9jnXX0Dknr4ea0ZFurdAzps6zCf7OLwF9SnIEix1YikDt9Aqmw/0VnIsZ1vZAQUFiDixJUpn6vUeUS0Q0+ButiuriFfrwfK0prHhhRZXMboHmWmdQbRsK6TrAhRDQwsdCgyV1v9+NLGH21tprsMs64HrmDGJGtAnxYGK/m65YRW56NXAh1IYeSe5z0xu2FmKmnsG9o/n2v0fYOvyl2oatECqdCp4EvkAt4+hY2YbNvbMmCUHS6pzvs7gChtUEqGLebXi+IyZyACmUebcgBSXfeJXA4Qt+dBbsekQkj5MF3cF+/1BbG37D8cX9wzVnwEEDD8ZiohhQ==','EnRNXB254SNzcKLI677ucYNTnrLvKi9AE0Cp3bKUplTGsRPkMo4xgMpFYA0LnjQZH1LSGnhnCbR6rGxyziHZDHKCzQleD5NRUn1+DRF3NFmXCbdpBJwCUkiw8cuMvl9cQCqvrGO3TLJAm0qs53Tbdhxw88zmqfQtUh97psin3ASEIxiTya/5Cyo/VQDPe5yzCUYkF9CCeqMfdkM4LukB/pU0X1QQeomfVEUK6T3XABK9tn9QZEAQFpx93j6gAfW3+oKgUXtlMvM74hI5Oor27wggFIKmoCFLrf+OUWKRkEMT0L36nTBGin9LfQJXK819LHzbkljdreKOPKHuadGxgA==','$2b$10$3wwHME9TDKpUfrpe4Y/PR.p6y6.gEcpOWVLOSeIjTxHno96ySxKW2',0,NULL,NULL,'9275cbf7f56aac928abdd05e6625d9a6000ca7f79deca00ad0c1440dbfe3801e','d7acfde5503fc3fcd96dffb33ef7ac977e6075a86fe09f9d825924d02444a700','0b776e4c270c0c74bb7bcaee8b203a910be8ca0ddd2e4db5131ccf6803d06665'),(103,'djfUap7rTnaLgunYxslg6N2X3hz+1DcDooYuWDPlLZDB/UqGMyNsXwhccRDOy/mJu0YZh2ag8F24gRwIwhR+zkRHe0tIPo2juZGrMudyNhBL29F+Dzb/mWGhSAet9dcNnrNEw7zKIb49fuNJsSZ1RfKf78w2aKb3nuvlkEebz5lXU+nRnvPzQdrV1t98wY+7Lur719o6YAQwgQdVWfZysEqX5mNKTX56vH46ahqwa/pxxht1xyRXfW6+kZO/zfO5jk71X8YDnOP+o+aBMh6r5EsqUupgyL/fvOZztw1ntxvZm5ZHHDl1NH4LdX9P1Jld0qh4czsZV3qJ4czqZUtr4Q==','rrctmFPJyRu4JUBzv1RW8ZcHWM0snPeWM/eIWzgkmQIwkJZwxCz3CN0iHFO5NejX0dQpO8i+7uxhgGBMu5idQ2HzMZ0ospbFDkSt8UzyHdI2vFj/VlFZ+AweJXQrR+e8CDLntB84QEPLSctYBNza7j2apjURMf274muKcguaEqZIAa6AEt10XFoSrKOzC/psAuprdOxLi7rfQmPFFIiP6dmvgwB9HCXwZyeeFgKLOZ7OpIP3zgyC4N8o/3sZ0RCDtcF6CCuqLTH97l5+hKbPz2gMZRiIFJbAL/92GkqxlLmrV4Kcxlskl+RsjUS+XpOttIdRKI8uZT+df68eVXu03Q==','$2b$10$yPUoV0spMdyrpVL8keMPqux9VfzCv72Sma.9Zhhs8tExW0dcXR9me',0,NULL,NULL,'90b0d6be3e9dc44149f067df4d9e7d4e717483d21cd4dc076664e5803a498971','0bd04dc1913431e5631aba214879d9d4696a26127e2f4c9f42fb9df0dc7bbaca','b128a6e24a3500e6ccc65e34794159005207ee5f3ce5e17c82f41c6b3859d9f3'),(104,'Z7EXADZxVyQB81ShsqVo5HgnCllnPD1ioizyPW/+HKPuWCwpht9zELG9dA0KpKofiuQ5iN5iy9U8r/9SZxSt1NEWvzv/Y/p+FjHuNPghGi1sSMkNF/h8GjqDdJPgiLlGmjv3hneeb8/XnKLxB2MP8J8PoJ+y1paDNewXGcydglnSzyNxXzBUKvnbO8/RZH31ZxzgRKsbj2djCGx1jBI5FR5MOInp7fuQo0kuq224JXsei7qR6JqZAfeQ/vKGOikBxP1Ad75knifXYGsomE0+fei30DI/W6AmaQrTa7KnUIQNaJeQ5p39MjHiLawj6prNGRg1eFbAuGXRHDNIIRuiYQ==','IxNZlnLSR1z+wFmX/dvq+VJs1FswjdB7mGP9Qt8/n2CXudOuqN+efDqh1nZTplbqpoPNAetxZ+S7tdu8oW+KQ8GbWBwq0AzLB6V44k0Kv85NnhdqbJ2jYGc9AxkLwzMTJYb4K9aL59VOwq2k26M0U/q2JsR3TOyTkIEl8QxgkFGuAd/3qvuBRqIp+yvZf6nfeR3JMdOaFCZf08EDZEQPd6jmZ+adNabsVoBUAvFOATwjWi5yhaVnIdrCdyH53Aa8jRi+JL2eAXNUO9shNxkns1nRZrElJRY41b26IQWEA+b1xs92ARN467dnA7fdV8QQL41+jwumemXoJXJjIhjklw==','$2b$10$xoNaB.yxJLP.M/.WcgCOT.tOQtkOyaidcWZWJj/3IPJjioaq8TKye',0,NULL,NULL,'f876cd209364c7bd4963decdd1cb307b9f324f6930a231c7a15e868f776f73c8','83048cfd5b5c2356fb0849b68b6e93757129b4ad56734d5bbd413a43e9c06946','a8075db6c6679c9a228a77bc855d0e79c88054e71fb1bc6ba5dceb2d143aaf2f');
+/*!40000 ALTER TABLE `Users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2023-11-16 15:08:20

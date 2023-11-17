@@ -19,6 +19,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -71,7 +72,6 @@ app.use(cors({
 
 
 app.post('/loginvalidation', async (req, res) => {
-    console.log(req)
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -81,8 +81,15 @@ app.post('/loginvalidation', async (req, res) => {
     console.log(`Checking login validation for username:[${username}]...`);
 
     try {
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+
+
+
         // verify username exists
-        const usernameExists = await userLoginModel.checkIfUsernameExists(`${username}`);
+        const usernameExists = await userLoginModel.checkIfUsernameExists(digestedUserHMAC);
         console.log("Username exists:", usernameExists);
 
         if (!usernameExists) {
@@ -91,7 +98,7 @@ app.post('/loginvalidation', async (req, res) => {
         }
 
         // validate password against stored hash
-        const passwordsMatch = await userLoginModel.validatePassword(username, password);
+        const passwordsMatch = await userLoginModel.validatePassword(digestedUserHMAC, password);
 
         if (!passwordsMatch) {
             console.log(`Invalid password attempt for ${username}.`);
@@ -99,7 +106,7 @@ app.post('/loginvalidation', async (req, res) => {
         }
 
         // fetch user from DB using username
-        const fetchedUser = await userLoginModel.fetchUserFromUsername(username);
+        const fetchedUser = await userLoginModel.fetchUserFromUsername(digestedUserHMAC);
 
         if (fetchedUser) {
             console.log('user in api endpoint is: ', fetchedUser);
@@ -146,7 +153,17 @@ app.post('/create/account', async (req, res) => {
 
     try {
         // check if username or email already exists
-        const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(username, email);
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const emailHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedEmailHMAC = emailHMAC.update(email).digest('hex');
+
+
+
+
+        const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(digestedUserHMAC, digestedEmailHMAC);
         if (usernameOrEmailExists) {
             console.log(`Username ${username} or email ${email} already exist.`);
             return res.status(401).json({ message: "Username or email already exists." });

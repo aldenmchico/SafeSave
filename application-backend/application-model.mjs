@@ -5,7 +5,7 @@ import * as db from './db-connector.mjs';
 var con = mysql.createConnection(db.dbConfig);
 
 import https from 'https';
-
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 //Date stuff
 const currentDate = new Date();
 const year = currentDate.getFullYear();
@@ -17,11 +17,12 @@ const formattedDate = year + '-' + month + '-' + day;
 
 // POST Users Table Model Functions *****************************************
 const createUser = function (reqBody, callback) {
-    if (reqBody.username === undefined || reqBody.email === undefined || reqBody.password === undefined) {
+    if (reqBody.username === undefined || reqBody.email === undefined || reqBody.password === undefined || reqBody.userSalt === undefined || reqBody.userHMAC === undefined || reqBody.userEmailHMAC === undefined) {
         callback({ "code": "EMPTY_FIELD" }, null);
     }
     else {
-        let q = `INSERT INTO Users (userUsername, userEmail, userPassword) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}")`;
+        let q = `INSERT INTO Users (userUsername, userEmail, userPassword, userSalt, userHMAC, userEmailHMAC) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}", "${reqBody.userSalt}",
+"${reqBody.userHMAC}", "${reqBody.userEmailHMAC}")`;
         con.query(q, (err, result) => {
             if (err) callback(err, null);
             else callback(null, result);
@@ -29,13 +30,31 @@ const createUser = function (reqBody, callback) {
     }
 }
 
-// POST UserLoginItems Table Model Functions  *****************************************
-const createUserLoginItem = function (reqBody, callback) {
+const getUserSalt = (userID) => {
+    return new Promise((resolve, reject) => {
+        const saltQuery = `SELECT userSalt FROM Users WHERE userID = "${userID}"`;
+        con.query(saltQuery, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const userSalt = result[0] ? result[0].userSalt : null;
+                resolve(userSalt);
+            }
+        });
+    });
+};
 
+// POST UserLoginItems Table Model Functions  *****************************************
+const createUserLoginItem = async function (reqBody, callback) {
 
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
+
+    //TODO: FIX HARDCODED USER ID
+
+    const userSalt = await getUserSalt(84);
+
 
     let responseData;
     let userLoginWebsite = reqBody.website;
@@ -44,7 +63,7 @@ const createUserLoginItem = function (reqBody, callback) {
     let userHash = "pass1";
 
 
-    fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://127.0.0.1:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -53,7 +72,8 @@ const createUserLoginItem = function (reqBody, callback) {
             userLoginWebsite,
             userLoginUsername,
             userLoginPassword,
-            userHash
+            userHash,
+            userSalt
         }),
         agent, // to get rid of self-signed errors on SSL cert
     })
@@ -90,7 +110,7 @@ const createUserLoginItem = function (reqBody, callback) {
 
 // POST UserNotes Table Model Functions  *****************************************
 
-const createUserNote = function (reqBody, callback) {
+const createUserNote = async function (reqBody, callback) {
 
     let noteTitle = reqBody.title;
     let noteText = reqBody.content;
@@ -100,13 +120,17 @@ const createUserNote = function (reqBody, callback) {
     let userID = 1;
     let userHash = "pass1";
 
+    const userSalt = await getUserSalt(84);
+
+
+
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
 
     let responseData; // Variable to store the JSON response
 
-    fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://127.0.0.1:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -119,6 +143,7 @@ const createUserNote = function (reqBody, callback) {
             noteAccessedDate,
             userID,
             userHash,
+            userSalt
         }),
         agent, // Include the custom agent here
     })
@@ -154,8 +179,8 @@ const createUserNote = function (reqBody, callback) {
 // GET Users Table Model Functions  *****************************************
 
 // GET User by Email Model Function *****************************************
-const getUserByEmail = function (email, callback) {
-    let q = `SELECT * FROM Users WHERE userEmail = ${mysql.escape(email)}`;
+const getUserByEmail = async function (email, callback) {
+    let q = `SELECT * FROM Users WHERE userEmailHMAC = "${email}"`;
     con.query(q, (err, result) => {
         if (err) throw err;
         callback(null, result);
@@ -171,8 +196,8 @@ const getAllUsers = function (callback) {
     });
 };
 
-const getUserByUsername = function (username, callback) {
-    let q = `SELECT * FROM Users WHERE userUsername = '${username}'`;
+const getUserByUsername = async function (username, callback) {
+    let q = `SELECT * FROM Users WHERE userHMAC = "${username}"`;
     con.query(q, (err, result) => {
         if (err) throw err;
         callback(null, result);
@@ -293,7 +318,7 @@ const getUserNoteByTitle = function (id, title, callback) {
 
 // UPDATE (PATCH) MODEL FUNCTIONS *****************************************************
 
-const patchUser = function (reqBody, callback) {
+const patchUser =  function (reqBody, callback) {
     if (reqBody.userID === undefined) {
         callback({ "code": "NO_USER_ID" }, null);
     }
@@ -332,8 +357,8 @@ const patchUser = function (reqBody, callback) {
     }
 }
 
-const patchLoginItem = function (reqBody, callback) {
-    if (reqBody.loginItemID === undefined) {
+const patchLoginItem = async function (reqBody, callback) {
+    if (reqBody.userLoginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
@@ -349,16 +374,23 @@ const patchLoginItem = function (reqBody, callback) {
         let userLoginPassword = reqBody.password;
         var userHash = "pass1";
 
-        fetch('https://127.0.0.1:8002/ciphertext', {
+
+
+        //TODO: CHANGE HARDCODED USER ID!!!
+        const userSalt = await getUserSalt(84);
+
+
+        await fetch('https://localhost:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                userLoginWebsite,
+                userLoginWebsite: userLoginWebsite,
                 userLoginUsername,
                 userLoginPassword,
-                userHash
+                userHash,
+                userSalt
             }),
             agent, // to get rid of self-signed errors on SSL cert
         })
@@ -395,13 +427,13 @@ const patchLoginItem = function (reqBody, callback) {
                 q += ` passwordIV = "${responseData.passwordIV}",`;
                 q += ` authTag = "${responseData.authTag}"`;
 
-                q += ` WHERE userLoginItemID = ${reqBody.loginItemID}`;
+                q += ` WHERE userLoginItemID = ${reqBody.userLoginItemID}`;
 
                 if (q === '') callback({ "code": "NO_CHANGE" }, null);
 
 
                 else {
-                    con.query(q, (err, result) => {
+                    con.query(q, async (err, result) => {
                         if (err) callback(err, null);
                         else callback(null, result);
                     })
@@ -435,11 +467,14 @@ const patchLoginItemFavorite = function(reqBody, callback) {
 
 
 
-const patchNote = function (reqBody, callback) {
+const patchNote = async function (reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
+
+
+
 
 
         let noteTitle = reqBody.title;
@@ -449,6 +484,9 @@ const patchNote = function (reqBody, callback) {
         let noteAccessedDate = formattedDate;
         let userID = 1;
         let userHash = "pass1";
+        const userSalt = await getUserSalt(84);
+
+
 
         const agent = new https.Agent({
             rejectUnauthorized: false
@@ -456,7 +494,7 @@ const patchNote = function (reqBody, callback) {
 
         let responseData; // Variable to store the JSON response
 
-        fetch('https://127.0.0.1:8002/ciphertext', {
+        await fetch('https://127.0.0.1:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -469,6 +507,7 @@ const patchNote = function (reqBody, callback) {
                 noteAccessedDate,
                 userID,
                 userHash,
+                userSalt
             }),
             agent, // Include the custom agent here
         })

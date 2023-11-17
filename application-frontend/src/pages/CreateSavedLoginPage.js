@@ -23,6 +23,8 @@ function CreateSavedLoginPage() {
         }
     }, [location.state]);
 
+
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setLoginDetails(prevState => ({ ...prevState, [name]: value }));
@@ -33,10 +35,12 @@ function CreateSavedLoginPage() {
 
         const { website, username, password, userID } = loginDetails;
 
+
+
         const loginItemData = {
-            userLoginItemWebsite: website,
-            userLoginItemUsername: username,
-            userLoginItemPassword: password,
+            website: website,
+            username: username,
+            password: password,
             userLoginItemDateCreated: new Date().toISOString(),
             userLoginItemDateUpdated: new Date().toISOString(),
             userLoginItemDateAccessed: new Date().toISOString(),

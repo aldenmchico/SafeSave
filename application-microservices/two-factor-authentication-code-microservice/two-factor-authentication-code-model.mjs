@@ -207,7 +207,12 @@ const checkIfUserHas2FAEnabledAndRealSecret = async (username) => {
 }
 
 const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
+
+    console.log("username passed to 2fa is", username)
     try {
+
+
+
         const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAEnabledAndNoSecret');

@@ -1,6 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+function generateRandomString() {
+    const uppercaseCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lowercaseCharacters = 'abcdefghijklmnopqrstuvwxyz';
+    const digitCharacters = '0123456789';
+    const specialCharacters = '@$!%*?&';
+
+    const getRandomChar = (characterSet) => {
+        const randomIndex = Math.floor(Math.random() * characterSet.length);
+        return characterSet.charAt(randomIndex);
+    };
+
+    // Ensure at least one uppercase letter, one digit, and one special character
+    const initialString =
+        getRandomChar(uppercaseCharacters) +
+        getRandomChar(digitCharacters) +
+        getRandomChar(specialCharacters);
+
+    // Generate the remaining characters from the combined set without repetition
+    const remainingCharacters =
+        lowercaseCharacters + uppercaseCharacters + digitCharacters + specialCharacters;
+
+    const shuffledString = initialString +
+        Array.from({ length: 9 }, () => getRandomChar(remainingCharacters))
+            .sort(() => Math.random() - 0.5)
+            .join('');
+
+    return shuffledString;
+}
+
+
 
 function CreateAccountPage() {
     const [formData, setFormData] = useState({
@@ -34,7 +64,8 @@ function CreateAccountPage() {
 
         if (!validatePassword(formData.password)) {
             valid = false;
-            errs.password = 'Password must be at least 12 characters long and include at least 1 lowercase, 1 uppercase, 1 numeric, and 1 special character';
+            errs.password = 'Password must be at least 12 characters long and include at least 1 lowercase, 1 uppercase, 1 numeric, and 1 special character. '
+            + `A random, secure password that you could use is ${generateRandomString()}`;
         }
 
         if (formData.password !== formData.confirmPassword) {

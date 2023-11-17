@@ -99,21 +99,23 @@ const getNoteAccessed = async (noteAccessedQuery) => {
     });
 };
 
+
 const getDecryptedData = async (options) => {
 
     const {
         userNoteID, userNoteTitle, userNoteText, userNoteCreated, userNoteUpdated, userNoteAccessed, userID, userNoteIV, userHash,
         userLoginItemID, userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
         userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, IV, userNoteTextIV, websiteIV, usernameIV, passwordIV,
-        authTag, favorited
+        authTag, favorited, userSalt
     } = options;
 
 
     if(userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated
     && userLoginItemDateUpdated && userLoginItemDateAccessed && websiteIV && userHash){
         try {
+
             const userWebsiteIVBuffer = Buffer.from(websiteIV, 'hex');
-            const userKey = crypto.scryptSync(userHash, 'salt', 32);
+            const userKey = crypto.scryptSync(userHash, userSalt, 32);
             const userUsernameIVBuffer = Buffer.from(usernameIV, 'hex');
             const userPasswordIVBuffer = Buffer.from(passwordIV, 'hex');
 
@@ -176,7 +178,7 @@ const getDecryptedData = async (options) => {
             const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
             const userNoteTextIVBuffer = Buffer.from(userNoteTextIV, 'hex');
 
-            const userKey = crypto.scryptSync(userHash, 'salt', 32);
+            const userKey = crypto.scryptSync(userHash, userSalt, 32);
 
             console.log(userKey)
 
