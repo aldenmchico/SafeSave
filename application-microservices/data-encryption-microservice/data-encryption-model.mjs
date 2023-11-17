@@ -13,14 +13,15 @@ const getEncryptedData = async (options) => {
         userHash,
         website,
         username,
-        password
+        password,
+        userSalt
     } = options;
 
     try {
         // Ensure both plaintext and userHash are provided.
         if (userHash && noteTitle && noteText && noteCreatedDate && noteUpdatedDate && noteAccessedDate && userID) {
             const iv = crypto.randomBytes(16);
-            const key = crypto.scryptSync(userHash, 'salt', 32);
+            const key = crypto.scryptSync(userHash, userSalt, 32);
 
             const userNoteTextIV = crypto.randomBytes(16);
 
@@ -60,7 +61,7 @@ const getEncryptedData = async (options) => {
         else if(website && username && password && userHash){
 
             const websiteIV = crypto.randomBytes(16);
-            const key = crypto.scryptSync(userHash, 'salt', 32);
+            const key = crypto.scryptSync(userHash, userSalt, 32);
 
             const websiteCipher = crypto.createCipheriv('aes-256-cbc', key, websiteIV);
             let encryptedWebsiteData = websiteCipher.update(website, 'utf8', 'hex');

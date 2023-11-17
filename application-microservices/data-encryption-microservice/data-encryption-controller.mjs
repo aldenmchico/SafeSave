@@ -50,6 +50,7 @@ app.post('/ciphertext', async (req, res) => {
         noteAccessedDate,
         userID,
         userHash,
+        userSalt
     } = req.body;
 
     try {
@@ -65,6 +66,7 @@ app.post('/ciphertext', async (req, res) => {
                     noteAccessedDate: noteAccessedDate,
                     userID: userID,
                     userHash: userHash,
+                    userSalt: userSalt
                 }
             );
 
@@ -88,7 +90,8 @@ app.post('/ciphertext', async (req, res) => {
                     website: req.body.userLoginWebsite,
                     username: req.body.userLoginUsername,
                     password: req.body.userLoginPassword,
-                    userHash: req.body.userHash
+                    userHash: req.body.userHash,
+                    userSalt: req.body.userSalt
                 }
             );
 

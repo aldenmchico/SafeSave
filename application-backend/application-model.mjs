@@ -30,13 +30,31 @@ const createUser = function (reqBody, callback) {
     }
 }
 
-// POST UserLoginItems Table Model Functions  *****************************************
-const createUserLoginItem = function (reqBody, callback) {
+const getUserSalt = (userID) => {
+    return new Promise((resolve, reject) => {
+        const saltQuery = `SELECT userSalt FROM Users WHERE userID = "${userID}"`;
+        con.query(saltQuery, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const userSalt = result[0] ? result[0].userSalt : null;
+                resolve(userSalt);
+            }
+        });
+    });
+};
 
+// POST UserLoginItems Table Model Functions  *****************************************
+const createUserLoginItem = async function (reqBody, callback) {
 
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
+
+    //TODO: FIX HARDCODED USER ID
+
+    const userSalt = await getUserSalt(84);
+
 
     let responseData;
     let userLoginWebsite = reqBody.website;
@@ -45,7 +63,7 @@ const createUserLoginItem = function (reqBody, callback) {
     let userHash = "pass1";
 
 
-    fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://127.0.0.1:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -54,7 +72,8 @@ const createUserLoginItem = function (reqBody, callback) {
             userLoginWebsite,
             userLoginUsername,
             userLoginPassword,
-            userHash
+            userHash,
+            userSalt
         }),
         agent, // to get rid of self-signed errors on SSL cert
     })
