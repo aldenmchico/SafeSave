@@ -92,5 +92,15 @@ module.exports = function (app) {
         })
     )
 
+    app.use(
+        '/ciphertext',
+        createProxyMiddleware({
+            target: 'https://localhost:8002',
+            changeOrigin: true,
+            secure: false,
+        })
+    )
+
+
 
 };
