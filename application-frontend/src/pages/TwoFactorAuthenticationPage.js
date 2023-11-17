@@ -24,13 +24,13 @@ function TwoFactorAuthenticationPage() {
                 // If 2FA is not enabled, handle accordingly, e.g., navigate back or show a message.
                 setErrorMsg('Two-factor authentication is not enabled or you are already set up. Please check the Settings tab. Otherwise, please disable and enable 2-FA again.');
                 // navigate('/settings'); // Uncomment this line to navigate to the settings page.
-                return;
+                // return;
             }
 
             // display the QR code here
-            generateAndDisplayQRCode();
+            await generateAndDisplayQRCode();
         };
-        check2FAStatus();
+         check2FAStatus();
     }, []); // The empty dependency array means this effect will run once when the component mounts.
 
     const generateAndDisplayQRCode = async () => {

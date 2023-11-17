@@ -3,6 +3,9 @@ import express from 'express';
 import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
 import cors from 'cors';
+import * as db from './db-connector.mjs';
+var con = mysql.createConnection(db.dbConfig);
+
 
 import { checkAuth } from '../middlewares/checkAuth.mjs';
 
@@ -17,6 +20,7 @@ import { readFileSync } from 'fs';
 // Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import mysql from "mysql";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -67,6 +71,7 @@ app.use(cors({
 }));
 
 
+
 app.get('/api', checkAuth, (req, res) => {
     /*
     Dummy /api endpoint 
@@ -113,6 +118,20 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     }
 })
 
+const getUserHMAC = (userID) => {
+    return new Promise((resolve, reject) => {
+        const hmacQuery = `SELECT userHMAC FROM Users WHERE userID = "${userID}"`;
+        con.query(hmacQuery, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const userHMAC = result[0] ? result[0].userSalt : null;
+                resolve(userHMAC);
+            }
+        });
+    });
+};
+
 app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) => {
     /*
     Checks if Cookie user has 2FA enabled and Real Secret already established
@@ -120,9 +139,13 @@ app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) =>
     - If both enabled, then they are set up. 
     */
 
+
+
     const { userUsername } = req.user
     try {
-        const verified = await twoFACodeModel.checkIfUserHas2FAEnabledAndRealSecret(userUsername);
+
+        const userHMAC = await(getUserHMAC(req.user.userID))
+        const verified = await twoFACodeModel.checkIfUserHas2FAEnabledAndRealSecret(userHMAC);
 
         if (!verified) {
             return res.status(200).json({ verified: false });
@@ -144,7 +167,9 @@ app.get('/api/check-2fa-enabled-and-no-secret', checkAuth, async (req, res) => {
 
     const { userUsername } = req.user
     try {
-        const has2FAAndNoSecret = await twoFACodeModel.checkIfUserHas2FAEnabledAndNoSecret(userUsername);
+
+        const userHMAC = await(getUserHMAC(req.user.userID))
+        const has2FAAndNoSecret = await twoFACodeModel.checkIfUserHas2FAEnabledAndNoSecret(userHMAC);
 
         if (!has2FAAndNoSecret) {
             return res.status(200).json({ has2FAAndNoSecret: false });
@@ -173,8 +198,10 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
 
     try {
 
+        const userHMAC = await(getUserHMAC(req.user.userID))
+
         // pull user data from db
-        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
+        const userData = await twoFACodeModel.returnUserDataByUsername(userHMAC);
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
@@ -220,7 +247,9 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
     const { userID, userUsername } = req.user
 
     try {
-        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
+
+        const userHMAC = await(getUserHMAC(req.user.userID))
+        const userData = await twoFACodeModel.returnUserDataByUsername(userHMAC);
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
@@ -268,8 +297,9 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
 
     try {
 
+        const userHMAC = await(getUserHMAC(req.user.userID))
         // pull user data from db
-        const userData = await twoFACodeModel.returnUserDataByUsername(userUsername);
+        const userData = await twoFACodeModel.returnUserDataByUsername(userHMAC);
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
