@@ -174,7 +174,7 @@ userRouter.get('/byEmail/:email', (req, res) => {
         if (err) {
             // Log the actual error internally, but don't send it to the client
             console.error(err);
-            res.status(400).send({ "error": "Bad Request." });
+            res.status(400).send({ "error": "Bad Request." }); //
         } else {
             if (result.length == 0) {
                 res.status(404).send({ "error": "User email not found." });
