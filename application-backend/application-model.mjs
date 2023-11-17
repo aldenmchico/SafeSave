@@ -374,6 +374,9 @@ const patchLoginItem = async function (reqBody, callback) {
         let userLoginPassword = reqBody.password;
         var userHash = "pass1";
 
+
+
+        //TODO: CHANGE HARDCODED USER ID!!!
         const userSalt = await getUserSalt(84);
 
 
@@ -471,6 +474,9 @@ const patchNote = async function (reqBody, callback) {
     else {
 
 
+
+
+
         let noteTitle = reqBody.title;
         let noteText = reqBody.text;
         let noteCreatedDate = formattedDate;
@@ -478,6 +484,9 @@ const patchNote = async function (reqBody, callback) {
         let noteAccessedDate = formattedDate;
         let userID = 1;
         let userHash = "pass1";
+        const userSalt = await getUserSalt(84);
+
+
 
         const agent = new https.Agent({
             rejectUnauthorized: false
@@ -498,6 +507,7 @@ const patchNote = async function (reqBody, callback) {
                 noteAccessedDate,
                 userID,
                 userHash,
+                userSalt
             }),
             agent, // Include the custom agent here
         })
