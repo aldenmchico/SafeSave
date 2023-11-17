@@ -229,6 +229,14 @@ const getSingleUserLoginItems = function (id, callback) {
     });
 };
 
+const getSingleUserLoginItemsFavorites = function (id, callback) {
+    let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND favorited = 1`;
+    con.query(q, (err, result) => {
+        if (err) throw err;
+        callback(null, result);
+    });
+};
+
 const getUserLoginItemByWebsite = function (id, website, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND userLoginItemWebsite = '${website}'`;
     con.query(q, (err, result) => {
@@ -271,6 +279,13 @@ const getSingleUserNotes = function (id, callback) {
     });
 };
 
+const getSingleUserNotesFavorites = function (id, callback) {
+    let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND favorited = 1`;
+    con.query(q, (err, result) => {
+        if (err) throw err;
+        callback(null, result);
+    });
+};
 
 //Helper function to call decryption microservice
 async function decryptRowData(row) {
@@ -604,8 +619,8 @@ const deleteNote = function (userNoteId, callback) {
 export {
     createUser, createUserLoginItem, createUserNote,
     getAllUsers, getUserByUsername, getUserByEmail,
-    getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite,
-    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle,
+    getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
+    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
     patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
     deleteNote, deleteUserLoginItem, deleteUser
 };

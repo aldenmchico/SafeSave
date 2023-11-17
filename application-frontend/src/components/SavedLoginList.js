@@ -3,7 +3,7 @@ import SavedLoginRow from './SavedLoginRow';
 
 
 
-function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLoginItem}) {
+function SavedLoginList({loginItems, editLoginItem, deleteLoginItem}) {
     return (
         <div className="wrapper">
         <table>
@@ -24,7 +24,6 @@ function SavedLoginList({loginItems, editLoginItem, deleteLoginItem, favoriteLog
                     key={i}
                     editLoginItem={editLoginItem}
                     deleteLoginItem={deleteLoginItem}
-                    favoriteLoginItem={favoriteLoginItem}
                 />)}
             </tbody>
         </table>

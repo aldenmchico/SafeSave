@@ -219,6 +219,17 @@ loginItemRouter.get('/users/:id', (req, res) => {
     })
 });
 
+loginItemRouter.get('/users/:id/favorites', (req, res) => {
+    appModel.getSingleUserLoginItemsFavorites(req.params.id, (err, result) => {
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).send(JSON.stringify(result));
+        }
+    })
+});
+
 loginItemRouter.get('/users/:id/website/:website', (req, res) => {
     appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
@@ -276,6 +287,17 @@ notesRouter.get('/users/:id', (req, res) => {
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
+        }
+    })
+});
+
+notesRouter.get('/users/:id/favorites', (req, res) => {
+    appModel.getSingleUserNotesFavorites(req.params.id, (err, result) => {
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        else {
+            console.log(result);
+            res.set('Content-Type', 'application/json');
+            res.status(200).send(JSON.stringify(result));
         }
     })
 });

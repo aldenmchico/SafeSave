@@ -12,7 +12,7 @@ function HomePage({ setLoginItem }) {
     const [username, setUsername] = useState('Guest');
 
     const location = useLocation();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     console.log(location.state)
 
@@ -67,15 +67,10 @@ function HomePage({ setLoginItem }) {
         }
     };
 
-    const navigate = useNavigate();
     const editLoginRow = async login => {
         setLoginItem(login);
         navigate("/edit-login");
     }
-
-    const favoriteLoginRow = async login => {
-    }
-
 
     return (
         <div>
