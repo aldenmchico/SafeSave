@@ -19,6 +19,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import crypto from "crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -146,7 +147,17 @@ app.post('/create/account', async (req, res) => {
 
     try {
         // check if username or email already exists
-        const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(username, email);
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const emailHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedEmailHMAC = emailHMAC.update(email).digest('hex');
+
+
+
+
+        const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(digestedUserHMAC, digestedEmailHMAC);
         if (usernameOrEmailExists) {
             console.log(`Username ${username} or email ${email} already exist.`);
             return res.status(401).json({ message: "Username or email already exists." });

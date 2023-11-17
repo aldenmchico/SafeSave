@@ -156,7 +156,7 @@ const createUserNote = function (reqBody, callback) {
 
 // GET User by Email Model Function *****************************************
 const getUserByEmail = function (email, callback) {
-    let q = `SELECT * FROM Users WHERE userEmail = ${mysql.escape(email)}`;
+    let q = `SELECT * FROM Users WHERE userEmailHMAC = "${email}"`;
     con.query(q, (err, result) => {
         if (err) throw err;
         callback(null, result);
@@ -173,7 +173,7 @@ const getAllUsers = function (callback) {
 };
 
 const getUserByUsername = function (username, callback) {
-    let q = `SELECT * FROM Users WHERE userUsername = '${username}'`;
+    let q = `SELECT * FROM Users WHERE userHMAC = '${username}'`;
     con.query(q, (err, result) => {
         if (err) throw err;
         callback(null, result);

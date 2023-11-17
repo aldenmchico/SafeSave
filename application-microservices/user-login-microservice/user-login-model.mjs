@@ -51,10 +51,12 @@ const createUser = async (username, email, password) => {
 
         const userSalt = crypto.randomBytes(16).toString('hex');
 
+        //TODO: CHANGE SECRET KEY FILE UPON HOSTING LIVE
         const secretKey = readFileSync("secret_key", "utf-8");
         const emailHMAC = crypto.createHmac('sha256', secretKey);
 
         const digestedEmailHMAC = emailHMAC.update(email).digest('hex')
+
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
@@ -95,7 +97,11 @@ const createUser = async (username, email, password) => {
 
 const checkIfUsernameExists = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+
+        const response = await fetch(`https://localhost:3001/users/byUsername/${digestedUserHMAC}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
