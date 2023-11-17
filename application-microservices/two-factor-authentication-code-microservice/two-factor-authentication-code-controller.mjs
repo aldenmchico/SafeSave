@@ -125,12 +125,13 @@ const getUserHMAC = (userID) => {
             if (err) {
                 reject(err);
             } else {
-                const userHMAC = result[0] ? result[0].userSalt : null;
+                const userHMAC = result[0] ? result[0].userHMAC : null;
                 resolve(userHMAC);
             }
         });
     });
 };
+
 
 app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) => {
     /*
@@ -144,7 +145,9 @@ app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) =>
     const { userUsername } = req.user
     try {
 
-        const userHMAC = await(getUserHMAC(req.user.userID))
+        const userHMAC = await getUserHMAC(95)
+
+        console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
         const verified = await twoFACodeModel.checkIfUserHas2FAEnabledAndRealSecret(userHMAC);
 
         if (!verified) {
@@ -273,7 +276,7 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
         const digits = '6';
         const period = '30';
         const otpType = 'totp';
-        const configUri = `otpauth://${otpType}/${issuer}:${userUsername}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
+        const configUri = `otpauth://${otpType}/${issuer}:${userHMAC}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
 
         // generate qr code
         res.setHeader('Content-Type', 'image/png');
