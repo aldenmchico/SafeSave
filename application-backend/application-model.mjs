@@ -110,7 +110,7 @@ const createUserLoginItem = async function (reqBody, callback) {
 
 // POST UserNotes Table Model Functions  *****************************************
 
-const createUserNote = function (reqBody, callback) {
+const createUserNote = async function (reqBody, callback) {
 
     let noteTitle = reqBody.title;
     let noteText = reqBody.content;
@@ -120,13 +120,17 @@ const createUserNote = function (reqBody, callback) {
     let userID = 1;
     let userHash = "pass1";
 
+    const userSalt = await getUserSalt(84);
+
+
+
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
 
     let responseData; // Variable to store the JSON response
 
-    fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://127.0.0.1:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -139,6 +143,7 @@ const createUserNote = function (reqBody, callback) {
             noteAccessedDate,
             userID,
             userHash,
+            userSalt
         }),
         agent, // Include the custom agent here
     })

@@ -57,8 +57,25 @@ app.post('/decrypttext', async (req, res) => {
     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userLoginItemUsername, websiteIV,
         usernameIV, passwordIV, authTag, favorited} = req.body
 
+    const getUserSalt = (userID) => {
+        return new Promise((resolve, reject) => {
+            const saltQuery = `SELECT userSalt FROM Users WHERE userID = "${userID}"`;
+            db.pool.query(saltQuery, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const userSalt = result[0] ? result[0].userSalt : null;
+                    resolve(userSalt);
+                }
+            });
+        });
+    };
+
     if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
     && userLoginItemDateAccessed && websiteIV){
+
+        //TODO: UN-HARDCODE USER ID
+        const userSalt = await getUserSalt(84);
         const result = await dataDecryptionModel.getDecryptedData({
             userLoginItemID: userLoginItemID,
             userLoginItemWebsite: userLoginItemWebsite,
@@ -72,7 +89,8 @@ app.post('/decrypttext', async (req, res) => {
             usernameIV: usernameIV,
             passwordIV: passwordIV,
             authTag: authTag,
-            favorited: favorited
+            favorited: favorited,
+            userSalt: userSalt
         });
         res.status(201).json(result);
     }
@@ -81,6 +99,9 @@ app.post('/decrypttext', async (req, res) => {
     {
         try {
 
+
+            //TODO: UN-HARDCODE USER ID
+            const userSalt = await getUserSalt(84);
             // Perform the decryption with the hexadecimal IV
             const result = await dataDecryptionModel.getDecryptedData({
                 userNoteID: userNoteID,
@@ -94,7 +115,8 @@ app.post('/decrypttext', async (req, res) => {
                 userNoteTextIV: userNoteTextIV,
                 userHash: userHash,
                 authTag: authTag,
-                favorited: favorited
+                favorited: favorited,
+                userSalt: userSalt
             });
             res.status(201).json(result);
         } catch (error) {
