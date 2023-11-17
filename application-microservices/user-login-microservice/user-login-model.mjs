@@ -1,6 +1,8 @@
 // Import dependencies.
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import {readFileSync} from "fs";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const checkIfUsernameOrEmailExists = async (username, email) => {
@@ -47,14 +49,24 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
 const createUser = async (username, email, password) => {
     try {
 
+        const userSalt = crypto.randomBytes(16).toString('hex');
+
+        const secretKey = readFileSync("secret_key", "utf-8");
+        const emailHMAC = crypto.createHmac('sha256', secretKey);
+
+        const digestedEmailHMAC = emailHMAC.update(email).digest('hex')
+        const userHMAC = crypto.createHmac('sha256', secretKey)
+        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+
         // Prepare data for the POST request
         // TODO: assumption...data needs to be encrypted/hashed
         const postData = {
             username: username,
             email: email,
-            password: password
-
-            // include uid using uuid 
+            password: password,
+            userSalt: userSalt,
+            userHMAC: digestedUserHMAC,
+            userEmailHMAC: digestedEmailHMAC
 
         };
 

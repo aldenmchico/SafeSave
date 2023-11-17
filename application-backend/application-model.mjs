@@ -17,11 +17,12 @@ const formattedDate = year + '-' + month + '-' + day;
 
 // POST Users Table Model Functions *****************************************
 const createUser = function (reqBody, callback) {
-    if (reqBody.username === undefined || reqBody.email === undefined || reqBody.password === undefined) {
+    if (reqBody.username === undefined || reqBody.email === undefined || reqBody.password === undefined || reqBody.userSalt === undefined || reqBody.userHMAC === undefined || reqBody.userEmailHMAC === undefined) {
         callback({ "code": "EMPTY_FIELD" }, null);
     }
     else {
-        let q = `INSERT INTO Users (userUsername, userEmail, userPassword) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}")`;
+        let q = `INSERT INTO Users (userUsername, userEmail, userPassword, userSalt, userHMAC, userEmailHMAC) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}", "${reqBody.userSalt}",
+"${reqBody.userHMAC}", "${reqBody.userEmailHMAC}")`;
         con.query(q, (err, result) => {
             if (err) callback(err, null);
             else callback(null, result);
