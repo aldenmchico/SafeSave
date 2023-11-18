@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function SettingsPage() {
     const [userID, setUserID] = useState(1);
@@ -84,11 +85,21 @@ function SettingsPage() {
         }
     };
 
-    const handleDeleteAccount = () => {
+    const handleDeleteAccount = async () => {
         const confirmation = window.confirm("Are you sure you want to delete your account? This action is irreversible.");
         if (confirmation) {
             // Account deletion logic
-            console.log("Account deletion initiated");
+            response = await fetch(`/users/${userID}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.status === 204) {
+                const navigate = useNavigate()
+                navigate('/createaccount')
+            }
+            else alert("Failed to delete account...")
         }
     };
 
