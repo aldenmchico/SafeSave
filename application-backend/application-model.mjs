@@ -45,15 +45,13 @@ const getUserSalt = (userID) => {
 };
 
 // POST UserLoginItems Table Model Functions  *****************************************
-const createUserLoginItem = async function (reqBody, callback) {
+const createUserLoginItem = async function (userID, reqBody, callback) {
 
     const agent = new https.Agent({
         rejectUnauthorized: false
     });
 
-    //TODO: FIX HARDCODED USER ID
-
-    const userSalt = await getUserSalt(84);
+    const userSalt = await getUserSalt(userID);
 
 
     let responseData;
@@ -92,7 +90,7 @@ const createUserLoginItem = async function (reqBody, callback) {
                     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, websiteIV, usernameIV, passwordIV, authTag)
           VALUES ("${responseData.encryptedWebsite}", "${responseData.encryptedUsername}", 
           "${responseData.encryptedPassword}", 
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.websiteIV}", "${responseData.usernameIV}", "${responseData.passwordIV}", "${responseData.authTag}")`;
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', '${userID}', "${responseData.websiteIV}", "${responseData.usernameIV}", "${responseData.passwordIV}", "${responseData.authTag}")`;
 
             con.query(q, (err, result) => {
                 if (err) callback(err, null);
@@ -110,17 +108,16 @@ const createUserLoginItem = async function (reqBody, callback) {
 
 // POST UserNotes Table Model Functions  *****************************************
 
-const createUserNote = async function (reqBody, callback) {
+const createUserNote = async function (userID, reqBody, callback) {
 
     let noteTitle = reqBody.title;
     let noteText = reqBody.content;
-    let noteCreatedDate = formattedDate;
-    let noteUpdatedDate = formattedDate;
-    let noteAccessedDate = formattedDate;
-    let userID = 1;
+    let noteCreatedDate = reqBody.userNoteDateCreated;
+    let noteUpdatedDate = reqBody.userNoteDateCreated;
+    let noteAccessedDate = reqBody.userNoteDateCreated;
     let userHash = "pass1";
 
-    const userSalt = await getUserSalt(84);
+    const userSalt = await getUserSalt(userID);
 
 
 
@@ -161,7 +158,7 @@ const createUserNote = async function (reqBody, callback) {
             let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
           userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag)
           VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}",
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', 1, "${responseData.iv}", "${responseData.userNoteTextIV}", "${responseData.authTag}")`;
+          '${formattedDate}', '${formattedDate}', '${formattedDate}', '${userID}', "${responseData.iv}", "${responseData.userNoteTextIV}", "${responseData.authTag}")`;
 
             con.query(q, (err, result) => {
                 if (err) callback(err, null);
@@ -212,10 +209,10 @@ const getAllLoginItems = function (callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -228,10 +225,10 @@ const getSingleUserLoginItems = function (id, callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -244,10 +241,10 @@ const getSingleUserLoginItemsFavorites = function (id, callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -260,10 +257,10 @@ const getUserLoginItemByWebsite = function (id, website, callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -276,10 +273,10 @@ const getUserLoginItemByUsername = function (id, username, callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -293,10 +290,10 @@ const getAllUserNotes = function (callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -345,6 +342,8 @@ async function decryptRowData(row) {
         }
 
         // TODO: Fix Hardcoded password!
+        // HAVE AUSTIN EXPLAIN WHAT I HAPPENING HERE. DECRYPTION MAY BE FUNKY? 
+        // CHECK DATA DECRYPTION CONTROLLER / MODEL 
         let userHash = "userHash";
         encryptedData[userHash] = "pass1";
 
@@ -378,10 +377,10 @@ const getUserNoteByTitle = function (id, title, callback) {
             callback(err);
             return;
         }
-        try{
+        try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
             callback(null, decryptedResult);
-        } catch (error){
+        } catch (error) {
             callback(error)
         }
     });
@@ -390,7 +389,7 @@ const getUserNoteByTitle = function (id, title, callback) {
 
 // UPDATE (PATCH) MODEL FUNCTIONS *****************************************************
 
-const patchUser =  function (reqBody, callback) {
+const patchUser = function (reqBody, callback) {
     if (reqBody.userID === undefined) {
         callback({ "code": "NO_USER_ID" }, null);
     }
@@ -429,7 +428,7 @@ const patchUser =  function (reqBody, callback) {
     }
 }
 
-const patchLoginItem = async function (reqBody, callback) {
+const patchLoginItem = async function (userID, reqBody, callback) {
     if (reqBody.userLoginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
@@ -446,10 +445,7 @@ const patchLoginItem = async function (reqBody, callback) {
         let userLoginPassword = reqBody.password;
         var userHash = "pass1";
 
-
-
-        //TODO: CHANGE HARDCODED USER ID!!!
-        const userSalt = await getUserSalt(84);
+        const userSalt = await getUserSalt(userID);
 
 
         await fetch('https://localhost:8002/ciphertext', {
@@ -458,7 +454,7 @@ const patchLoginItem = async function (reqBody, callback) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                userLoginWebsite: userLoginWebsite,
+                userLoginWebsite,
                 userLoginUsername,
                 userLoginPassword,
                 userHash,
@@ -483,11 +479,11 @@ const patchLoginItem = async function (reqBody, callback) {
                     q += ` userLoginItemWebsite = "${responseData.encryptedWebsite}",`;
                 }
 
-                if(reqBody.password !== undefined) {
+                if (reqBody.password !== undefined) {
                     q += ` userLoginItemPassword = "${responseData.encryptedPassword}",`;
                 }
 
-                if(reqBody.username !== undefined){
+                if (reqBody.username !== undefined) {
                     q += ` userLoginItemUsername = "${responseData.encryptedUsername}",`;
                 }
 
@@ -516,10 +512,10 @@ const patchLoginItem = async function (reqBody, callback) {
                 console.error('Error:', error.message);
                 callback(error, null);
             })
-        }
+    }
 }
 
-const patchLoginItemFavorite = function(reqBody, callback) {
+const patchLoginItemFavorite = function (reqBody, callback) {
     if (reqBody.loginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
@@ -539,24 +535,19 @@ const patchLoginItemFavorite = function(reqBody, callback) {
 
 
 
-const patchNote = async function (reqBody, callback) {
+const patchNote = async function (userID, reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
-
-
-
-
 
         let noteTitle = reqBody.title;
         let noteText = reqBody.text;
         let noteCreatedDate = formattedDate;
         let noteUpdatedDate = formattedDate;
         let noteAccessedDate = formattedDate;
-        let userID = 1;
         let userHash = "pass1";
-        const userSalt = await getUserSalt(84);
+        const userSalt = await getUserSalt(userID);
 
 
 
@@ -611,11 +602,11 @@ const patchNote = async function (reqBody, callback) {
 
                 q += ` WHERE userNoteID = ${reqBody.noteID}`;
 
-                    console.log(q)
-                    con.query(q, (err, result) => {
-                        if (err) callback(err, null);
-                        else callback(null, result);
-                    })
+                console.log(q)
+                con.query(q, (err, result) => {
+                    if (err) callback(err, null);
+                    else callback(null, result);
+                })
             })
             .catch(error => {
                 console.error('Error:', error.message);
@@ -625,7 +616,7 @@ const patchNote = async function (reqBody, callback) {
     }
 }
 
-const patchNoteFavorite = function(reqBody, callback) {
+const patchNoteFavorite = function (reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }

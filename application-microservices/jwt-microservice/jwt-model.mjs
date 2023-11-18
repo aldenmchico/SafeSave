@@ -2,7 +2,9 @@
 import jwt from 'jsonwebtoken'
 import 'dotenv/config';
 
-const SECRET_KEY = process.env.SECRET;
+// const SECRET_KEY = process.env.SECRET;
+
+const SECRET = 'ChangeLater';
 
 const signJwtToken = (user) => {
 
@@ -10,7 +12,7 @@ const signJwtToken = (user) => {
     const token = jwt.sign({
         userUsername,
         userID
-    }, SECRET_KEY, { expiresIn: '3hr' }); // Adjust expiresIn as needed
+    }, SECRET, { expiresIn: '3hr' }); // Adjust expiresIn as needed
     console.log(`token created at signJwtToken ${token}`);
 
     return token

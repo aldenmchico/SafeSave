@@ -24,7 +24,7 @@ function TwoFactorAuthenticationPage() {
                 // If 2FA is not enabled, handle accordingly, e.g., navigate back or show a message.
                 setErrorMsg('Two-factor authentication is not enabled or you are already set up. Please check the Settings tab. Otherwise, please disable and enable 2-FA again.');
                 // navigate('/settings'); // Uncomment this line to navigate to the settings page.
-                // return;
+                return;
             }
 
             // display the QR code here

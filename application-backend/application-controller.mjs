@@ -9,7 +9,12 @@ const app = express();
 app.use(express.json());
 import path from 'path';
 
+import cookieparser from 'cookie-parser';
+
+app.use(cookieparser());
+
 import https from 'https';
+import { checkAuth } from '../application-microservices/middlewares/checkAuth.mjs';
 
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
@@ -100,11 +105,12 @@ userRouter.post('/', (req, res) => {
 });
 
 // POST UserLoginItems Table endpoint ****************************************************
-loginItemRouter.post('/', (req, res) => {
-    appModel.createUserLoginItem(req.body, (err, result) => {
+loginItemRouter.post('/', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    appModel.createUserLoginItem(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "EMPTY_FIELD") res.status(406).send({ "error": `${err.code} - Not all fields populated.` });
-            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request in loginItemRouter.post.` });
         }
         else {
             if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
@@ -118,11 +124,12 @@ loginItemRouter.post('/', (req, res) => {
 });
 
 // POST UserNotes Table endpoint ****************************************************
-notesRouter.post('/', (req, res) => {
-    appModel.createUserNote(req.body, (err, result) => {
+notesRouter.post('/', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    appModel.createUserNote(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "EMPTY_FIELD") res.status(406).send({ "error": `${err.code} - Not all fields populated.` });
-            else res.status(400).send({ "error": `${err.code} - Bad Request.` });
+            else res.status(400).send({ "error": `${err.code} - Bad Request in notesRouter.post.` });
         }
         else {
             if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
@@ -203,11 +210,13 @@ loginItemRouter.get('/', (req, res) => {
     })
 });
 
-loginItemRouter.get('/users/:id', (req, res) => {
-    appModel.getSingleUserLoginItems(req.params.id, (err, result) => {
+loginItemRouter.get('/users/userID', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    console.log(`loginItemRouter/users/userID, userID is: ${userID}`)
+    appModel.getSingleUserLoginItems(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
+            if (result.length === 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
             else {
                 console.log(result);
                 res.set('Content-Type', 'application/json');
@@ -271,8 +280,9 @@ notesRouter.get('/', (req, res) => {
     })
 });
 
-notesRouter.get('/users/:id', (req, res) => {
-    appModel.getSingleUserNotes(req.params.id, (err, result) => {
+notesRouter.get('/users/userID', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    appModel.getSingleUserNotes(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID" });
@@ -334,8 +344,9 @@ userRouter.patch('/', (req, res) => {
     })
 });
 
-loginItemRouter.patch('/', (req, res) => {
-    appModel.patchLoginItem(req.body, (err, result) => {
+loginItemRouter.patch('/', checkAuth, (req, res) => {
+    const {userID} = req.user; 
+    appModel.patchLoginItem(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });
@@ -364,8 +375,9 @@ loginItemRouter.patch('/favorite', (req, res) => {
 });
 
 
-notesRouter.patch('/', (req, res) => {
-    appModel.patchNote(req.body, (err, result) => {
+notesRouter.patch('/', checkAuth, (req, res) => {
+    const {userID} = req.user; 
+    appModel.patchNote(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
             else if (err.code === "NO_CHANGE") res.status(404).send({ "error": `${err.code} - User information not modified.` });

@@ -6,35 +6,17 @@ function HomePage({ setLoginItem }) {
     const [savedLogins, setSavedLogins] = useState([]);
     const [savedNotes, setSavedNotes] = useState([]);
 
-    // Hardcoded default credentials
-    const [userID, setUserID] = useState(1);
-    const [userHash, setUserHash] = useState('pass1');
-    const [username, setUsername] = useState('Guest');
-
-    const location = useLocation();
     const navigate = useNavigate();
 
-    console.log(location.state)
-
-    // change later 
     useEffect(() => {
-        if (!location.state) {
-            loadSavedLogins();
-            loadSavedNotes();
-            setUsername('John Doe'); // Placeholder
-        } else {
-            if (location.state.userID) setUserID(location.state.userID);
-            if (location.state.password) setUserHash(location.state.password);
-            if (location.state.username) setUsername(location.state.username);
-            loadSavedLogins();
-            loadSavedNotes();
-        }
-    }, [location.state]);
+        loadSavedLogins();
+        loadSavedNotes();
+    }, []);
 
 
     const loadSavedLogins = async () => {
         try {
-            const response = await fetch(`/login_items/users/${userID}`);
+            const response = await fetch('/login_items/users/userID');
             if (!response.ok) {
                 throw new Error('Failed to fetch logins');
             }
@@ -47,7 +29,7 @@ function HomePage({ setLoginItem }) {
 
     const loadSavedNotes = async () => {
         try {
-            const response = await fetch(`/notes/users/${userID}`);
+            const response = await fetch('/notes/users/userID');
             if (!response.ok) {
                 throw new Error('Failed to fetch notes');
             }
@@ -74,7 +56,7 @@ function HomePage({ setLoginItem }) {
 
     return (
         <div>
-            <h1>Welcome to SafeSave, {username}!</h1>
+            <h1>Welcome to SafeSave!!!</h1>
             <p>Your secure vault for online credentials and notes.</p>
 
             <div className="content-section">

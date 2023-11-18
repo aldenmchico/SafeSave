@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function SettingsPage() {
-    const [userID, setUserID] = useState(1);
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [pendingTwoFactorEnabled, setPendingTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');
@@ -85,23 +84,23 @@ function SettingsPage() {
         }
     };
 
-    const handleDeleteAccount = async () => {
-        const confirmation = window.confirm("Are you sure you want to delete your account? This action is irreversible.");
-        if (confirmation) {
-            // Account deletion logic
-            response = await fetch(`/users/${userID}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (response.status === 204) {
-                const navigate = useNavigate()
-                navigate('/createaccount')
-            }
-            else alert("Failed to delete account...")
-        }
-    };
+    // const handleDeleteAccount = async () => {
+    //     const confirmation = window.confirm("Are you sure you want to delete your account? This action is irreversible.");
+    //     if (confirmation) {
+    //         // Account deletion logic
+    //         const response = await fetch(`/users/${userID}`, {
+    //             method: 'DELETE',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         });
+    //         if (response.status === 204) {
+    //             const navigate = useNavigate()
+    //             navigate('/createaccount')
+    //         }
+    //         else alert("Failed to delete account...")
+    //     }
+    // };
 
     return (
         <div>
@@ -124,7 +123,7 @@ function SettingsPage() {
             <section>
                 <h2>Account</h2>
                 <button onClick={() => {/* Navigate to account details */ }}>View Account Details</button>
-                <button onClick={handleDeleteAccount}>Delete Account</button>
+                {/* <button onClick={handleDeleteAccount}>Delete Account</button> */}
             </section>
             <section>
                 <h2>Save Changes</h2>

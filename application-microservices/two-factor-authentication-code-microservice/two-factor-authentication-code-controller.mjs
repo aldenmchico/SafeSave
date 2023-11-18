@@ -142,10 +142,10 @@ app.get('/api/check-2fa-enabled-and-real-secret', checkAuth, async (req, res) =>
 
 
 
-    const { userUsername } = req.user
+    const { userUsername, userID } = req.user
     try {
 
-        const userHMAC = await getUserHMAC(95)
+        const userHMAC = await getUserHMAC(userID)
 
         console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
         const verified = await twoFACodeModel.checkIfUserHas2FAEnabledAndRealSecret(userHMAC);
@@ -168,10 +168,10 @@ app.get('/api/check-2fa-enabled-and-no-secret', checkAuth, async (req, res) => {
     - If both enabled, then they are set up. 
     */
 
-    const { userUsername } = req.user
+    const { userUsername, userID } = req.user
     try {
 
-        const userHMAC = await(getUserHMAC(req.user.userID))
+        const userHMAC = await getUserHMAC(userID)
         const has2FAAndNoSecret = await twoFACodeModel.checkIfUserHas2FAEnabledAndNoSecret(userHMAC);
 
         if (!has2FAAndNoSecret) {

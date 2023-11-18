@@ -13,7 +13,7 @@ import * as dataDecryptionModel from "./data-decryption-model.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import * as db from "./db-connector.cjs";
+import * as db from "./db-connector.mjs";
 
 const privateKeyPath = path.resolve(__dirname, 'key.pem');
 const certificatePath = path.resolve(__dirname, 'cert.pem');
@@ -74,8 +74,8 @@ app.post('/decrypttext', async (req, res) => {
     if(req.body.userLoginItemID && userLoginItemWebsite && userLoginItemUsername && userLoginItemPassword && userLoginItemDateCreated && userLoginItemDateUpdated
     && userLoginItemDateAccessed && websiteIV){
 
-        //TODO: UN-HARDCODE USER ID
-        const userSalt = await getUserSalt(84);
+        
+        const userSalt = await getUserSalt(userID);
         const result = await dataDecryptionModel.getDecryptedData({
             userLoginItemID: userLoginItemID,
             userLoginItemWebsite: userLoginItemWebsite,
@@ -100,8 +100,7 @@ app.post('/decrypttext', async (req, res) => {
         try {
 
 
-            //TODO: UN-HARDCODE USER ID
-            const userSalt = await getUserSalt(84);
+            const userSalt = await getUserSalt(userID);
             // Perform the decryption with the hexadecimal IV
             const result = await dataDecryptionModel.getDecryptedData({
                 userNoteID: userNoteID,

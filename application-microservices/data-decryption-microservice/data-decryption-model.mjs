@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import crypto from 'crypto';
-import * as db from "./db-connector.cjs";
+import * as db from "./db-connector.mjs";
 
 const getUserNoteIV = async (noteIVQuery) => {
     return new Promise((resolve, reject) => {
