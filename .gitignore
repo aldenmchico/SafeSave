@@ -25,6 +25,5 @@
 /application-microservices/jwt-microservice/node_modules
 /application-microservices/jwt-microservice/package-lock.json
 database/db-connector.js
-application-backend/db-connector.mjs
 /.idea
 
