@@ -196,7 +196,6 @@ loginItemRouter.get('/', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user login items" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -211,7 +210,6 @@ loginItemRouter.get('/users/:id', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -237,7 +235,6 @@ loginItemRouter.get('/users/:id/website/:website', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -252,7 +249,6 @@ loginItemRouter.get('/users/:id/username/:username', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given username" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -268,7 +264,6 @@ notesRouter.get('/', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user notes" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -283,7 +278,6 @@ notesRouter.get('/users/:id', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -309,7 +303,6 @@ notesRouter.get('/users/:id/title/:title', (req, res) => {
             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
             else {
                 console.log(result);
-                // UPDATE: Call decryption microservice here to decrypt all the JSON objects in result. Output from decryption should not include IV values.
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }

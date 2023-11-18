@@ -207,9 +207,17 @@ const getUserByUsername = async function (username, callback) {
 // GET UserLoginItems Table Model Functions  *****************************************
 const getAllLoginItems = function (callback) {
     let q = "SELECT * FROM UserLoginItems";
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
@@ -231,34 +239,66 @@ const getSingleUserLoginItems = function (id, callback) {
 
 const getSingleUserLoginItemsFavorites = function (id, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND favorited = 1`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
 const getUserLoginItemByWebsite = function (id, website, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND userLoginItemWebsite = '${website}'`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
 const getUserLoginItemByUsername = function (id, username, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND userLoginItemUsername = '${username}'`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
 // GET UserNotes Table Model Functions  *****************************************
 const getAllUserNotes = function (callback) {
     let q = "SELECT * FROM UserNotes";
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
@@ -281,9 +321,18 @@ const getSingleUserNotes = function (id, callback) {
 
 const getSingleUserNotesFavorites = function (id, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND favorited = 1`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try {
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            console.log("application-model.mjs result", decryptedResult);
+            callback(null, decryptedResult);
+        } catch (error) {
+            callback(error);
+        }
     });
 };
 
@@ -324,9 +373,17 @@ async function decryptRowData(row) {
 
 const getUserNoteByTitle = function (id, title, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND userNoteTitle = "${title}"`;
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
+    con.query(q, async (err, result) => {
+        if (err) {
+            callback(err);
+            return;
+        }
+        try{
+            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            callback(null, decryptedResult);
+        } catch (error){
+            callback(error)
+        }
     });
 };
 
