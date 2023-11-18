@@ -1,103 +1,22 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 import * as db from "./db-connector.mjs";
+import fs from "fs";
 
-const getUserNoteIV = async (noteIVQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteIVQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteIV) {
-                    resolve(iv[0].userNoteIV);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
+async function decryptIV(encryptedData) {
+    try {
+        // Read the private key from the file
+        const privKey = fs.readFileSync("private_ivkey.pem");
 
-const getNoteTitle = async (noteTitleQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteTitleQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteTitle) {
-                    resolve(iv[0].userNoteTitle);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
+        // Decrypt the data using the private key
+        const decryptedIV = crypto.privateDecrypt({ key: privKey, padding: crypto.constants.RSA_PKCS1_PADDING }, encryptedData);
 
-const getNoteText = async (noteTextQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteTextQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteText) {
-                    resolve(iv[0].userNoteText);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
-
-const getNoteCreated = async (noteCreatedQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteCreatedQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteCreated) {
-                    resolve(iv[0].userNoteCreated);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
-
-const getNoteUpdated = async (noteUpdatedQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteUpdatedQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteUpdated) {
-                    resolve(iv[0].userNoteUpdated);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
-
-
-const getNoteAccessed = async (noteAccessedQuery) => {
-    return new Promise((resolve, reject) => {
-        db.pool.query(noteAccessedQuery, function(error, iv, fields) {
-            if (error) {
-                reject(error);
-            } else {
-                if (iv[0] && iv[0].userNoteAccessed) {
-                    resolve(iv[0].userNoteAccessed);
-                } else {
-                    reject(new Error('userNoteIV not found.'));
-                }
-            }
-        });
-    });
-};
+        return decryptedIV;
+    } catch (error) {
+        console.error('Error during decryption:', error);
+        throw error;
+    }
+}
 
 
 const getDecryptedData = async (options) => {
@@ -119,10 +38,14 @@ const getDecryptedData = async (options) => {
             const userUsernameIVBuffer = Buffer.from(usernameIV, 'hex');
             const userPasswordIVBuffer = Buffer.from(passwordIV, 'hex');
 
+            const decrypteduserWebsiteIVBuffer = await decryptIV(userWebsiteIVBuffer);
+            const decipherWebsite = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserWebsiteIVBuffer)
 
-            const decipherWebsite = crypto.createDecipheriv('aes-256-cbc', userKey, userWebsiteIVBuffer)
-            const decipherUsername = crypto.createDecipheriv('aes-256-cbc', userKey, userUsernameIVBuffer)
-            const decipherPassword = crypto.createDecipheriv('aes-256-cbc', userKey, userPasswordIVBuffer)
+            const decrypteduserUsernameIVBuffer = await decryptIV(userUsernameIVBuffer);
+            const decipherUsername = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserUsernameIVBuffer)
+
+            const decrypteduserPasswordIVBuffer = await decryptIV(userPasswordIVBuffer)
+            const decipherPassword = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserPasswordIVBuffer)
 
             let decryptedWebsite = decipherWebsite.update(userLoginItemWebsite, 'hex', 'utf8');
             decryptedWebsite += decipherWebsite.final('utf8');
@@ -178,12 +101,16 @@ const getDecryptedData = async (options) => {
             const userNoteIVBuffer = Buffer.from(userNoteIV, 'hex');
             const userNoteTextIVBuffer = Buffer.from(userNoteTextIV, 'hex');
 
+            const decrypteduserNoteIVBuffer = await decryptIV(userNoteIVBuffer);
+
             const userKey = crypto.scryptSync(userHash, userSalt, 32);
 
             console.log(userKey)
 
-            const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteIVBuffer);
-            const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, userNoteTextIVBuffer);
+            const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserNoteIVBuffer);
+
+            const decrypteduserNoteTextIVBuffer = await decryptIV(userNoteTextIVBuffer)
+            const decipherText = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserNoteTextIVBuffer);
 
             let decryptedNoteTitle = decipherTitle.update(userNoteTitle, 'hex', 'utf8');
             decryptedNoteTitle += decipherTitle.final('utf8');

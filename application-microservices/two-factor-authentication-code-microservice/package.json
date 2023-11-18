@@ -20,6 +20,7 @@
     "mysql": "^2.18.1",
     "node-json-db": "^2.3.0",
     "nodemon": "^2.0.22",
+    "pem": "^1.14.8",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {

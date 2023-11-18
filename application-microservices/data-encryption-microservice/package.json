@@ -18,7 +18,8 @@
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "pem": "^1.14.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.6",
