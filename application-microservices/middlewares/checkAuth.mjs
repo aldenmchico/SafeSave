@@ -17,7 +17,10 @@ export const checkAuth = (req, res, next) => {
 
     try {
 
-        const SECRET = 'ChangeLater';
+        // TODO: Change SECRET at prod 
+        // const SECRET = 'ced3cf93230c634299151337bcd1ccca68d881107703ae6183a78e080a3bb4c03dc9dead55ee3c1027c56018a4dc68b9340b025239c23c964dfa5c271014f980';
+
+        const SECRET = 'ChangeLater'
         jwt.verify(token, SECRET, (err, verifiedToken) => {
             if (err) {
 

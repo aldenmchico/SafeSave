@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+
+# Find and replace the first code block
+find . -type f -exec sed -i 's/\/\/ Get an instance of mysql we can use in the app[^}]*}/\/\/ Get an instance of mysql we can use in the app\nimport { createPool } from '\''mysql'\'';\n\n\/\/ Create a '\''connection pool'\'' using the provided credentials\nvar pool = createPool({\n    connectionLimit: 10,\n    host: '\''classmysql.engr.oregonstate.edu'\'',\n    user: '\''capstone_2023_securepass1'\'',\n    password: '\''zxob8b@T8!yF'\'',\n    database: '\''capstone_2023_securepass1'\''\n})\n\nexport { pool };/' {} +
+
+# Find and replace the second code block
+find . -type f -exec sed -i 's/let dbConfig = {[^}]*}/let dbConfig = {\n    host: '\''classmysql.engr.oregonstate.edu'\'',\n    user: '\''capstone_2023_securepass1'\'',\n    password: '\''zxob8b@T8!yF'\'',\n    database: '\''capstone_2023_securepass1'\'',\n    multipleStatements: true\n}\n\nexport { dbConfig }/' {} +
+
+
+

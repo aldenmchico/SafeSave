@@ -6,9 +6,14 @@ import 'dotenv/config';
 
 const SECRET = 'ChangeLater';
 
+// make async for mysql
 const signJwtToken = (user) => {
 
     const { userUsername, userID, user2FAEnabled } = user;
+
+    // TODO: Include SESSION ID in signature
+    // include SESSION ID column in User table 
+    // when user logs out / closes browser --> clear session ID
     const token = jwt.sign({
         userUsername,
         userID

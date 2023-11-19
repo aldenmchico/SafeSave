@@ -41,7 +41,7 @@ function LoginPage() {
                 setPassword(credentials.password); // Set the unencrypted password in state
 
                 // Navigate to HomePage with userID and password state
-                navigate('/home', { state: { userID: fetchedUserID, password: credentials.password } });
+                navigate('/');
             } else {
                 if (response.status === 401) {
                     setError('Invalid username or password. Please try again.');

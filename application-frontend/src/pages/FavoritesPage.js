@@ -4,27 +4,25 @@ import { useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 import SavedNoteList from '../components/SavedNoteList';
 
-function FavoritesPage({setLoginItem, setNote}) {
+function FavoritesPage({ setLoginItem, setNote }) {
     // Use state variable exercises to bring in the data
     const [favoriteLogins, setFavoriteLogins] = useState([]);
     const [favoriteNotes, setFavoriteNotes] = useState([]);
-    const [userID, setUserID] = useState(1);
-    const [password, setPassword] = useState('pass123')
 
     // Load favorite logins from the backend
     const loadFavoriteLogins = async () => {
-        const response = await fetch(`/login_items/users/${userID}/favorites`);
+        const response = await fetch('/login_items/users/id/favorites');
         const logins = await response.json();
         setFavoriteLogins(logins);
     }
 
     // Load favorite notes from the backend
     const loadFavoriteNotes = async () => {
-        const response = await fetch(`/notes/users/${userID}/favorites`);
+        const response = await fetch(`/notes/users/id/favorites`);
         const notesData = await response.json();
         setFavoriteNotes(notesData);
     }
-    
+
     useEffect(() => {
         loadFavoriteLogins();
         loadFavoriteNotes();
@@ -70,26 +68,26 @@ function FavoritesPage({setLoginItem, setNote}) {
 
             <div>
                 <h2>Favorite Logins</h2>
-                    <div className="login-item-list">
+                <div className="login-item-list">
                     <SavedLoginList
                         loginItems={favoriteLogins}
                         editLoginItem={editLoginRow}
-                        deleteLoginItem = {deleteLoginRow}
+                        deleteLoginItem={deleteLoginRow}
                     />
-                    </div>
-                    <Link to="/createsavedlogin">Add New Login</Link>
+                </div>
+                <Link to="/createsavedlogin">Add New Login</Link>
             </div>
 
             <div>
                 <h2>Favorite Notes</h2>
                 <div className="note-list">
-                <SavedNoteList
-                    notes={favoriteNotes}
-                    editNote={editNoteRow}
-                    deleteNote = {deleteNoteRow}
-                />
+                    <SavedNoteList
+                        notes={favoriteNotes}
+                        editNote={editNoteRow}
+                        deleteNote={deleteNoteRow}
+                    />
                 </div>
-                <Link to="/createsavednote" state={{ userID, password }}>Add New Note</Link>
+                <Link to="/createsavednote" >Add New Note</Link>
             </div>
         </div>
     );
