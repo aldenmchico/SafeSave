@@ -44,6 +44,24 @@ const getUserSalt = (userID) => {
     });
 };
 
+//This is pulling the hash straight from the database. Normally, creating key/iv pairs with what's in the database is
+//no better than storing passwords in plaintext. However, IV's are encrypted with a private key prior to be inserted
+//into the database. This key does not live in the database.
+const getUserHash = (userID) => {
+    return new Promise((resolve, reject) => {
+        const hashQuery = `SELECT userPassword FROM Users WHERE userID = "${userID}"`;
+        con.query(hashQuery, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const userPassword = result[0] ? result[0].userPassword : null;
+                resolve(userPassword);
+            }
+        });
+    });
+};
+
+
 // POST UserLoginItems Table Model Functions  *****************************************
 const createUserLoginItem = async function (userID, reqBody, callback) {
 
@@ -58,7 +76,8 @@ const createUserLoginItem = async function (userID, reqBody, callback) {
     let userLoginWebsite = reqBody.website;
     let userLoginUsername = reqBody.username;
     let userLoginPassword = reqBody.password;
-    let userHash = "pass1";
+
+    const userHash = await getUserHash(userID);
 
 
     await fetch('https://127.0.0.1:8002/ciphertext', {
@@ -115,7 +134,8 @@ const createUserNote = async function (userID, reqBody, callback) {
     let noteCreatedDate = reqBody.userNoteDateCreated;
     let noteUpdatedDate = reqBody.userNoteDateCreated;
     let noteAccessedDate = reqBody.userNoteDateCreated;
-    let userHash = "pass1";
+
+    const userHash = await getUserHash(userID);
 
     const userSalt = await getUserSalt(userID);
 
@@ -343,9 +363,11 @@ async function decryptRowData(row) {
 
         // TODO: Fix Hardcoded password!
         // HAVE AUSTIN EXPLAIN WHAT I HAPPENING HERE. DECRYPTION MAY BE FUNKY? 
-        // CHECK DATA DECRYPTION CONTROLLER / MODEL 
-        let userHash = "userHash";
-        encryptedData[userHash] = "pass1";
+        // CHECK DATA DECRYPTION CONTROLLER / MODEL
+
+        const userHash = await getUserHash(row.userID);
+        const key = "userHash"
+        encryptedData[key] = userHash
 
         const agent = new https.Agent({
             rejectUnauthorized: false
@@ -378,7 +400,7 @@ const getUserNoteByTitle = function (id, title, callback) {
             return;
         }
         try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
+            const decryptedResult = await Promise.all(result.map(decryptRowData, id));
             callback(null, decryptedResult);
         } catch (error) {
             callback(error)
@@ -443,7 +465,8 @@ const patchLoginItem = async function (userID, reqBody, callback) {
         let userLoginWebsite = reqBody.website;
         let userLoginUsername = reqBody.username;
         let userLoginPassword = reqBody.password;
-        var userHash = "pass1";
+
+        let userHash = await getUserHash(userID);
 
         const userSalt = await getUserSalt(userID);
 
@@ -546,7 +569,7 @@ const patchNote = async function (userID, reqBody, callback) {
         let noteCreatedDate = formattedDate;
         let noteUpdatedDate = formattedDate;
         let noteAccessedDate = formattedDate;
-        let userHash = "pass1";
+        const userHash = await getUserHash(userID);
         const userSalt = await getUserSalt(userID);
 
 
