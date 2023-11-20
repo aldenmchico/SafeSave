@@ -4,7 +4,8 @@ import * as userLoginModel from './user-login-model.mjs';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 import cookieparser from 'cookie-parser';
-
+import mysql from 'mysql';
+import * as db from "./db-connector.mjs";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -39,11 +40,13 @@ try {
 }
 
 const creds = { key: privateKey, cert: certificate };
-
+const con = mysql.createConnection(db.dbConfig)
 const httpsServer = https.createServer(creds, app);
 
 app.use(express.json());
 app.use(cookieparser());
+
+
 
 // Enable COR requests from localhost:3000 only
 
@@ -86,6 +89,8 @@ app.post('/loginvalidation', async (req, res) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
+        const con = mysql.createConnection(db.dbConfig);
+
 
 
         // verify username exists
@@ -117,6 +122,16 @@ app.post('/loginvalidation', async (req, res) => {
             const user = { userID, userUsername };
 
             try {
+
+                res.clearCookie("access_token");
+
+                const clearSessionID = `UPDATE Users SET userSessionID = NULL WHERE userID = ?`
+
+                con.query(clearSessionID, [user.userID])
+
+
+
+
                 const tokenResponse = await userLoginModel.signJwtToken(user);
 
                 if (tokenResponse && tokenResponse.token) {

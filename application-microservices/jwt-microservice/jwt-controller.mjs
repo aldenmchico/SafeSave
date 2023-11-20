@@ -12,6 +12,7 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -66,7 +67,9 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
     Function to create, sign and return JWT in a cookie 
     */
 
-    const { user } = req.body   // grab User from login-controller - only time I ask for User (curr only sending username, id and 2faenabled ) 
+    const { user } = req.body   // grab User from login-controller - only time I ask for User (curr only sending username, id and 2faenabled )
+
+    console.log(req.body.sessionID)
 
     if (!user) {
         return res.status(400).json({ error: "User data is required" });
@@ -75,8 +78,10 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
     console.log(`Beginning JWT token creation for user:`, user);
 
     try {
+
+        const sessionID = crypto.randomBytes(16).toString('hex')
         // sign a JWT using User
-        const token = jwtModel.signJwtToken(user);
+        const token = jwtModel.signJwtToken(user, sessionID);
 
         // If all validations pass, send a success response.
         return res.status(200).json({ message: "Token creation successful.", token: token });

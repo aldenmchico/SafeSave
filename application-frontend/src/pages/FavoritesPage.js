@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import SavedLoginList from '../components/SavedLoginList';
 import SavedNoteList from '../components/SavedNoteList';
 
+
 function FavoritesPage({setLoginItem, setNote}) {
     // Use state variable exercises to bring in the data
     const [favoriteLogins, setFavoriteLogins] = useState([]);
