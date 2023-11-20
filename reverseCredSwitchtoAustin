@@ -1,0 +1,12 @@
+#!/bin/bash
+
+find . -type f \( -name ".env" -o -name "db-connector.mjs" \) -exec sed -i \
+    -e "s/host: 'classmysql.engr.oregonstate.edu'/host: 'localhost'/g" \
+    -e "s/user: 'capstone_2023_securepass1'/user: 'root'/g" \
+    -e "s/password: 'zxob8b@T8!yF'/password: 'DemoDatabasePassword!!123'/g" \
+    -e "s/dbpassphrase=zxob8b@T8!yF/dbpassphrase=DemoDatabasePassword!!123/g" \
+    -e "s/host=classmysql.engr.oregonstate.edu/host=localhost/g" \
+    -e "s/dbuser=capstone_2023_securepass1/dbuser=root/g" {} \;
+
+echo "Reversion complete."
+
