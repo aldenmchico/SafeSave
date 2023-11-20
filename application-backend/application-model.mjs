@@ -21,19 +21,27 @@ const createUser = function (reqBody, callback) {
         callback({ "code": "EMPTY_FIELD" }, null);
     }
     else {
-        let q = `INSERT INTO Users (userUsername, userEmail, userPassword, userSalt, userHMAC, userEmailHMAC) VALUES ("${reqBody.username}", "${reqBody.email}", "${reqBody.password}", "${reqBody.userSalt}",
-"${reqBody.userHMAC}", "${reqBody.userEmailHMAC}")`;
-        con.query(q, (err, result) => {
-            if (err) callback(err, null);
-            else callback(null, result);
+        let q = `INSERT INTO Users (userUsername, userEmail, userPassword, userSalt, userHMAC, userEmailHMAC) VALUES (?, ?, ?, ?, ?, ?)`;
+
+        const values = [];
+
+        values.push(reqBody.username, reqBody.email, reqBody.password, reqBody.userSalt, reqBody.userHMAC, reqBody.userEmailHMAC)
+
+        con.query(q, values, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
         });
+
     }
 }
 
 const getUserSalt = (userID) => {
     return new Promise((resolve, reject) => {
-        const saltQuery = `SELECT userSalt FROM Users WHERE userID = "${userID}"`;
-        con.query(saltQuery, (err, result) => {
+        const saltQuery = `SELECT userSalt FROM Users WHERE userID = ?`;
+        con.query(saltQuery, [userID], (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -44,13 +52,14 @@ const getUserSalt = (userID) => {
     });
 };
 
+
 //This is pulling the hash straight from the database. Normally, creating key/iv pairs with what's in the database is
 //no better than storing passwords in plaintext. However, IV's are encrypted with a private key prior to be inserted
 //into the database. This key does not live in the database.
 const getUserHash = (userID) => {
     return new Promise((resolve, reject) => {
-        const hashQuery = `SELECT userPassword FROM Users WHERE userID = "${userID}"`;
-        con.query(hashQuery, (err, result) => {
+        const hashQuery = `SELECT userPassword FROM Users WHERE userID = ?`;
+        con.query(hashQuery, [userID], (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -60,6 +69,7 @@ const getUserHash = (userID) => {
         });
     });
 };
+
 
 
 // POST UserLoginItems Table Model Functions  *****************************************
@@ -104,17 +114,31 @@ const createUserLoginItem = async function (userID, reqBody, callback) {
             responseData = data;
             console.log("data is", data);
 
-            //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
-                    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, websiteIV, usernameIV, passwordIV, authTag)
-          VALUES ("${responseData.encryptedWebsite}", "${responseData.encryptedUsername}", 
-          "${responseData.encryptedPassword}", 
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', '${userID}', "${responseData.websiteIV}", "${responseData.usernameIV}", "${responseData.passwordIV}", "${responseData.authTag}")`;
+    userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, websiteIV, usernameIV, passwordIV, authTag)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-            con.query(q, (err, result) => {
-                if (err) callback(err, null);
-                else callback(null, result);
+            const values = [];
+            values.push(responseData.encryptedWebsite,
+                responseData.encryptedUsername,
+                responseData.encryptedPassword,
+                formattedDate,
+                formattedDate,
+                formattedDate,
+                userID,
+                responseData.websiteIV,
+                responseData.usernameIV,
+                responseData.passwordIV,
+                responseData.authTag)
+
+            con.query(q, values, (err, result) => {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, result);
+                }
             });
+
         })
         .catch(error => {
             console.error('Error:', error.message);
@@ -174,13 +198,15 @@ const createUserNote = async function (userID, reqBody, callback) {
             responseData = data;
             console.log("data is", data);
 
-            //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
             let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
           userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag)
-          VALUES ("${responseData.encryptedTitleData}", "${responseData.encryptedNoteData}",
-          '${formattedDate}', '${formattedDate}', '${formattedDate}', '${userID}', "${responseData.iv}", "${responseData.userNoteTextIV}", "${responseData.authTag}")`;
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-            con.query(q, (err, result) => {
+            const values = []
+
+            values.push(responseData.encryptedTitleData, responseData.encryptedNoteData, formattedDate, formattedDate, formattedDate, userID, responseData.iv, responseData.userNoteTextIV, responseData.authTag)
+
+            con.query(q, values, (err, result) => {
                 if (err) callback(err, null);
                 else callback(null, result);
             });
@@ -197,8 +223,8 @@ const createUserNote = async function (userID, reqBody, callback) {
 
 // GET User by Email Model Function *****************************************
 const getUserByEmail = async function (email, callback) {
-    let q = `SELECT * FROM Users WHERE userEmailHMAC = "${email}"`;
-    con.query(q, (err, result) => {
+    let q = `SELECT * FROM Users WHERE userEmailHMAC = ?`;
+    con.query(q, [email], (err, result) => {
         if (err) throw err;
         callback(null, result);
     });
@@ -214,8 +240,10 @@ const getAllUsers = function (callback) {
 };
 
 const getUserByUsername = async function (username, callback) {
-    let q = `SELECT * FROM Users WHERE userHMAC = "${username}"`;
-    con.query(q, (err, result) => {
+    const values = []
+    values.push(username)
+    let q = `SELECT * FROM Users WHERE userHMAC = ?`;
+    con.query(q, values, (err, result) => {
         if (err) throw err;
         callback(null, result);
     });
@@ -239,8 +267,8 @@ const getAllLoginItems = function (callback) {
 };
 
 const getSingleUserLoginItems = function (id, callback) {
-    let q = `SELECT * FROM UserLoginItems WHERE userID = ${id}`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserLoginItems WHERE userID = ?`;
+    con.query(q, [id], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -255,8 +283,8 @@ const getSingleUserLoginItems = function (id, callback) {
 };
 
 const getSingleUserLoginItemsFavorites = function (id, callback) {
-    let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND favorited = 1`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserLoginItems WHERE userID = ? AND favorited = ?`;
+    con.query(q, [id, 1], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -271,8 +299,8 @@ const getSingleUserLoginItemsFavorites = function (id, callback) {
 };
 
 const getUserLoginItemByWebsite = function (id, website, callback) {
-    let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND userLoginItemWebsite = '${website}'`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserLoginItems WHERE userID = ? AND userLoginItemWebsite = ?`;
+    con.query(q, [id, website], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -286,21 +314,17 @@ const getUserLoginItemByWebsite = function (id, website, callback) {
     });
 };
 
-const getUserLoginItemByUsername = function (id, username, callback) {
-    let q = `SELECT * FROM UserLoginItems WHERE userID = ${id} AND userLoginItemUsername = '${username}'`;
-    con.query(q, async (err, result) => {
+const getUserLoginItemByUsername = function (userID, username, callback) {
+    let q = `SELECT * FROM UserLoginItems WHERE userID = ? AND userLoginItemUsername = ?`;
+    con.query(q, [userID, username], (err, result) => {
         if (err) {
-            callback(err);
-            return;
-        }
-        try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
-            callback(null, decryptedResult);
-        } catch (error) {
-            callback(error)
+            callback(err, null);
+        } else {
+            callback(null, result);
         }
     });
 };
+
 
 // GET UserNotes Table Model Functions  *****************************************
 const getAllUserNotes = function (callback) {
@@ -320,8 +344,8 @@ const getAllUserNotes = function (callback) {
 };
 
 const getSingleUserNotes = function (id, callback) {
-    let q = `SELECT * FROM UserNotes WHERE userID = ${id}`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserNotes WHERE userID = ?`;
+    con.query(q, [id], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -337,8 +361,8 @@ const getSingleUserNotes = function (id, callback) {
 };
 
 const getSingleUserNotesFavorites = function (id, callback) {
-    let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND favorited = 1`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserNotes WHERE userID = ? AND favorited = ?`;
+    con.query(q, [id, 1], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -393,8 +417,8 @@ async function decryptRowData(row) {
 
 
 const getUserNoteByTitle = function (id, title, callback) {
-    let q = `SELECT * FROM UserNotes WHERE userID = ${id} AND userNoteTitle = "${title}"`;
-    con.query(q, async (err, result) => {
+    let q = `SELECT * FROM UserNotes WHERE userID = ? AND userNoteTitle = ?`;
+    con.query(q, [id, title], async (err, result) => {
         if (err) {
             callback(err);
             return;
@@ -453,10 +477,7 @@ const patchUser = function (reqBody, callback) {
 const patchLoginItem = async function (userID, reqBody, callback) {
     if (reqBody.userLoginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
-    }
-    else {
-
-
+    } else {
         const agent = new https.Agent({
             rejectUnauthorized: false
         });
@@ -467,9 +488,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
         let userLoginPassword = reqBody.password;
 
         let userHash = await getUserHash(userID);
-
         const userSalt = await getUserSalt(userID);
-
 
         await fetch('https://localhost:8002/ciphertext', {
             method: 'POST',
@@ -495,56 +514,63 @@ const patchLoginItem = async function (userID, reqBody, callback) {
                 responseData = data;
                 console.log("data is", data);
 
-                //TODO: HARDCODED USER VALUE NEEDS TO BE FIXED
                 let q = `UPDATE UserLoginItems SET`;
 
+                const values = [];
                 if (reqBody.website !== undefined) {
-                    q += ` userLoginItemWebsite = "${responseData.encryptedWebsite}",`;
+                    q += ` userLoginItemWebsite = ?,`;
+                    values.push(responseData.encryptedWebsite);
                 }
 
                 if (reqBody.password !== undefined) {
-                    q += ` userLoginItemPassword = "${responseData.encryptedPassword}",`;
+                    q += ` userLoginItemPassword = ?,`;
+                    values.push(responseData.encryptedPassword);
                 }
 
                 if (reqBody.username !== undefined) {
-                    q += ` userLoginItemUsername = "${responseData.encryptedUsername}",`;
+                    q += ` userLoginItemUsername = ?,`;
+                    values.push(responseData.encryptedUsername);
                 }
 
-                q += ` userLoginItemDateUpdated = "${formattedDate}",`;
-                q += ` userLoginItemDateAccessed = "${formattedDate}",`;
+                q += ` userLoginItemDateUpdated = ?,`;
+                q += ` userLoginItemDateAccessed = ?,`;
 
-                q += ` websiteIV = "${responseData.websiteIV}",`;
-                q += ` usernameIV = "${responseData.usernameIV}",`;
-                q += ` passwordIV = "${responseData.passwordIV}",`;
-                q += ` authTag = "${responseData.authTag}"`;
+                q += ` websiteIV = ?,`;
+                q += ` usernameIV = ?,`;
+                q += ` passwordIV = ?,`;
+                q += ` authTag = ?`;
 
-                q += ` WHERE userLoginItemID = ${reqBody.userLoginItemID}`;
+                q += ` WHERE userLoginItemID = ?`;
+
+                values.push(formattedDate, formattedDate, responseData.websiteIV, responseData.usernameIV, responseData.passwordIV, responseData.authTag, reqBody.userLoginItemID);
 
                 if (q === '') callback({ "code": "NO_CHANGE" }, null);
-
-
                 else {
-                    con.query(q, async (err, result) => {
+                    con.query(q, values, async (err, result) => {
                         if (err) callback(err, null);
                         else callback(null, result);
-                    })
+                    });
                 }
-
             })
             .catch(error => {
                 console.error('Error:', error.message);
                 callback(error, null);
-            })
+            });
     }
-}
+};
+
 
 const patchLoginItemFavorite = function (reqBody, callback) {
     if (reqBody.loginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     }
     else {
-        let q = `UPDATE UserLoginItems SET favorited = "${reqBody.favorite}" WHERE userLoginItemID = ${reqBody.loginItemID}; `;
-        con.query(q, (err, result) => {
+
+        const values = []
+        let q = `UPDATE UserLoginItems SET favorited = ? WHERE userLoginItemID = ?`;
+
+        values.push(reqBody.favorite, reqBody.loginItemID)
+        con.query(q, values, (err, result) => {
             if (err) {
                 console.log(err);
                 callback(err, null);
@@ -561,9 +587,7 @@ const patchLoginItemFavorite = function (reqBody, callback) {
 const patchNote = async function (userID, reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
-    }
-    else {
-
+    } else {
         let noteTitle = reqBody.title;
         let noteText = reqBody.text;
         let noteCreatedDate = formattedDate;
@@ -571,8 +595,6 @@ const patchNote = async function (userID, reqBody, callback) {
         let noteAccessedDate = formattedDate;
         const userHash = await getUserHash(userID);
         const userSalt = await getUserSalt(userID);
-
-
 
         const agent = new https.Agent({
             rejectUnauthorized: false
@@ -609,51 +631,58 @@ const patchNote = async function (userID, reqBody, callback) {
 
                 let q = `UPDATE UserNotes SET`;
 
+                const values = [];
                 if (reqBody.title !== undefined) {
-                    q += ` userNoteTitle = "${responseData.encryptedTitleData}",`;
+                    q += ` userNoteTitle = ?,`;
+                    values.push(responseData.encryptedTitleData);
                 }
 
                 if (reqBody.text !== undefined) {
-                    q += ` userNoteText = "${responseData.encryptedNoteData}",`;
+                    q += ` userNoteText = ?,`;
+                    values.push(responseData.encryptedNoteData);
                 }
 
-                q += ` userNoteAccessed = "${formattedDate}",`;
-                q += ` userNoteUpdated = "${formattedDate}",`;
-                q += ` userNoteIV = "${responseData.iv}",`;
-                q += ` userNoteTextIV = "${responseData.userNoteTextIV}",`;
-                q += ` authTag = "${responseData.authTag}"`;
+                q += ` userNoteAccessed = ?,`;
+                q += ` userNoteUpdated = ?,`;
+                q += ` userNoteIV = ?,`;
+                q += ` userNoteTextIV = ?,`;
+                q += ` authTag = ?`;
 
-                q += ` WHERE userNoteID = ${reqBody.noteID}`;
+                q += ` WHERE userNoteID = ?`;
+
+                values.push(formattedDate, formattedDate, responseData.iv, responseData.userNoteTextIV, responseData.authTag, reqBody.noteID);
 
                 console.log(q)
-                con.query(q, (err, result) => {
+                con.query(q, values, (err, result) => {
                     if (err) callback(err, null);
                     else callback(null, result);
-                })
+                });
             })
             .catch(error => {
                 console.error('Error:', error.message);
                 callback(error, null);
-            })
-
+            });
     }
-}
+};
 
 const patchNoteFavorite = function (reqBody, callback) {
     if (reqBody.noteID === undefined) {
         callback({ "code": "NO_ID" }, null);
-    }
-    else {
-        let q = `UPDATE UserNotes SET favorited = "${reqBody.favorite}" WHERE userNoteID = ${reqBody.noteID}; `;
-        con.query(q, (err, result) => {
+    } else {
+        let q = `UPDATE UserNotes SET favorited = ? WHERE userNoteID = ?`;
+        const values = [reqBody.favorite, reqBody.noteID];
+
+        con.query(q, values, (err, result) => {
             if (err) {
                 console.log(err);
                 callback(err, null);
+            } else {
+                callback(null, result);
             }
-            else callback(null, result);
         });
     }
-}
+};
+
 
 
 
@@ -662,24 +691,24 @@ const patchNoteFavorite = function (reqBody, callback) {
 // DELETE (DELETE) MODEL FUNCTIONS  *****************************************
 
 const deleteUser = function (userId, callback) {
-    let q = `DELETE FROM Users WHERE userID = ${userId}`;
-    con.query(q, (err, result) => {
+    let q = `DELETE FROM Users WHERE userID = ?`;
+    con.query(q[userId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
 }
 
 const deleteUserLoginItem = function (userLoginItemId, callback) {
-    let q = `DELETE FROM UserLoginItems WHERE userLoginItemID = ${userLoginItemId}`;
-    con.query(q, (err, result) => {
+    let q = `DELETE FROM UserLoginItems WHERE userLoginItemID = ?`;
+    con.query(q[userLoginItemId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
 }
 
 const deleteNote = function (userNoteId, callback) {
-    let q = `DELETE FROM UserNotes WHERE userNoteID = ${userNoteId}`;
-    con.query(q, (err, result) => {
+    let q = `DELETE FROM UserNotes WHERE userNoteID = ?`;
+    con.query(q[userNoteId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });

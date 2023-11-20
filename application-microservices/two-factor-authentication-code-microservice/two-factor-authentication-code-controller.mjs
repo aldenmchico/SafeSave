@@ -120,8 +120,8 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
 
 const getUserHMAC = (userID) => {
     return new Promise((resolve, reject) => {
-        const hmacQuery = `SELECT userHMAC FROM Users WHERE userID = "${userID}"`;
-        con.query(hmacQuery, (err, result) => {
+        const hmacQuery = `SELECT userHMAC FROM Users WHERE userID = ?`;
+        con.query(hmacQuery, [userID], (err, result) => {
             if (err) {
                 reject(err);
             } else {

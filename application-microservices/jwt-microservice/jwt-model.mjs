@@ -7,7 +7,6 @@ import * as db from "./db-connector.mjs";
 import {readFileSync} from "fs";
 
 
-// const SECRET_KEY = process.env.SECRET;
 
 const con = mysql.createConnection(db.dbConfig);
 
@@ -40,8 +39,6 @@ const signJwtToken =  (user, sessionID) => {
 
         const userUsername = user.userUsername;
         const userID = user.userID;
-
-        // const SECRET = process.env.SECRET
 
 
 

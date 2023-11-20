@@ -17,8 +17,11 @@ const con = mysql.createConnection(db.dbConfig);
 const getUserSession = (userID) => {
 
     return new Promise((resolve, reject) => {
-        const sessionQuery = `SELECT userSessionID FROM Users WHERE userID = "${userID}"`;
-        con.query(sessionQuery, (err, result) => {
+        const sessionQuery = `SELECT userSessionID FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(sessionQuery, values, (err, result) => {
             if (err) {
                 console.error('Error executing query:', err);
                 reject(err);

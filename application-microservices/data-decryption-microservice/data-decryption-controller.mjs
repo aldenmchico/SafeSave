@@ -59,8 +59,8 @@ app.post('/decrypttext', async (req, res) => {
 
     const getUserSalt = (userID) => {
         return new Promise((resolve, reject) => {
-            const saltQuery = `SELECT userSalt FROM Users WHERE userID = "${userID}"`;
-            db.pool.query(saltQuery, (err, result) => {
+            const saltQuery = `SELECT userSalt FROM Users WHERE userID = ?`;
+            db.pool.query(saltQuery, [userID], (err, result) => {
                 if (err) {
                     reject(err);
                 } else {
