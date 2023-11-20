@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App.js';
-import logo from '../SafeSave-Logo.svg'; 
+import logo from '../SafeSave-Logo.svg';
 
 const Navigation = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,9 +15,26 @@ const Navigation = () => {
 
 
     // TODO: make an HTTP endpoint to a delete cookie endpoint 
-    const handleLogout = () => {
-        logout();
-        navigate('/loginnavigation');
+    const handleLogout = async () => {
+        try {
+            // Send a request to delete cookies
+            const response = await fetch('/logout', {
+                method: 'GET',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Navigate to the login page
+                console.log('Logging Out. Cookies should have been deleted.');
+                navigate('/loginnavigation');
+            } else {
+                // Handle error (e.g., show an error message)
+                console.error('Logout failed:', response.statusText);
+            }
+        } catch (error) {
+            // Handle network or other errors
+            console.error('Error during logout:', error);
+        }
     };
 
     return (
@@ -77,7 +94,7 @@ const Navigation = () => {
                 <li><NavLink to="/createsavedlogin">Create Saved Login</NavLink></li>
                 <li><NavLink to="/createsavednote">Create Saved Note</NavLink></li>
                 {/* <li onClick={handleLogout}>Logout</li> */}
-                <li className="logout-button" onClick={handleLogout}><NavLink to="#">Logout</NavLink></li>
+                <li className="logout-button" onClick={() => handleLogout()}><NavLink to="#">Logout</NavLink></li>
                 <li><NavLink to="/about">About</NavLink></li>
                 <li><NavLink to="/twofactorauth">2FA</NavLink></li>
                 <li><NavLink to="/createaccount">Create Account</NavLink></li>

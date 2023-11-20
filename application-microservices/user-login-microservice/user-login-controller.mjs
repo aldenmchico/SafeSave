@@ -192,6 +192,11 @@ app.post('/create/account', async (req, res) => {
     }
 });
 
+app.get('/logout', (req, res) => {
+    res.clearCookie('access_token');
+    res.send('Cookie has been deleted successfully');
+});
+
 // app.patch('/users/', async (req, res) => {
 
 //     const { password, userId } = req.body;
