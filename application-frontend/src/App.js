@@ -80,9 +80,9 @@ function App() {
                 <Route path="/loginnavigation" element={<LoginPage />} />
                 <Route path="/savedlogins" element={<SavedLoginsPage setLoginItem={setLoginItem} />} />
                 <Route path="/savednotes" element={<NotesPage setNote={setNote} />} />
-                <Route path="/payments" element={<PaymentsPage />} />
-                <Route path="/personalinfo" element={<PersonalInfoPage />} />
-                <Route path="/ids" element={<IDsPage />} />
+                {/*<Route path="/payments" element={<PaymentsPage />} />*/}
+                {/*<Route path="/personalinfo" element={<PersonalInfoPage />} />*/}
+                {/*<Route path="/ids" element={<IDsPage />} />*/}
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/createaccount" element={<CreateAccountPage />} />

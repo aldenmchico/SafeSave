@@ -226,8 +226,9 @@ loginItemRouter.get('/users/userID', checkAuth, (req, res) => {
     })
 });
 
-loginItemRouter.get('/users/:id/favorites', (req, res) => {
-    appModel.getSingleUserLoginItemsFavorites(req.params.id, (err, result) => {
+loginItemRouter.get('/users/id/favorites', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    appModel.getSingleUserLoginItemsFavorites(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             console.log(result);
@@ -295,8 +296,9 @@ notesRouter.get('/users/userID', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.get('/users/:id/favorites', (req, res) => {
-    appModel.getSingleUserNotesFavorites(req.params.id, (err, result) => {
+notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
+    const { userID } = req.user;
+    appModel.getSingleUserNotesFavorites(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
             console.log(result);
