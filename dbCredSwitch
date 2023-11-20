@@ -9,5 +9,3 @@ find . -type f \( -name ".env" -o -name "db-connector.mjs" \) -exec sed -i \
     -e "s/dbuser=root/dbuser=capstone_2023_securepass1/g" {} \;
 
 echo "Replacement complete."
-
-
