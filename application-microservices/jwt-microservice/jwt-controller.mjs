@@ -7,7 +7,7 @@ import * as jwtModel from './jwt-model.mjs';
 
 import https from 'https';
 import { readFileSync } from 'fs';
- 
+
 // Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -16,7 +16,7 @@ import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
- 
+
 const privateKeyPath = path.resolve(__dirname, 'key.pem');
 const certificatePath = path.resolve(__dirname, 'cert.pem');
 
@@ -69,7 +69,7 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
 
     const { user } = req.body   // grab User from login-controller - only time I ask for User (curr only sending username, id and 2faenabled )
 
-    console.log(req.body.sessionID)
+    console.log(`req.body.session id in /jwt-api/sign is ${req.body.sessionID}`); // null rn since DNE
 
     if (!user) {
         return res.status(400).json({ error: "User data is required" });

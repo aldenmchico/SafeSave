@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App.js';
-import logo from '../SafeSave-Logo.svg'; 
+import logo from '../SafeSave-Logo.svg';
 
 const Navigation = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -13,9 +13,28 @@ const Navigation = () => {
     //     navigate(`/search/${searchTerm}`);
     // };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/loginnavigation');
+    // TODO: make an HTTP endpoint to a delete cookie endpoint 
+    const handleLogout = async () => {
+        try {
+            // Send a request to delete cookies
+            const response = await fetch('/logout', {
+                method: 'GET',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (response.ok) {
+                // Navigate to the login page
+                console.log('Logging Out. Cookies should have been deleted.');
+                navigate('/loginnavigation');
+                return;
+            } else {
+                // Handle error (e.g., show an error message)
+                console.error('Logout failed:', response.statusText);
+            }
+        } catch (error) {
+            // Handle network or other errors
+            console.error('Error during logout:', error);
+        }
     };
 
     return (

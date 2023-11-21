@@ -58,7 +58,6 @@ export const checkAuth = async (req, res, next) => {
         jwt.verify(token, SECRET, async (err, verifiedToken) => {
             if (err) {
 
-
                 console.log(`SECRET IS ${SECRET}`);
                 console.log(`Error in checkAuth ${err}`);
 
@@ -68,9 +67,6 @@ export const checkAuth = async (req, res, next) => {
                     return res.status(403).json({message: "Invalid token"});
                 }
             }
-
-
-
 
                 const dbSessionID = await getUserSession(verifiedToken.userID);
 

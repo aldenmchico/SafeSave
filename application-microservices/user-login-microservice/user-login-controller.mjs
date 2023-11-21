@@ -22,6 +22,8 @@ import { dirname } from 'path';
 import path from 'path';
 import crypto from "crypto";
 
+import { checkAuth } from '../middlewares/checkAuth.mjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -127,10 +129,14 @@ app.post('/loginvalidation', async (req, res) => {
 
                 const clearSessionID = `UPDATE Users SET userSessionID = NULL WHERE userID = ?`
 
-                con.query(clearSessionID, [user.userID])
+                // con.query(clearSessionID, [user.userID])
 
-
-
+                await new Promise((resolve, reject) => {
+                    con.query(clearSessionID, [user.userID], (err, result) => {
+                        if (err) reject(err);
+                        else resolve(result);
+                    });
+                });
 
                 const tokenResponse = await userLoginModel.signJwtToken(user);
 
@@ -204,6 +210,36 @@ app.post('/create/account', async (req, res) => {
         // current implementation - model file handles nonexistent user... this catch block never hits 
         console.error(`Error validating username or email field for ${username} and ${email}: ${error.message}`);
         return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+app.get('/logout', checkAuth, async (req, res) => {
+
+    const { userID } = req.user
+
+    try {
+        // Prepare data for the PATCH request
+        const patchData = {
+            userID: userID
+        };
+
+        // Send PATCH request to update user's temp secret
+        const response = await fetch(`https://localhost:3001/users/session`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(patchData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        res.clearCookie('access_token');
+        res.send('Cookie has been deleted successfully');
+    } catch (error) {
+        console.error('Error in calling /logout from user-login-controller: ', error.message);
     }
 });
 
