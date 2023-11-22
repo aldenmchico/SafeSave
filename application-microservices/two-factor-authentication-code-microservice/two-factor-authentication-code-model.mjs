@@ -140,7 +140,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
 }
 
 // token is the TOTP from Google Authenticator
-const verifyAuthenticatedTOTP = async (token, secret, window = 1) => {
+const verifyAuthenticatedTOTP = (token, secret, window = 1) => {
 
     if (Math.abs(+window) > 10) {
         console.error('Window size is too large');
@@ -149,7 +149,10 @@ const verifyAuthenticatedTOTP = async (token, secret, window = 1) => {
 
     for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
         const totp = generateTOTP(secret, errorWindow);
-        if (token == totp) {
+        console.log('verifyAuthenticatedTOTP): ');
+        console.log(`token is ${token}`)
+        console.log(`totp is ${totp}`)
+        if (token === totp) {
             return true;
         }
     }
@@ -187,18 +190,18 @@ const disableTwoFactor = async (userId) => {
     }
 };
 
-const checkIfUserHas2FAEnabledAndRealSecret = async (username) => {
+const checkIfUserHas2FAEnabled = async (username) => {
     try {
         const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
-            throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabledAndRealSecret(). ');
+            throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabled(). ');
         }
         const data = await response.json();
         console.log(`user data found in checkIfUserHas2FAEnabled: `, data);
 
         const twoFactor = data[0].user2FAEnabled
         const secret = data[0].userSecret
-        if (!twoFactor) return false // if 2FA disabled or no Real secret 
+        if (!twoFactor) return false // if 2FA disabled 
 
         return true
     } catch (error) {
@@ -229,6 +232,24 @@ const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
     }
 }
 
+const checkIfUserHas2FAAndSecretEstablished = async (username) => {
+    try {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        if (!response.ok) {
+            throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAAndSecretEstablished');
+        }
+        const data = await response.json();
+        const twoFactor = data[0].user2FAEnabled
+        const secret = data[0].userSecret
+        if (twoFactor && secret) return true; // if 2FA and official Secret already exists 
+        return false;
+    } catch (error) {
+        console.log('There was a problem with the fetch operation in checkIfUserHas2FAAndSecretEstablished:', error.message);
+    }
+}
+
+
+
 const returnUserDataByUsername = async (username) => {
     try {
         const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
@@ -248,5 +269,5 @@ const returnUserDataByUsername = async (username) => {
 export {
     generateAndStoreTempSecretToken, verifyTemporaryTOTP,
     verifyAuthenticatedTOTP, disableTwoFactor,
-    checkIfUserHas2FAEnabledAndRealSecret, checkIfUserHas2FAEnabledAndNoSecret, returnUserDataByUsername
+    checkIfUserHas2FAEnabled, checkIfUserHas2FAEnabledAndNoSecret, returnUserDataByUsername, checkIfUserHas2FAAndSecretEstablished
 };

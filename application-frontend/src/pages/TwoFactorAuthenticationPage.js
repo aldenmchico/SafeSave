@@ -30,7 +30,7 @@ function TwoFactorAuthenticationPage() {
             // display the QR code here
             await generateAndDisplayQRCode();
         };
-         check2FAStatus();
+        check2FAStatus();
     }, []); // The empty dependency array means this effect will run once when the component mounts.
 
     const generateAndDisplayQRCode = async () => {
@@ -123,7 +123,7 @@ function TwoFactorAuthenticationPage() {
             console.log(`responseData is`, responseData)
 
             if (response.ok && responseData.verified) {
-                setErrorMsg('It worked!')
+                setErrorMsg('It worked! 2FA has been set up for your account. Do not lose the Authenticator entry.');
             } else {
                 setErrorMsg(responseData.message || 'Invalid 2FA code. Please try again.');
             }
