@@ -88,7 +88,7 @@ const generateTOTP = (secret, window = 0) => {
 }
 
 // token is the TOTP from Google Authenticator
-const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
+const verifyTemporaryTOTP = async (userId, token, secret, window = 2) => {
 
     try {
 
@@ -102,8 +102,12 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
 
             console.log(`token is ${token}`)
             console.log(`totp is ${totp}`)
+
+            console.log(`secret in verifyTemporaryTOTP is ${secret}`);
             // token matches totp from auth
-            if (token == totp) {
+
+            const totpString = totp.toString();
+            if (token === totpString) {
 
                 // Prepare data for the PATCH request
                 const patchData = {
@@ -140,19 +144,24 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 1) => {
 }
 
 // token is the TOTP from Google Authenticator
-const verifyAuthenticatedTOTP = (token, secret, window = 1) => {
+const verifyAuthenticatedTOTP = (token, secret, window = 2) => {
 
     if (Math.abs(+window) > 10) {
         console.error('Window size is too large');
         return false;
     }
 
+    console.log(`secret in verifyAuthenticatedTOTP is ${secret}`);
+
     for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
         const totp = generateTOTP(secret, errorWindow);
         console.log('verifyAuthenticatedTOTP): ');
-        console.log(`token is ${token}`)
-        console.log(`totp is ${totp}`)
-        if (token === totp) {
+        console.log(`token is ${token}, ${typeof(token)}`)
+        console.log(`totp is ${totp}, ${typeof(totp)}`)
+
+        const totpString = totp.toString();
+
+        if (token === totpString) {
             return true;
         }
     }

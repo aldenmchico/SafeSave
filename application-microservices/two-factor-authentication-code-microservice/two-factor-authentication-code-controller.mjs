@@ -330,6 +330,8 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
         const secret = userData[0].userSecret;
         const user2FAEnabled = userData[0].user2FAEnabled;
 
+        console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
+
 
         // check if 2FA is even enabled
         if (!user2FAEnabled) {

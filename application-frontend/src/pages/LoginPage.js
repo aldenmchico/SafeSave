@@ -15,8 +15,6 @@ function LoginPage() {
 
     const navigate = useNavigate();
 
-    const showNavigationBar = false;
-
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setCredentials(prevState => ({ ...prevState, [name]: value }));
