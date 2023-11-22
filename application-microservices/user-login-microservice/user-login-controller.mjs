@@ -142,11 +142,23 @@ app.post('/loginvalidation', async (req, res) => {
 
                 if (tokenResponse && tokenResponse.token) {
                     // If all validations pass, send a success response.
-                    return res.cookie("access_token", tokenResponse.token, { httpOnly: true }).status(200).json({
+                    // return res.cookie("access_token", tokenResponse.token, { httpOnly: true }).status(200).json({
+                    //     message: "Login successful.",
+                    //     user,
+                    //     token: tokenResponse.token
+                    // });
+
+                    return res.cookie("access_token", tokenResponse.token, {
+                        httpOnly: true,
+                        // Optional: Add 'secure: true' if using HTTPS
+                        secure: true,
+                        // Do not set 'Max-Age' or 'Expires'
+                    }).status(200).json({
                         message: "Login successful.",
                         user,
                         token: tokenResponse.token
                     });
+
                 } else {
                     throw new Error('Token creation failed');
                 }
