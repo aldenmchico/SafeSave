@@ -231,9 +231,12 @@ loginItemRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     appModel.getSingleUserLoginItemsFavorites(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            console.log(result);
-            res.set('Content-Type', 'application/json');
-            res.status(200).send(JSON.stringify(result));
+            if (result.length === 0) res.status(404).send({ "error": "No user favorite items found for specified user ID" });
+            else {
+                console.log(result);
+                res.set('Content-Type', 'application/json');
+                res.status(200).send(JSON.stringify(result));
+            }
         }
     })
 });
@@ -301,9 +304,12 @@ notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     appModel.getSingleUserNotesFavorites(userID, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
-            console.log(result);
-            res.set('Content-Type', 'application/json');
-            res.status(200).send(JSON.stringify(result));
+            if (result.length === 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
+            else {
+                console.log(result);
+                res.set('Content-Type', 'application/json');
+                res.status(200).send(JSON.stringify(result));
+            }
         }
     })
 });
@@ -347,7 +353,7 @@ userRouter.patch('/', (req, res) => {
 });
 
 loginItemRouter.patch('/', checkAuth, (req, res) => {
-    const {userID} = req.user; 
+    const { userID } = req.user;
     appModel.patchLoginItem(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -358,6 +364,20 @@ loginItemRouter.patch('/', checkAuth, (req, res) => {
             console.log(result);
             res.set('Content-Type', 'application/json');
             res.status(200).end();
+        }
+    })
+});
+
+userRouter.patch('/session', (req, res) => {
+    appModel.nullSessionID(req.body, (err, result) => {
+        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+        else {
+            if (result.affectedRows === 0) res.status(404).send({ "error": "No users found with specified user ID in PATCH /session" });
+            else {
+                console.log(result);
+                res.set('Content-Type', 'application/json');
+                res.status(204).end();
+            }
         }
     })
 });
@@ -378,7 +398,7 @@ loginItemRouter.patch('/favorite', (req, res) => {
 
 
 notesRouter.patch('/', checkAuth, (req, res) => {
-    const {userID} = req.user; 
+    const { userID } = req.user;
     appModel.patchNote(userID, req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -427,6 +447,8 @@ userRouter.delete('/:userId', (req, res) => {
         }
     })
 });
+
+
 
 loginItemRouter.delete('/:loginItemId', (req, res) => {
     appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {

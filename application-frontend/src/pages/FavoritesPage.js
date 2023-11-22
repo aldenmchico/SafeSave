@@ -11,17 +11,43 @@ function FavoritesPage({ setLoginItem, setNote }) {
 
     // Load favorite logins from the backend
     const loadFavoriteLogins = async () => {
-        const response = await fetch('/login_items/users/id/favorites');
-        const logins = await response.json();
-        setFavoriteLogins(logins);
-    }
+        try {
+            const response = await fetch('/login_items/users/id/favorites');
+            if (response.ok) {
+                const logins = await response.json();
+                setFavoriteLogins(logins);
+            } else if (response.status === 404) {
+                console.log('Response code in loadFavoritesLogin is 404 - nothing to return. Dont worry about this 404 Error code.');
+                setFavoriteLogins([]);
+                return;
+            }
+            else {
+                throw new Error('Failed to fetch favorite login items');
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     // Load favorite notes from the backend
     const loadFavoriteNotes = async () => {
-        const response = await fetch(`/notes/users/id/favorites`);
-        const notesData = await response.json();
-        setFavoriteNotes(notesData);
-    }
+        try {
+            const response = await fetch(`/notes/users/id/favorites`);
+            if (response.ok) {
+                const notesData = await response.json();
+                setFavoriteNotes(notesData);
+            } else if (response.status === 404) {
+                console.log('Response code in loadFavoriteNotes is 404 - nothing to return. Dont worry about this 404 Error code.');
+                setFavoriteNotes([]);
+                return;
+            }
+            else {
+                throw new Error('Failed to fetch favorite note items');
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     useEffect(() => {
         loadFavoriteLogins();

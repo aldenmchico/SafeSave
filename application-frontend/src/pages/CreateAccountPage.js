@@ -94,7 +94,7 @@ function CreateAccountPage() {
 
                 if (response.ok) {
                     alert('Account created successfully! Please login.');
-                    navigate('/loginnavigation');
+                    navigate('/');
                 } else {
                     const errorData = await response.json();
                     setErrors({ ...errs, server: errorData.message });

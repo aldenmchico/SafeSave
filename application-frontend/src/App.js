@@ -23,7 +23,7 @@ const EditSavedNotePage = lazy(() => import('./pages/EditSavedNotePage'));
 const NotFound = lazy(() => import('./pages/NotFound'));  // 404 page
 
 // Authentication context
-export const AuthContext = createContext(); 
+export const AuthContext = createContext();
 
 function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -74,10 +74,11 @@ function App() {
             <Suspense fallback={<div>Loading...</div>}>
               <Navigation />
               <Routes>
-                <Route path="/" element={<HomePage setLoginItem={setLoginItem} />} />
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/home" element={<HomePage setLoginItem={setLoginItem} />} />
                 <Route path="/favorites" element={<FavoritesPage setLoginItem={setLoginItem} setNote={setNote} />} />
                 <Route path="/twofactorauth" element={<TwoFactorAuthenticationPage />} />
-                <Route path="/loginnavigation" element={<LoginPage />} />
+
                 <Route path="/savedlogins" element={<SavedLoginsPage setLoginItem={setLoginItem} />} />
                 <Route path="/savednotes" element={<NotesPage setNote={setNote} />} />
                 {/*<Route path="/payments" element={<PaymentsPage />} />*/}

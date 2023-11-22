@@ -101,6 +101,15 @@ module.exports = function (app) {
         })
     )
 
+    app.use(
+        '/logout',
+        createProxyMiddleware({
+            target: 'https://localhost:8008',
+            changeOrigin: true,
+            secure: false,
+        })
+    )
+
 
 
 };

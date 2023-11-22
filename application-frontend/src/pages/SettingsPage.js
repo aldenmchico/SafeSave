@@ -19,7 +19,7 @@ function SettingsPage() {
     const locateUserAndCheck2FAEnabled = async () => {
 
         try {
-            const response = await fetch('/api/check-2fa-enabled-and-real-secret') // PORT 8006 
+            const response = await fetch('/api/check-2fa-enabled') // PORT 8006 
             if (!response.ok) {
                 throw new Error('Something went wrong with fetch in SettingsPage');
             }

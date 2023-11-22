@@ -461,6 +461,13 @@ const patchUser = function (reqBody, callback) {
         if (reqBody.user2FAEnabled !== undefined) {
             q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
         }
+
+        // model function for handling user session id when logging out 
+        if (reqBody.userSessionID !== undefined) {
+            // If userSessionID is explicitly set to null, construct the SQL without quotes
+            const tempSessionID = reqBody.userSessionID === null ? null : `"${reqBody.userSessionID}"`;
+            q += `UPDATE Users SET userSessionID = ${tempSessionID} WHERE userID = ${reqBody.userID}; `;
+        }
         if (q === '') callback({ "code": "NO_CHANGE" }, null)
         else {
             con.query(q, (err, result) => {
@@ -581,6 +588,21 @@ const patchLoginItemFavorite = function (reqBody, callback) {
 }
 
 
+const nullSessionID = function (reqBody, callback) {
+    if (reqBody.userID === undefined) {
+        callback({ "code": "NO_ID" }, null);
+        return; // Exit the function if no userID is provided
+    }
+
+    let q = `UPDATE Users SET userSessionID = NULL WHERE userID = ?`;
+    con.query(q, [reqBody.userID], (err, result) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, result);
+        }
+    });
+}
 
 
 
@@ -715,6 +737,8 @@ const deleteNote = function (userNoteId, callback) {
 }
 
 
+
+
 // Exports for application-controller
 export {
     createUser, createUserLoginItem, createUserNote,
@@ -722,5 +746,5 @@ export {
     getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
     getAllUserNotes, getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
     patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
-    deleteNote, deleteUserLoginItem, deleteUser
+    deleteNote, deleteUserLoginItem, deleteUser, nullSessionID
 };

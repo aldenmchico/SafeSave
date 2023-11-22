@@ -22,4 +22,14 @@ module.exports = function (app) {
             secure: false
         })
     );
+
+    // Proxy request for /api/check-2fa-enabled-and-real-secret
+    app.use(
+        '/api',
+        createProxyMiddleware({
+            target: 'https://localhost:8006',
+            chanrgeOrigin: true,
+            secure: false
+        })
+    )
 }

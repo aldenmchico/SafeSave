@@ -25,6 +25,8 @@ const signJwtToken =  (user, sessionID) => {
 
         const sessionIDQuery = `UPDATE Users SET userSessionID = ? WHERE userID = ?`;
 
+        console.log(`user is ${user} and userID is ${user.userID} in signJwtToken()`); 
+
         con.query(sessionIDQuery, [hmac, user.userID], (error, results, fields) => {
             if (error) {
                 console.error("Error updating user session ID:", error);
