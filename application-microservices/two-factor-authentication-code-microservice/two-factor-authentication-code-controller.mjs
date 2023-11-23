@@ -211,6 +211,66 @@ app.get('/api/check-2fa-enabled-and-real-secret-established', checkAuth, async (
 });
 
 
+const getUserTempSecret = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const tempSecretQuery = `SELECT userTempSecret FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(tempSecretQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userTempSecret = result[0] ? result[0].userTempSecret : null;
+                console.log('Retrieved userSessionID:', userTempSecret);
+                resolve(userTempSecret);
+            }
+        });
+    });
+};
+
+const getUserSecret = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const userSecretQuery = `SELECT userSecret FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(userSecretQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userSecret = result[0] ? result[0].userSecret : null;
+                console.log('Retrieved userSessionID:', userSecret);
+                resolve(userSecret);
+            }
+        });
+    });
+};
+
+const getUser2faEnabled = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const twoFAQuery = `SELECT user2FAEnabled FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(twoFAQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const user2FAEnabled = result[0] ? result[0].user2FAEnabled : null;
+                console.log('Retrieved userSessionID:', user2FAEnabled);
+                resolve(user2FAEnabled);
+            }
+        });
+    });
+};
+
 app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     /*
     Verifies temporary secret token.
@@ -233,8 +293,8 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
         // get tempsecret , 2faenabled using Cookie
-        const tempSecret = userData[0].userTempSecret;
-        const user2FAEnabled = userData[0].user2FAEnabled;
+        const tempSecret = await getUserTempSecret(userData[0].userID)
+        const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
 
         console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
 
@@ -280,9 +340,9 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
-        const mfaSecret = userData[0].userSecret;
-        const mfaTempSecret = userData[0].userTempSecret;
-        const mfaEnabled = userData[0].user2FAEnabled;
+        const mfaSecret = await getUserSecret(userData[0].userID)
+        const mfaTempSecret = await getUserTempSecret(userData[0].userID)
+        const mfaEnabled =  await getUser2faEnabled(userData[0].userID)
 
         console.log(`mfaSecret is ${mfaSecret} mfaTempSecret is ${mfaTempSecret} and mfaEnabled is ${mfaEnabled}`);
 
@@ -330,8 +390,8 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
-        const secret = userData[0].userSecret;
-        const user2FAEnabled = userData[0].user2FAEnabled;
+        const secret = await getUserSecret(userData[0].userID)
+        const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
 
         console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
 
