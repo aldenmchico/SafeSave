@@ -714,7 +714,7 @@ const patchNoteFavorite = function (reqBody, callback) {
 
 const deleteUser = function (userId, callback) {
     let q = `DELETE FROM Users WHERE userID = ?`;
-    con.query(q[userId], (err, result) => {
+    con.query(q, [userId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
@@ -722,7 +722,7 @@ const deleteUser = function (userId, callback) {
 
 const deleteUserLoginItem = function (userLoginItemId, callback) {
     let q = `DELETE FROM UserLoginItems WHERE userLoginItemID = ?`;
-    con.query(q[userLoginItemId], (err, result) => {
+    con.query(q, [userLoginItemId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
@@ -730,7 +730,7 @@ const deleteUserLoginItem = function (userLoginItemId, callback) {
 
 const deleteNote = function (userNoteId, callback) {
     let q = `DELETE FROM UserNotes WHERE userNoteID = ?`;
-    con.query(q[userNoteId], (err, result) => {
+    con.query(q, [userNoteId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
