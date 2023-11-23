@@ -230,6 +230,8 @@ app.get('/logout', checkAuth, async (req, res) => {
 
     const { userID } = req.user
 
+    const token = req.cookies.access_token;
+
     try {
         // Prepare data for the PATCH request
         const patchData = {
@@ -242,7 +244,10 @@ app.get('/logout', checkAuth, async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(patchData)
+            body: JSON.stringify({
+                access_token: token,
+                ...patchData, // Include other properties from patchData
+            }),
         });
 
         if (!response.ok) {

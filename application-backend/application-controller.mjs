@@ -329,7 +329,7 @@ loginItemRouter.patch('/', checkAuth, (req, res) => {
     })
 });
 
-userRouter.patch('/session', (req, res) => {
+userRouter.patch('/session', checkAuth,(req, res) => {
     appModel.nullSessionID(req.body, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -374,7 +374,7 @@ notesRouter.patch('/', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.patch('/favorite', (req, res) => {
+notesRouter.patch('/favorite', checkAuth,(req, res) => {
     appModel.patchNoteFavorite(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -395,7 +395,7 @@ notesRouter.patch('/favorite', (req, res) => {
 // Response (Sucess): INSERT COMMENT
 // Response (FAILURE): INSERT COMMENT
 
-userRouter.delete('/:userId', (req, res) => {
+userRouter.delete('/:userId', checkAuth, (req, res) => {
     appModel.deleteUser(req.params.userId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -411,7 +411,7 @@ userRouter.delete('/:userId', (req, res) => {
 
 
 
-loginItemRouter.delete('/:loginItemId', (req, res) => {
+loginItemRouter.delete('/:loginItemId', checkAuth,(req, res) => {
     appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -426,7 +426,7 @@ loginItemRouter.delete('/:loginItemId', (req, res) => {
 });
 
 
-notesRouter.delete('/:noteId', (req, res) => {
+notesRouter.delete('/:noteId', checkAuth, (req, res) => {
     appModel.deleteNote(req.params.noteId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
