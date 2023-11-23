@@ -145,19 +145,6 @@ notesRouter.post('/', checkAuth, (req, res) => {
 // GET HTTP ENDPOINTS ****************************************************
 
 // GET Users Table endpoints ****************************************************
-userRouter.get('/', (req, res) => {
-    appModel.getAllUsers((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user from specified username" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -195,20 +182,7 @@ userRouter.get('/byEmail/:email', (req, res) => {
 });
 
 
-// GET UserLoginItems Table endpoints ****************************************************
-loginItemRouter.get('/', (req, res) => {
-    appModel.getAllLoginItems((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user login items" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+
 
 loginItemRouter.get('/users/userID', checkAuth, (req, res) => {
     const { userID } = req.user;
@@ -241,19 +215,19 @@ loginItemRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     })
 });
 
-loginItemRouter.get('/users/:id/website/:website', (req, res) => {
-    appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+// loginItemRouter.get('/users/:id/website/:website', (req, res) => {
+//     appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
+//         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+//         else {
+//             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
+//             else {
+//                 console.log(result);
+//                 res.set('Content-Type', 'application/json');
+//                 res.status(200).send(JSON.stringify(result));
+//             }
+//         }
+//     })
+// });
 
 loginItemRouter.get('/users/:id/username/:username', (req, res) => {
     appModel.getUserLoginItemByUsername(req.params.id, req.params.username, (err, result) => {
@@ -269,20 +243,7 @@ loginItemRouter.get('/users/:id/username/:username', (req, res) => {
     })
 });
 
-// GET UserNotes Table endpoints ****************************************************
-notesRouter.get('/', (req, res) => {
-    appModel.getAllUserNotes((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user notes" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+
 
 notesRouter.get('/users/userID', checkAuth, (req, res) => {
     const { userID } = req.user;
@@ -314,19 +275,19 @@ notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.get('/users/:id/title/:title', (req, res) => {
-    appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+// notesRouter.get('/users/:id/title/:title', checkAuth, (req, res) => {
+//     appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
+//         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+//         else {
+//             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
+//             else {
+//                 console.log(result);
+//                 res.set('Content-Type', 'application/json');
+//                 res.status(200).send(JSON.stringify(result));
+//             }
+//         }
+//     })
+// });
 
 // UPDATE (PATCH) controller ************************************
 
@@ -336,7 +297,7 @@ notesRouter.get('/users/:id/title/:title', (req, res) => {
 // Response (FAILURE): INSERT COMMENT
 
 
-userRouter.patch('/', (req, res) => {
+userRouter.patch('/', checkAuth,(req, res) => {
     appModel.patchUser(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_USER_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -368,7 +329,7 @@ loginItemRouter.patch('/', checkAuth, (req, res) => {
     })
 });
 
-userRouter.patch('/session', (req, res) => {
+userRouter.patch('/session', checkAuth,(req, res) => {
     appModel.nullSessionID(req.body, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -382,7 +343,7 @@ userRouter.patch('/session', (req, res) => {
     })
 });
 
-loginItemRouter.patch('/favorite', (req, res) => {
+loginItemRouter.patch('/favorite', checkAuth, (req, res) => {
     appModel.patchLoginItemFavorite(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -413,7 +374,7 @@ notesRouter.patch('/', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.patch('/favorite', (req, res) => {
+notesRouter.patch('/favorite', checkAuth,(req, res) => {
     appModel.patchNoteFavorite(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -434,7 +395,7 @@ notesRouter.patch('/favorite', (req, res) => {
 // Response (Sucess): INSERT COMMENT
 // Response (FAILURE): INSERT COMMENT
 
-userRouter.delete('/:userId', (req, res) => {
+userRouter.delete('/:userId', checkAuth, (req, res) => {
     appModel.deleteUser(req.params.userId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -450,7 +411,7 @@ userRouter.delete('/:userId', (req, res) => {
 
 
 
-loginItemRouter.delete('/:loginItemId', (req, res) => {
+loginItemRouter.delete('/:loginItemId', checkAuth,(req, res) => {
     appModel.deleteUserLoginItem(req.params.loginItemId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {
@@ -465,7 +426,7 @@ loginItemRouter.delete('/:loginItemId', (req, res) => {
 });
 
 
-notesRouter.delete('/:noteId', (req, res) => {
+notesRouter.delete('/:noteId', checkAuth, (req, res) => {
     appModel.deleteNote(req.params.noteId, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {

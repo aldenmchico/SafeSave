@@ -86,15 +86,18 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     */
 
     // grab userID from stored Cookie
+    const accessToken = req.cookies.access_token
     const { userID } = req.user
     const { enableTwoFactor } = req.body
 
     console.log(`enableTwoFactor is: ${enableTwoFactor}`);
 
+
+
     // If the request is to disable 2FA
     if (!enableTwoFactor) {
         try {
-            const twoFADisabled = await twoFACodeModel.disableTwoFactor(userID);
+            const twoFADisabled = await twoFACodeModel.disableTwoFactor(userID, accessToken);
             if (!twoFADisabled) {
                 return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userID ${userID}` });
             }
@@ -105,7 +108,7 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     }
 
     try {
-        const temp_secret = await twoFACodeModel.generateAndStoreTempSecretToken(userID);
+        const temp_secret = await twoFACodeModel.generateAndStoreTempSecretToken(userID, accessToken);
         if (!temp_secret) {
             return res.status(400).json({ message: 'Something went wrong trying to generate and store temp token' });
         }
@@ -208,6 +211,66 @@ app.get('/api/check-2fa-enabled-and-real-secret-established', checkAuth, async (
 });
 
 
+const getUserTempSecret = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const tempSecretQuery = `SELECT userTempSecret FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(tempSecretQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userTempSecret = result[0] ? result[0].userTempSecret : null;
+                console.log('Retrieved userSessionID:', userTempSecret);
+                resolve(userTempSecret);
+            }
+        });
+    });
+};
+
+const getUserSecret = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const userSecretQuery = `SELECT userSecret FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(userSecretQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userSecret = result[0] ? result[0].userSecret : null;
+                console.log('Retrieved userSessionID:', userSecret);
+                resolve(userSecret);
+            }
+        });
+    });
+};
+
+const getUser2faEnabled = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const twoFAQuery = `SELECT user2FAEnabled FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(twoFAQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const user2FAEnabled = result[0] ? result[0].user2FAEnabled : null;
+                console.log('Retrieved userSessionID:', user2FAEnabled);
+                resolve(user2FAEnabled);
+            }
+        });
+    });
+};
+
 app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
     /*
     Verifies temporary secret token.
@@ -230,8 +293,10 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
         // get tempsecret , 2faenabled using Cookie
-        const tempSecret = userData[0].userTempSecret;
-        const user2FAEnabled = userData[0].user2FAEnabled;
+        const tempSecret = await getUserTempSecret(userData[0].userID)
+        const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
+
+        const accessToken = req.cookies.access_token
 
         console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
 
@@ -247,7 +312,7 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
         }
 
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, tempSecret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, tempSecret, 2, accessToken)
 
         if (verified) {
             // Here you might also want to establish a session or generate an access token
@@ -277,9 +342,9 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
-        const mfaSecret = userData[0].userSecret;
-        const mfaTempSecret = userData[0].userTempSecret;
-        const mfaEnabled = userData[0].user2FAEnabled;
+        const mfaSecret = await getUserSecret(userData[0].userID)
+        const mfaTempSecret = await getUserTempSecret(userData[0].userID)
+        const mfaEnabled =  await getUser2faEnabled(userData[0].userID)
 
         console.log(`mfaSecret is ${mfaSecret} mfaTempSecret is ${mfaTempSecret} and mfaEnabled is ${mfaEnabled}`);
 
@@ -297,7 +362,7 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
         const digits = '6';
         const period = '30';
         const otpType = 'totp';
-        const configUri = `otpauth://${otpType}/${issuer}:${userHMAC}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
+        const configUri = `otpauth://${otpType}/${issuer}:${userID}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
 
         // generate qr code
         res.setHeader('Content-Type', 'image/png');
@@ -308,6 +373,26 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
     }
 });
 
+const getUserName = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const userNameQuery = `SELECT userHMAC FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(userNameQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userHMAC = result[0] ? result[0].userHMAC : null;
+                console.log('Retrieved userSessionID:', userHMAC);
+                resolve(userHMAC);
+            }
+        });
+    });
+};
+
 app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
     /*  
     Verifies the token received when user tries logging into app.
@@ -317,7 +402,6 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
     // get secret , 2faenabled, id from req.user
     // get token from user input in body
     const { token } = req.body;
-    const { userUsername } = req.user
 
     try {
 
@@ -325,12 +409,15 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
         // pull user data from db
         const userData = await twoFACodeModel.returnUserDataByUsername(userHMAC);
 
+
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
-        const secret = userData[0].userSecret;
-        const user2FAEnabled = userData[0].user2FAEnabled;
+        const secret = await getUserSecret(userData[0].userID)
+        const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
 
         console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
+
+        const userUserName = await getUserName(userData[0].userID)
 
 
         // check if 2FA is even enabled
@@ -339,7 +426,7 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
         }
 
         // Check for required fields
-        if (!userUsername || !token || !secret) {
+        if (!userUserName || !token || !secret) {
             return res.status(400).json({ message: "Username and token and secret are required." });
         }
 

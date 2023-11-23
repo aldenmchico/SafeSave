@@ -12,13 +12,11 @@ function generateRandomString() {
         return characterSet.charAt(randomIndex);
     };
 
-    // Ensure at least one uppercase letter, one digit, and one special character
     const initialString =
         getRandomChar(uppercaseCharacters) +
         getRandomChar(digitCharacters) +
         getRandomChar(specialCharacters);
 
-    // Generate the remaining characters from the combined set without repetition
     const remainingCharacters =
         lowercaseCharacters + uppercaseCharacters + digitCharacters + specialCharacters;
 
@@ -29,8 +27,6 @@ function generateRandomString() {
 
     return shuffledString;
 }
-
-
 
 function CreateAccountPage() {
     const [formData, setFormData] = useState({
@@ -53,7 +49,7 @@ function CreateAccountPage() {
     };
 
     const handleAccountCreation = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         let valid = true;
         let errs = {};
 
@@ -64,8 +60,8 @@ function CreateAccountPage() {
 
         if (!validatePassword(formData.password)) {
             valid = false;
-            errs.password = 'Password must be at least 12 characters long and include at least 1 lowercase, 1 uppercase, 1 numeric, and 1 special character. '
-            + `A random, secure password that you could use is ${generateRandomString()}`;
+            errs.password = 'Password must be 12+ characters with lowercase, uppercase, numeric, and special characters. ' +
+                `Suggested secure password: ${generateRandomString()}`;
         }
 
         if (formData.password !== formData.confirmPassword) {
@@ -84,7 +80,6 @@ function CreateAccountPage() {
 
             try {
                 const response = await fetch('/create/account', {
-
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -93,8 +88,8 @@ function CreateAccountPage() {
                 });
 
                 if (response.ok) {
-                    alert('Account created successfully! Please login.');
-                    navigate('/');
+                    alert('Account created successfully!');
+                    navigate('/'); // Redirect to homepage
                 } else {
                     const errorData = await response.json();
                     setErrors({ ...errs, server: errorData.message });

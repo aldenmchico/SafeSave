@@ -3,6 +3,10 @@ import 'dotenv/config';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import {readFileSync} from "fs";
+import * as db from "./db-connector.mjs";
+import mysql from 'mysql';
+
+const con = mysql.createConnection(db.dbConfig);
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const checkIfUsernameOrEmailExists = async (username, email) => {
@@ -127,6 +131,24 @@ const checkIfUsernameExists = async (username) => {
     }
 }
 
+const getUserHashedPassword = (userID) => {
+    return new Promise((resolve, reject) => {
+        const passQuery = `SELECT userPassword FROM Users WHERE userID = ?`;
+
+        const values = [userID];
+        con.query(passQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userPassword = result[0] ? result[0].userPassword : null;
+                console.log('Retrieved userPassword:', userPassword);
+                resolve(userPassword);
+            }
+        });
+    });
+};
+
 
 const fetchUserFromUsername = async (username) => {
     try {
@@ -164,7 +186,7 @@ const validatePassword = async (username, plainTextPassword) => {
         }
         const data = await response.json();
         console.log(`user data found in validatePassword: `, data);
-        const hashedPassword = data[0].userPassword;
+        const hashedPassword = await getUserHashedPassword(data[0].userID)
 
         console.log(`hashedPassword is ${hashedPassword}`);
 

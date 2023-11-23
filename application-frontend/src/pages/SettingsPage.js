@@ -43,11 +43,11 @@ function SettingsPage() {
             //            const response = await fetch('https://localhost:8006/api/2fa-registration', {
             const response = await fetch('/api/2fa-registration', {
                 method: 'POST',
-                credentials: 'include', // Include credentials in the request
                 headers: {
                     'Content-Type': 'application/json',
                     // Include other headers as required, such as authentication tokens
                 },
+                credentials: 'include', // Include credentials in the request
                 body: JSON.stringify({ enableTwoFactor: newState }),
             });
 
