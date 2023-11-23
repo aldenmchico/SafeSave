@@ -362,7 +362,7 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
         const digits = '6';
         const period = '30';
         const otpType = 'totp';
-        const configUri = `otpauth://${otpType}/${issuer}:${userHMAC}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
+        const configUri = `otpauth://${otpType}/${issuer}:${userID}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
 
         // generate qr code
         res.setHeader('Content-Type', 'image/png');
