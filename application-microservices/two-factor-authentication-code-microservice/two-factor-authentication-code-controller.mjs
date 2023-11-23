@@ -373,6 +373,26 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
     }
 });
 
+const getUserName = (userID) => {
+
+    return new Promise((resolve, reject) => {
+        const userNameQuery = `SELECT userHMAC FROM Users WHERE userID = ?`;
+
+        const values = []
+        values.push(userID)
+        con.query(userNameQuery, values, (err, result) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                reject(err);
+            } else {
+                const userHMAC = result[0] ? result[0].userHMAC : null;
+                console.log('Retrieved userSessionID:', userHMAC);
+                resolve(userHMAC);
+            }
+        });
+    });
+};
+
 app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
     /*  
     Verifies the token received when user tries logging into app.
@@ -382,13 +402,13 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
     // get secret , 2faenabled, id from req.user
     // get token from user input in body
     const { token } = req.body;
-    const { userUsername } = req.user
 
     try {
 
         const userHMAC = await (getUserHMAC(req.user.userID))
         // pull user data from db
         const userData = await twoFACodeModel.returnUserDataByUsername(userHMAC);
+
 
         if (!userData) return res.status(400).json({ message: "Invalid User - ensure Cookies are valid" });
 
@@ -397,6 +417,8 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
 
         console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
 
+        const userUserName = await getUserName(userData[0].userID)
+
 
         // check if 2FA is even enabled
         if (!user2FAEnabled) {
@@ -404,7 +426,7 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
         }
 
         // Check for required fields
-        if (!userUsername || !token || !secret) {
+        if (!userUserName || !token || !secret) {
             return res.status(400).json({ message: "Username and token and secret are required." });
         }
 
