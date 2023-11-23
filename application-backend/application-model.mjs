@@ -223,7 +223,7 @@ const createUserNote = async function (userID, reqBody, callback) {
 
 // GET User by Email Model Function *****************************************
 const getUserByEmail = async function (email, callback) {
-    let q = `SELECT * FROM Users WHERE userEmailHMAC = ?`;
+    let q = `SELECT userID FROM Users WHERE userEmailHMAC = ?`;
     con.query(q, [email], (err, result) => {
         if (err) throw err;
         callback(null, result);
