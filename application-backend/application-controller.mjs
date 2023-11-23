@@ -145,19 +145,6 @@ notesRouter.post('/', checkAuth, (req, res) => {
 // GET HTTP ENDPOINTS ****************************************************
 
 // GET Users Table endpoints ****************************************************
-userRouter.get('/', (req, res) => {
-    appModel.getAllUsers((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user from specified username" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -195,20 +182,7 @@ userRouter.get('/byEmail/:email', (req, res) => {
 });
 
 
-// GET UserLoginItems Table endpoints ****************************************************
-loginItemRouter.get('/', (req, res) => {
-    appModel.getAllLoginItems((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user login items" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+
 
 loginItemRouter.get('/users/userID', checkAuth, (req, res) => {
     const { userID } = req.user;
@@ -269,20 +243,7 @@ loginItemRouter.get('/users/:id/username/:username', (req, res) => {
     })
 });
 
-// GET UserNotes Table endpoints ****************************************************
-notesRouter.get('/', (req, res) => {
-    appModel.getAllUserNotes((err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "Could not retrieve user notes" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+
 
 notesRouter.get('/users/userID', checkAuth, (req, res) => {
     const { userID } = req.user;

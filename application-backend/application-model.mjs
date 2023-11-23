@@ -231,13 +231,6 @@ const getUserByEmail = async function (email, callback) {
 };
 
 
-const getAllUsers = function (callback) {
-    let q = "SELECT * FROM Users";
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
-    });
-};
 
 const getUserByUsername = async function (username, callback) {
     const values = []
@@ -249,22 +242,7 @@ const getUserByUsername = async function (username, callback) {
     });
 };
 
-// GET UserLoginItems Table Model Functions  *****************************************
-const getAllLoginItems = function (callback) {
-    let q = "SELECT * FROM UserLoginItems";
-    con.query(q, async (err, result) => {
-        if (err) {
-            callback(err);
-            return;
-        }
-        try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
-            callback(null, decryptedResult);
-        } catch (error) {
-            callback(error)
-        }
-    });
-};
+
 
 const getSingleUserLoginItems = function (id, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ?`;
@@ -326,22 +304,7 @@ const getUserLoginItemByUsername = function (userID, username, callback) {
 };
 
 
-// GET UserNotes Table Model Functions  *****************************************
-const getAllUserNotes = function (callback) {
-    let q = "SELECT * FROM UserNotes";
-    con.query(q, async (err, result) => {
-        if (err) {
-            callback(err);
-            return;
-        }
-        try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
-            callback(null, decryptedResult);
-        } catch (error) {
-            callback(error)
-        }
-    });
-};
+
 
 const getSingleUserNotes = function (id, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ?`;
@@ -742,9 +705,9 @@ const deleteNote = function (userNoteId, callback) {
 // Exports for application-controller
 export {
     createUser, createUserLoginItem, createUserNote,
-    getAllUsers, getUserByUsername, getUserByEmail,
-    getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
-    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
+    getUserByUsername, getUserByEmail,
+    getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
+    getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
     patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
     deleteNote, deleteUserLoginItem, deleteUser, nullSessionID
 };
