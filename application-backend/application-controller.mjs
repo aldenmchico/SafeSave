@@ -215,19 +215,19 @@ loginItemRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     })
 });
 
-loginItemRouter.get('/users/:id/website/:website', (req, res) => {
-    appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+// loginItemRouter.get('/users/:id/website/:website', (req, res) => {
+//     appModel.getUserLoginItemByWebsite(req.params.id, req.params.website, (err, result) => {
+//         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+//         else {
+//             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given website" });
+//             else {
+//                 console.log(result);
+//                 res.set('Content-Type', 'application/json');
+//                 res.status(200).send(JSON.stringify(result));
+//             }
+//         }
+//     })
+// });
 
 loginItemRouter.get('/users/:id/username/:username', (req, res) => {
     appModel.getUserLoginItemByUsername(req.params.id, req.params.username, (err, result) => {
@@ -275,19 +275,19 @@ notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.get('/users/:id/title/:title', checkAuth, (req, res) => {
-    appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
-        if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
-        else {
-            if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
-            else {
-                console.log(result);
-                res.set('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            }
-        }
-    })
-});
+// notesRouter.get('/users/:id/title/:title', checkAuth, (req, res) => {
+//     appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
+//         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
+//         else {
+//             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID with given title" });
+//             else {
+//                 console.log(result);
+//                 res.set('Content-Type', 'application/json');
+//                 res.status(200).send(JSON.stringify(result));
+//             }
+//         }
+//     })
+// });
 
 // UPDATE (PATCH) controller ************************************
 
