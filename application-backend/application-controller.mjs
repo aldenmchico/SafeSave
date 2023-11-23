@@ -275,7 +275,7 @@ notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
     })
 });
 
-notesRouter.get('/users/:id/title/:title', (req, res) => {
+notesRouter.get('/users/:id/title/:title', checkAuth, (req, res) => {
     appModel.getUserNoteByTitle(req.params.id, req.params.title, (err, result) => {
         if (err !== null) res.status(400).send({ "error": `${err.code} - Bad Request.` });
         else {

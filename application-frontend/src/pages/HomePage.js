@@ -73,7 +73,9 @@ function HomePage({ setLoginItem }) {
 
             <div className="content-section">
                 <h2>Quick Summary</h2>
-                <p>You have {savedLogins.length} saved logins and {savedNotes.length} saved notes.</p>
+                <p>
+                    You have {savedLogins.length === 1 ? '1 saved login' : `${savedLogins.length} saved logins`} and {savedNotes.length === 1 ? '1 saved note' : `${savedNotes.length} saved notes`}.
+                </p>
             </div>
 
             <section className="content-section">
