@@ -98,7 +98,7 @@ const generateTOTP = (secret, window = 0) => {
 }
 
 // token is the TOTP from Google Authenticator
-const verifyTemporaryTOTP = async (userId, token, secret, window = 2) => {
+const verifyTemporaryTOTP = async (userId, token, secret, window = 2, accessToken) => {
 
     try {
 
@@ -132,7 +132,10 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 2) => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(patchData)
+                    body: JSON.stringify({
+                        access_token: accessToken,
+                        ...patchData, // Include other properties from patchData
+                    }),
                 });
 
                 if (!response.ok) {

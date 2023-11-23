@@ -296,6 +296,8 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
         const tempSecret = await getUserTempSecret(userData[0].userID)
         const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
 
+        const accessToken = req.cookies.access_token
+
         console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
 
 
@@ -310,7 +312,7 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
         }
 
         // verify that token from authenticator is same as token generated using secret -  make temporary token, permanent for user
-        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, tempSecret)
+        const verified = await twoFACodeModel.verifyTemporaryTOTP(userID, token, tempSecret, 2, accessToken)
 
         if (verified) {
             // Here you might also want to establish a session or generate an access token
