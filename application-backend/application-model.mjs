@@ -233,14 +233,14 @@ const getUserByEmail = async function (email, callback) {
 
 
 const getUserByUsername = async function (username, callback) {
-    const values = []
-    values.push(username)
-    let q = `SELECT * FROM Users WHERE userHMAC = ?`;
+    const values = [username];
+    let q = `SELECT userID FROM Users WHERE userHMAC = ?`;
     con.query(q, values, (err, result) => {
         if (err) throw err;
         callback(null, result);
     });
 };
+
 
 
 
