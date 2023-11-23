@@ -297,7 +297,7 @@ notesRouter.get('/users/:id/title/:title', checkAuth, (req, res) => {
 // Response (FAILURE): INSERT COMMENT
 
 
-userRouter.patch('/', (req, res) => {
+userRouter.patch('/', checkAuth,(req, res) => {
     appModel.patchUser(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_USER_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });
@@ -343,7 +343,7 @@ userRouter.patch('/session', (req, res) => {
     })
 });
 
-loginItemRouter.patch('/favorite', (req, res) => {
+loginItemRouter.patch('/favorite', checkAuth, (req, res) => {
     appModel.patchLoginItemFavorite(req.body, (err, result) => {
         if (err !== null) {
             if (err.code === "NO_ID") res.status(406).send({ "error": `${err.code} - User ID required to update user information.` });

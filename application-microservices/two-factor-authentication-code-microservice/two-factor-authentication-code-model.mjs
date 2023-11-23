@@ -6,13 +6,15 @@ import base32 from 'hi-base32';
 import https from 'https';
 
 const agent = new https.Agent({
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
+    credentials: true
 });
 
 // generate temp secret key for step 1 of 2FA 
-const generateAndStoreTempSecretToken = async (userId, length = 20) => {
+const generateAndStoreTempSecretToken = async (userId, accessToken, length = 20) => {
 
     try {
+
 
         const randomBuffer = crypto.randomBytes(length);
         const cleanedSecret = base32.encode(randomBuffer).replace(/=/g, '');
@@ -30,7 +32,10 @@ const generateAndStoreTempSecretToken = async (userId, length = 20) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(patchData)
+            body: JSON.stringify({
+                access_token: accessToken,
+                ...patchData, // Include other properties from patchData
+            }),
         });
 
         if (!response.ok) {
@@ -168,7 +173,8 @@ const verifyAuthenticatedTOTP = (token, secret, window = 2) => {
     return false;
 }
 
-const disableTwoFactor = async (userId) => {
+const disableTwoFactor =
+    async (userId, accessToken) => {
 
     // Prepare data for the PATCH request
     const patchData = {
@@ -184,7 +190,11 @@ const disableTwoFactor = async (userId) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(patchData),
+            credentials: "include",
+            body: JSON.stringify({
+                access_token: accessToken,
+                ...patchData, // Include other properties from patchData
+            }),
             agent: agent
         });
 
@@ -201,8 +211,9 @@ const disableTwoFactor = async (userId) => {
 
 const checkIfUserHas2FAEnabled = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
-        if (!response.ok) {
+        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`, {
+            credentials: 'include',
+        });        if (!response.ok) {
             throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabled(). ');
         }
         const data = await response.json();

@@ -86,15 +86,18 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     */
 
     // grab userID from stored Cookie
+    const accessToken = req.cookies.access_token
     const { userID } = req.user
     const { enableTwoFactor } = req.body
 
     console.log(`enableTwoFactor is: ${enableTwoFactor}`);
 
+
+
     // If the request is to disable 2FA
     if (!enableTwoFactor) {
         try {
-            const twoFADisabled = await twoFACodeModel.disableTwoFactor(userID);
+            const twoFADisabled = await twoFACodeModel.disableTwoFactor(userID, accessToken);
             if (!twoFADisabled) {
                 return res.status(400).json({ message: `Something went wrong trying to disable 2FA for userID ${userID}` });
             }
@@ -105,7 +108,7 @@ app.post('/api/2fa-registration', checkAuth, async (req, res) => {
     }
 
     try {
-        const temp_secret = await twoFACodeModel.generateAndStoreTempSecretToken(userID);
+        const temp_secret = await twoFACodeModel.generateAndStoreTempSecretToken(userID, accessToken);
         if (!temp_secret) {
             return res.status(400).json({ message: 'Something went wrong trying to generate and store temp token' });
         }

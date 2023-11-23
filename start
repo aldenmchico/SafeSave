@@ -10,4 +10,4 @@ cd ./application-microservices/data-decryption-microservice/ && npm start &
 cd ./application-frontend/ && npm start &
 cd ./application-microservices/user-login-microservice/ && npm start &
 cd ./application-microservices/jwt-microservice/ && npm start &
-cd ./application-microservices/two-factor-authentication-code-microservice/ && npm start &
+#cd ./application-microservices/two-factor-authentication-code-microservice/ && npm start &
