@@ -45,7 +45,17 @@ export const checkAuth = async (req, res, next) => {
 
 
     console.log('req.cookies is: ', req.cookies);
-    const token = req.cookies.access_token;
+    let token;
+
+    try {
+        if (req.body.access_token !== undefined) {
+            token = req.body.access_token;
+        } else if (req.cookies.access_token) {
+            token = req.cookies.access_token
+        }
+    }catch(e){
+        console.log(e)
+    }
     if (!token) {
         return res.status(401).json('No token found');
     }

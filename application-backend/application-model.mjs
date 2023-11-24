@@ -223,7 +223,7 @@ const createUserNote = async function (userID, reqBody, callback) {
 
 // GET User by Email Model Function *****************************************
 const getUserByEmail = async function (email, callback) {
-    let q = `SELECT * FROM Users WHERE userEmailHMAC = ?`;
+    let q = `SELECT userID FROM Users WHERE userEmailHMAC = ?`;
     con.query(q, [email], (err, result) => {
         if (err) throw err;
         callback(null, result);
@@ -231,40 +231,18 @@ const getUserByEmail = async function (email, callback) {
 };
 
 
-const getAllUsers = function (callback) {
-    let q = "SELECT * FROM Users";
-    con.query(q, (err, result) => {
-        if (err) throw err;
-        callback(null, result);
-    });
-};
 
 const getUserByUsername = async function (username, callback) {
-    const values = []
-    values.push(username)
-    let q = `SELECT * FROM Users WHERE userHMAC = ?`;
+    const values = [username];
+    let q = `SELECT userID FROM Users WHERE userHMAC = ?`;
     con.query(q, values, (err, result) => {
         if (err) throw err;
         callback(null, result);
     });
 };
 
-// GET UserLoginItems Table Model Functions  *****************************************
-const getAllLoginItems = function (callback) {
-    let q = "SELECT * FROM UserLoginItems";
-    con.query(q, async (err, result) => {
-        if (err) {
-            callback(err);
-            return;
-        }
-        try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
-            callback(null, decryptedResult);
-        } catch (error) {
-            callback(error)
-        }
-    });
-};
+
+
 
 const getSingleUserLoginItems = function (id, callback) {
     let q = `SELECT * FROM UserLoginItems WHERE userID = ?`;
@@ -326,22 +304,7 @@ const getUserLoginItemByUsername = function (userID, username, callback) {
 };
 
 
-// GET UserNotes Table Model Functions  *****************************************
-const getAllUserNotes = function (callback) {
-    let q = "SELECT * FROM UserNotes";
-    con.query(q, async (err, result) => {
-        if (err) {
-            callback(err);
-            return;
-        }
-        try {
-            const decryptedResult = await Promise.all(result.map(decryptRowData));
-            callback(null, decryptedResult);
-        } catch (error) {
-            callback(error)
-        }
-    });
-};
+
 
 const getSingleUserNotes = function (id, callback) {
     let q = `SELECT * FROM UserNotes WHERE userID = ?`;
@@ -714,7 +677,7 @@ const patchNoteFavorite = function (reqBody, callback) {
 
 const deleteUser = function (userId, callback) {
     let q = `DELETE FROM Users WHERE userID = ?`;
-    con.query(q[userId], (err, result) => {
+    con.query(q, [userId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
@@ -722,7 +685,7 @@ const deleteUser = function (userId, callback) {
 
 const deleteUserLoginItem = function (userLoginItemId, callback) {
     let q = `DELETE FROM UserLoginItems WHERE userLoginItemID = ?`;
-    con.query(q[userLoginItemId], (err, result) => {
+    con.query(q, [userLoginItemId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
@@ -730,7 +693,7 @@ const deleteUserLoginItem = function (userLoginItemId, callback) {
 
 const deleteNote = function (userNoteId, callback) {
     let q = `DELETE FROM UserNotes WHERE userNoteID = ?`;
-    con.query(q[userNoteId], (err, result) => {
+    con.query(q, [userNoteId], (err, result) => {
         if (err) callback(err, null);
         else callback(null, result);
     });
@@ -742,9 +705,9 @@ const deleteNote = function (userNoteId, callback) {
 // Exports for application-controller
 export {
     createUser, createUserLoginItem, createUserNote,
-    getAllUsers, getUserByUsername, getUserByEmail,
-    getAllLoginItems, getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
-    getAllUserNotes, getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
+    getUserByUsername, getUserByEmail,
+    getSingleUserLoginItems, getUserLoginItemByUsername, getUserLoginItemByWebsite, getSingleUserLoginItemsFavorites,
+    getSingleUserNotes, getUserNoteByTitle, getSingleUserNotesFavorites,
     patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
     deleteNote, deleteUserLoginItem, deleteUser, nullSessionID
 };
