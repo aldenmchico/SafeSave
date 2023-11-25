@@ -163,6 +163,7 @@ function CreateAccountPage() {
                 </div>
                 {errors.server && <p className="error-message">{errors.server}</p>}
                 <div className="submit-button">
+                    <button className="back-button" type="button" onClick={() => navigate('/')}>Back to Login</button>
                     <button className="login-button" onClick={handleAccountCreation}>Create Account</button>
                 </div>
             </form>

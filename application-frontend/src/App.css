@@ -347,10 +347,14 @@ main {
 
 .submit-button {
   width: 100%;
-  display: block;
+  display: flex;
   text-align: center;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.back-button {
+  margin-left: auto; /* This will push the button to the right */
 }
 
 .login-button {
