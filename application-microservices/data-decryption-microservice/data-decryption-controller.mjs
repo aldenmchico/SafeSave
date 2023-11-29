@@ -10,13 +10,16 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import * as dataDecryptionModel from "./data-decryption-model.mjs";
+import * as db from "./db-connector.mjs"
+import mysql from 'mysql2'
 
+const con = mysql.createConnection(db.dbConfig)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import * as db from "./db-connector.mjs";
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
+
 
 let privateKey;
 let certificate;
@@ -60,7 +63,7 @@ app.post('/decrypttext', async (req, res) => {
     const getUserSalt = (userID) => {
         return new Promise((resolve, reject) => {
             const saltQuery = `SELECT userSalt FROM Users WHERE userID = ?`;
-            db.pool.query(saltQuery, [userID], (err, result) => {
+            con.query(saltQuery, [userID], (err, result) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -124,22 +127,6 @@ app.post('/decrypttext', async (req, res) => {
         }
     }
 });
-
-
-
-app.get('/', async (req, res) => {
-    const queryDatabase = `SELECT * FROM UserNotes`;
-
-    await db.pool.query(queryDatabase, function(error, notes, fields) {
-        if (error) {
-            console.log(error);
-            res.send('An error occurred while fetching data from the database.');
-        } else {
-            res.render('table', { notes });
-        }
-    });
-});
-
 
 httpsServer.listen(PORT, () => {
     console.log(`Decryption server listening on port ${PORT}...`);

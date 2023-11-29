@@ -7,7 +7,6 @@ import cookieparser from 'cookie-parser';
 import mysql from 'mysql';
 import * as db from "./db-connector.mjs";
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Configure express server
 const PORT = process.env.PORT;
@@ -27,8 +26,8 @@ import { checkAuth } from '../middlewares/checkAuth.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
 
 let privateKey;
 let certificate;
@@ -56,7 +55,7 @@ app.use(cookieparser());
 //CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
 //which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
 //allowed origins will EVENTUALLY have our domain name at port 443 once we host!
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://safesave.ddns.net']
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -83,11 +82,11 @@ app.post('/loginvalidation', async (req, res) => {
         return res.status(400).json({ message: "Username and password are required." });
     }
 
-    console.log(`Checking login validation for username:[${username}]...`);
+    //console.log(`Checking login validation for username:[${username}]...`);
 
     try {
 
-        const secretKey = readFileSync("secret_key", "utf-8");
+        const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
@@ -97,10 +96,10 @@ app.post('/loginvalidation', async (req, res) => {
 
         // verify username exists
         const usernameExists = await userLoginModel.checkIfUsernameExists(digestedUserHMAC);
-        console.log("Username exists:", usernameExists);
+        //console.log("Username exists:", usernameExists);
 
         if (!usernameExists) {
-            console.log(`User ${username} does not exist.`);
+            //console.log(`User ${username} does not exist.`);
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
@@ -108,7 +107,7 @@ app.post('/loginvalidation', async (req, res) => {
         const passwordsMatch = await userLoginModel.validatePassword(digestedUserHMAC, password);
 
         if (!passwordsMatch) {
-            console.log(`Invalid password attempt for ${username}.`);
+            //console.log(`Invalid password attempt for ${username}.`);
             return res.status(401).json({ message: "Invalid username or password." });
         }
 
@@ -116,10 +115,10 @@ app.post('/loginvalidation', async (req, res) => {
         const fetchedUser = await userLoginModel.fetchUserFromUsername(digestedUserHMAC);
 
         if (fetchedUser) {
-            console.log('user in api endpoint is: ', fetchedUser);
+            //console.log('user in api endpoint is: ', fetchedUser);
 
             const { userID, userUsername } = fetchedUser[0];
-            console.log(`userID is ${userID}, username is ${userUsername}`);
+            //console.log(`userID is ${userID}, username is ${userUsername}`);
 
             const user = { userID, userUsername };
 
@@ -182,12 +181,12 @@ app.post('/create/account', async (req, res) => {
         return res.status(400).json({ message: "Username and email and password are required." });
     }
 
-    console.log(`Checking account creation for username:[${username}]... and email:[${email}] and password:[${password}]...`);
+    //console.log(`Checking account creation for username:[${username}]... and email:[${email}] and password: REDACTED...`);
 
     try {
         // check if username or email already exists
 
-        const secretKey = readFileSync("secret_key", "utf-8");
+        const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
         const emailHMAC = crypto.createHmac('sha256', secretKey)
@@ -198,7 +197,7 @@ app.post('/create/account', async (req, res) => {
 
         const usernameOrEmailExists = await userLoginModel.checkIfUsernameOrEmailExists(digestedUserHMAC, digestedEmailHMAC);
         if (usernameOrEmailExists) {
-            console.log(`Username ${username} or email ${email} already exist.`);
+            //console.log(`Username ${username} or email ${email} already exist.`);
             return res.status(401).json({ message: "Username or email already exists." });
         }
 
@@ -239,7 +238,7 @@ app.get('/logout', checkAuth, async (req, res) => {
         };
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`https://localhost:3001/users/session`, {
+        const response = await fetch(`https://safesave.ddns.net:3001/users/session`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

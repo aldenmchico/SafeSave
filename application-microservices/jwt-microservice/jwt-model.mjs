@@ -17,7 +17,7 @@ const con = mysql.createConnection(db.dbConfig);
 const signJwtToken =  (user, sessionID) => {
     try{
 
-        const SECRET = readFileSync("authSecret.txt").toString('hex')
+        const SECRET = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/authSecret").toString('hex')
         const hmac = crypto.createHmac('sha256', SECRET)
             .update(user.userUsername + user.userID + sessionID)
             .digest('hex');
@@ -51,10 +51,10 @@ const signJwtToken =  (user, sessionID) => {
             userUsername,
             userID,
             sessionID
-        }, SECRET, { expiresIn: '1hr' });
+        }, SECRET, { expiresIn: '3hr' });
 
 
-        console.log(`Token created at signJwtToken: ${token}`);
+        //console.log(`Token created at signJwtToken: ${token}`);
         return token;
     } catch (error) {
         console.error('Error in signJwtToken:', error);

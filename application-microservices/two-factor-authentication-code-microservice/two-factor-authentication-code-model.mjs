@@ -11,7 +11,7 @@ const con = mysql.createConnection(db.dbConfig);
 import https from 'https';
 
 const agent = new https.Agent({
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
     credentials: true
 });
 
@@ -32,7 +32,7 @@ const generateAndStoreTempSecretToken = async (userId, accessToken, length = 20)
         };
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`https://localhost:3001/users/`, {
+        const response = await fetch(`https://safesave.ddns.net:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const generateAndStoreTempSecretToken = async (userId, accessToken, length = 20)
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`User updated: `, data);
+        //console.log(`User updated: `, data);
         return data;
     } catch (error) {
         console.error('Error in generating and storing secret: ', error.message);
@@ -67,7 +67,7 @@ const doDynamicTruncation = (hmacValue) => {
 
 const generateHOTP = (secret, counter) => {
 
-    console.log("Attempting to decode:", secret);
+    //console.log("Attempting to decode:", secret);
 
     // decode secret
     const decodedSecret = base32.decode.asBytes(secret);
@@ -110,10 +110,10 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 2, accessToke
         for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
             const totp = generateTOTP(secret, errorWindow);
 
-            console.log(`token is ${token}`)
-            console.log(`totp is ${totp}`)
+            //console.log(`token is ${token}`)
+            //console.log(`totp is ${totp}`)
 
-            console.log(`secret in verifyTemporaryTOTP is ${secret}`);
+            //console.log(`secret in verifyTemporaryTOTP is ${secret}`);
             // token matches totp from auth
 
             const totpString = totp.toString();
@@ -127,7 +127,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 2, accessToke
                 };
 
                 // Send PATCH request to update user's primary secret field
-                const response = await fetch(`https://localhost:3001/users/`, {
+                const response = await fetch(`https://safesave.ddns.net:3001/users/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 2, accessToke
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                console.log(`User updated: `, data);
+                //console.log(`User updated: `, data);
                 return true; // Return true only if the token matches
             }
         }
@@ -164,13 +164,13 @@ const verifyAuthenticatedTOTP = (token, secret, window = 2) => {
         return false;
     }
 
-    console.log(`secret in verifyAuthenticatedTOTP is ${secret}`);
+    //console.log(`secret in verifyAuthenticatedTOTP is ${secret}`);
 
     for (let errorWindow = -window; errorWindow <= +window; errorWindow++) {
         const totp = generateTOTP(secret, errorWindow);
-        console.log('verifyAuthenticatedTOTP): ');
-        console.log(`token is ${token}, ${typeof(token)}`)
-        console.log(`totp is ${totp}, ${typeof(totp)}`)
+        //console.log('verifyAuthenticatedTOTP): ');
+        //console.log(`token is ${token}, ${typeof(token)}`)
+        //console.log(`totp is ${totp}, ${typeof(totp)}`)
 
         const totpString = totp.toString();
 
@@ -193,7 +193,7 @@ const disableTwoFactor =
     };
     try {
         // Send PATCH request to update user's primary secret field
-        const response = await fetch(`https://localhost:3001/users/`, {
+        const response = await fetch(`https://safesave.ddns.net:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ const disableTwoFactor =
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`User information updated - 2FA disabled: `, data);
+        //console.log(`User information updated - 2FA disabled: `, data);
         return data;
     } catch (error) {
         console.error('Error in disabling 2FA in model: ', error.message);
@@ -230,7 +230,7 @@ const getUser2faEnabled = (userID) => {
                 reject(err);
             } else {
                 const user2FAEnabled = result[0] ? result[0].user2FAEnabled : null;
-                console.log('Retrieved userSessionID:', user2FAEnabled);
+                //console.log('Retrieved userSessionID:', user2FAEnabled);
                 resolve(user2FAEnabled);
             }
         });
@@ -250,7 +250,7 @@ const getUserSecret = (userID) => {
                 reject(err);
             } else {
                 const userSecret = result[0] ? result[0].userSecret : null;
-                console.log('Retrieved userSessionID:', userSecret);
+                //console.log('Retrieved userSessionID:', userSecret);
                 resolve(userSecret);
             }
         });
@@ -259,13 +259,13 @@ const getUserSecret = (userID) => {
 
 const checkIfUserHas2FAEnabled = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`, {
+        const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`, {
             credentials: 'include',
         });        if (!response.ok) {
             throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabled(). ');
         }
         const data = await response.json();
-        console.log(`user data found in checkIfUserHas2FAEnabled: `, data);
+        //console.log(`user data found in checkIfUserHas2FAEnabled: `, data);
 
         const twoFactor = await getUser2faEnabled(data[0].userID)
         const secret = await getUserSecret(data[0].userID)
@@ -279,17 +279,17 @@ const checkIfUserHas2FAEnabled = async (username) => {
 
 const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
 
-    console.log("username passed to 2fa is", username)
+    //console.log("username passed to 2fa is", username)
     try {
 
 
 
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAEnabledAndNoSecret');
         }
         const data = await response.json();
-        console.log(`user data found in checkIfUserHas2FAEnabledAndNoSecret(): `, data);
+        //console.log(`user data found in checkIfUserHas2FAEnabledAndNoSecret(): `, data);
 
         const twoFactor = await getUser2faEnabled(data[0].userID)
         const secret = await getUserSecret(data[0].userID)
@@ -302,7 +302,7 @@ const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
 
 const checkIfUserHas2FAAndSecretEstablished = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAAndSecretEstablished');
         }
@@ -312,7 +312,7 @@ const checkIfUserHas2FAAndSecretEstablished = async (username) => {
         if (twoFactor && secret) return true; // if 2FA and official Secret already exists 
         return false;
     } catch (error) {
-        console.log('There was a problem with the fetch operation in checkIfUserHas2FAAndSecretEstablished:', error.message);
+       console.log('There was a problem with the fetch operation in checkIfUserHas2FAAndSecretEstablished:', error.message);
     }
 }
 
@@ -320,7 +320,7 @@ const checkIfUserHas2FAAndSecretEstablished = async (username) => {
 
 const returnUserDataByUsername = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: returnUserDataByUsername');
         }

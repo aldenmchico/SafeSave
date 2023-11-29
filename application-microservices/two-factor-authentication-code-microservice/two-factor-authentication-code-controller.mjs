@@ -26,8 +26,8 @@ import mysql from "mysql";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
 
 let privateKey;
 let certificate;
@@ -49,10 +49,9 @@ const app = express();
 app.use(cookieparser());
 app.use(express.json());
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Enable All CORS Requests from any origin and allow server to accept cookies from client
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://107.181.189.57:7263', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263'];
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://safesave.ddns.net'];
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -148,7 +147,7 @@ app.get('/api/check-2fa-enabled', checkAuth, async (req, res) => {
 
         const userHMAC = await getUserHMAC(userID)
 
-        console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
+        //console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
         const verified = await twoFACodeModel.checkIfUserHas2FAEnabled(userHMAC);
 
         if (!verified) {
@@ -196,7 +195,7 @@ app.get('/api/check-2fa-enabled-and-real-secret-established', checkAuth, async (
 
         const userHMAC = await getUserHMAC(userID)
 
-        console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
+        //console.log(`THE HMAC CALLED IN 2fa AUTH CONTROLLER IS ${userHMAC}`);
         const verified = await twoFACodeModel.checkIfUserHas2FAAndSecretEstablished(userHMAC);
 
         if (verified) {
@@ -224,7 +223,7 @@ const getUserTempSecret = (userID) => {
                 reject(err);
             } else {
                 const userTempSecret = result[0] ? result[0].userTempSecret : null;
-                console.log('Retrieved userSessionID:', userTempSecret);
+                //console.log('Retrieved userSessionID:', userTempSecret);
                 resolve(userTempSecret);
             }
         });
@@ -244,7 +243,7 @@ const getUserSecret = (userID) => {
                 reject(err);
             } else {
                 const userSecret = result[0] ? result[0].userSecret : null;
-                console.log('Retrieved userSessionID:', userSecret);
+                //console.log('Retrieved userSessionID:', userSecret);
                 resolve(userSecret);
             }
         });
@@ -264,7 +263,7 @@ const getUser2faEnabled = (userID) => {
                 reject(err);
             } else {
                 const user2FAEnabled = result[0] ? result[0].user2FAEnabled : null;
-                console.log('Retrieved userSessionID:', user2FAEnabled);
+                //console.log('Retrieved userSessionID:', user2FAEnabled);
                 resolve(user2FAEnabled);
             }
         });
@@ -298,7 +297,7 @@ app.post('/api/verify-2fa-setup-token', checkAuth, async (req, res) => {
 
         const accessToken = req.cookies.access_token
 
-        console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
+        //console.log(`In verify-2fa-setup-token mfaTempSecret is ${tempSecret} and mfaEnabled is ${user2FAEnabled}`);
 
 
         // check if 2FA is even enabled
@@ -346,7 +345,7 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
         const mfaTempSecret = await getUserTempSecret(userData[0].userID)
         const mfaEnabled =  await getUser2faEnabled(userData[0].userID)
 
-        console.log(`mfaSecret is ${mfaSecret} mfaTempSecret is ${mfaTempSecret} and mfaEnabled is ${mfaEnabled}`);
+        //console.log(`mfaSecret is ${mfaSecret} mfaTempSecret is ${mfaTempSecret} and mfaEnabled is ${mfaEnabled}`);
 
         // For security, we no longer show the QR code if already verified
         if (mfaEnabled && mfaSecret) return res.status(404).json({ message: "2FA is already enabled " });
@@ -386,7 +385,7 @@ const getUserName = (userID) => {
                 reject(err);
             } else {
                 const userHMAC = result[0] ? result[0].userHMAC : null;
-                console.log('Retrieved userSessionID:', userHMAC);
+                //console.log('Retrieved userSessionID:', userHMAC);
                 resolve(userHMAC);
             }
         });
@@ -415,7 +414,7 @@ app.post('/api/verify-2fa-login-token', checkAuth, async (req, res) => {
         const secret = await getUserSecret(userData[0].userID)
         const user2FAEnabled = await getUser2faEnabled(userData[0].userID)
 
-        console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
+        //console.log(`userSecret[0].userSecret in /api/verify-2fa-login-token is ${secret}`);
 
         const userUserName = await getUserName(userData[0].userID)
 

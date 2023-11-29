@@ -27,7 +27,7 @@ const getUserSession = (userID) => {
                 reject(err);
             } else {
                 const userSessionID = result[0] ? result[0].userSessionID : null;
-                console.log('Retrieved userSessionID:', userSessionID);
+                //console.log('Retrieved userSessionID:', userSessionID);
                 resolve(userSessionID);
             }
         });
@@ -39,12 +39,12 @@ export const checkAuth = async (req, res, next) => {
     Middleware function to authenticate client Cookie
     */
 
-    const KeyPath = path.resolve(__dirname, 'authSecret.txt');
+    const KeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/authSecret');
 
     const SECRET = fs.readFileSync(KeyPath).toString('hex')
 
 
-    console.log('req.cookies is: ', req.cookies);
+    //console.log('req.cookies is: ', req.cookies);
     let token;
 
     try {
@@ -68,8 +68,8 @@ export const checkAuth = async (req, res, next) => {
         jwt.verify(token, SECRET, async (err, verifiedToken) => {
             if (err) {
 
-                console.log(`SECRET IS ${SECRET}`);
-                console.log(`Error in checkAuth ${err}`);
+                //console.log(`SECRET IS ${SECRET}`);
+                //console.log(`Error in checkAuth ${err}`);
 
                 if (err.name === 'TokenExpiredError') {
                     return res.status(401).json({message: "Token is expired."});
@@ -85,8 +85,8 @@ export const checkAuth = async (req, res, next) => {
                         .update(userUsername + userID + sessionID)
                         .digest('hex');
 
-                    console.log("Computed hmac", computedHMAC)
-                    console.log("stored hmac", storedHMAC)
+                    //console.log("Computed hmac", computedHMAC)
+                    //console.log("stored hmac", storedHMAC)
 
                     return computedHMAC === storedHMAC;
                 };
@@ -126,7 +126,7 @@ export const checkAuth = async (req, res, next) => {
                     if (error) {
                         throw error;
                     }
-                    console.log('Update successful:', results);
+                    //console.log('Update successful:', results);
                 });
             } catch (error) {
 

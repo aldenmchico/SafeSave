@@ -12,8 +12,8 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
 
 let privateKey;
 let certificate;
@@ -26,10 +26,8 @@ try {
     process.exit(1);
 }
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const passphrase = process.env.SSL_PASSPHRASE;
-const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
+const creds = { key: privateKey, cert: certificate };
 
 const PORT = process.env.PORT;
 const app = express();

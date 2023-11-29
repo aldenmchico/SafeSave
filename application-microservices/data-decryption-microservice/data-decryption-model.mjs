@@ -1,12 +1,11 @@
 import 'dotenv/config';
 import crypto from 'crypto';
-import * as db from "./db-connector.mjs";
 import fs from "fs";
 
 async function decryptIV(encryptedData) {
     try {
         // Read the private key from the file
-        const privKey = fs.readFileSync("private_ivkey.pem");
+        const privKey = fs.readFileSync("/etc/letsencrypt/live/safesave.ddns.net/private_ivkey.pem");
 
         // Decrypt the data using the private key
         const decryptedIV = crypto.privateDecrypt({ key: privKey, padding: crypto.constants.RSA_PKCS1_PADDING }, encryptedData);
@@ -105,7 +104,7 @@ const getDecryptedData = async (options) => {
 
             const userKey = crypto.scryptSync(userHash, userSalt, 32);
 
-            console.log(userKey)
+            //console.log(userKey)
 
             const decipherTitle = crypto.createDecipheriv('aes-256-cbc', userKey, decrypteduserNoteIVBuffer);
 

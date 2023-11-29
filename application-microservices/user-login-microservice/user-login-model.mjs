@@ -8,7 +8,6 @@ import mysql from 'mysql';
 
 const con = mysql.createConnection(db.dbConfig);
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const checkIfUsernameOrEmailExists = async (username, email) => {
     /*
     Error code 404 = entity does not exist ; not an system error.. interpret as a valid response
@@ -17,22 +16,21 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
-        console.log(`usernameResponse is: ${usernameResponse}`); 
+        const usernameResponse = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`);
+	//console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
-            console.log(`Username exists: `, usernameData);
+            //console.log(`Username exists: `, usernameData);
             usernameExists = true;
         } else if (usernameResponse.status === 404) {
             console.log('Username does not exist.');
         } else {
             throw new Error('An error occurred while checking the username.');
         }
-
-        const emailResponse = await fetch(`https://localhost:3001/users/byEmail/${email}`);
+        const emailResponse = await fetch(`https://safesave.ddns.net:3001/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
-            console.log(`Email exists: `, emailData);
+            //console.log(`Email exists: `, emailData);
             emailExists = true;
         } else if (emailResponse.status === 404) {
             console.log('Email does not exist.');
@@ -56,7 +54,7 @@ const createUser = async (username, email, password) => {
         const userSalt = crypto.randomBytes(16).toString('hex');
 
         //TODO: CHANGE SECRET KEY FILE UPON HOSTING LIVE
-        const secretKey = readFileSync("secret_key", "utf-8");
+        const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const emailHMAC = crypto.createHmac('sha256', secretKey);
 
         const digestedEmailHMAC = emailHMAC.update(email).digest('hex')
@@ -66,7 +64,7 @@ const createUser = async (username, email, password) => {
 
         //TODO: CHANGE KEYS UPON HOSTING
         const pubKey = readFileSync("public-useremail.pem")
-        const privKey = readFileSync("private-useremail-key.pem")
+        const privKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/private-useremail-key.pem")
 
         const encryptedUsername =  crypto.publicEncrypt({key: pubKey, padding: crypto.constants.RSA_PKCS1_PADDING},
             Buffer.from(username)).toString('hex');
@@ -87,7 +85,7 @@ const createUser = async (username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`https://localhost:3001/users`, {
+	const createResponse = await fetch(`https://safesave.ddns.net:3001/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -103,7 +101,7 @@ const createUser = async (username, email, password) => {
             throw error;
         }
         const responseData = await createResponse.json();
-        console.log(`User created: `, responseData);
+        //console.log(`User created: `, responseData);
         return responseData;
     } catch (error) {
         console.error('Error in creating a user:', error.message);
@@ -112,16 +110,15 @@ const createUser = async (username, email, password) => {
 
 const checkIfUsernameExists = async (username) => {
     try {
-        const secretKey = readFileSync("secret_key", "utf-8");
+        const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
-
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+	const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`username found: `, data);
+        //console.log(`username found: `, data);
         if (data) {
             return true;
         }
@@ -142,7 +139,7 @@ const getUserHashedPassword = (userID) => {
                 reject(err);
             } else {
                 const userPassword = result[0] ? result[0].userPassword : null;
-                console.log('Retrieved userPassword:', userPassword);
+                //console.log('Retrieved userPassword:', userPassword);
                 resolve(userPassword);
             }
         });
@@ -153,17 +150,16 @@ const getUserHashedPassword = (userID) => {
 const fetchUserFromUsername = async (username) => {
     try {
 
-        const secretKey = readFileSync("secret_key", "utf-8");
+        const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
-
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             console.log(`response was ${response.toString()}`)
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`username found in fetchUser: `, data);
+        //console.log(`username found in fetchUser: `, data);
         if (data) {
             return data;
         }
@@ -180,18 +176,18 @@ const validatePassword = async (username, plainTextPassword) => {
     - pass username externally
     */
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+	const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`user data found in validatePassword: `, data);
+        //console.log(`user data found in validatePassword: `, data);
         const hashedPassword = await getUserHashedPassword(data[0].userID)
 
-        console.log(`hashedPassword is ${hashedPassword}`);
+        //console.log(`hashedPassword is ${hashedPassword}`);
 
         const temp_password = await bcrypt.hash(plainTextPassword, 10);
-        console.log(`temp_password is ${temp_password}`); 
+        //console.log(`temp_password is ${temp_password}`); 
 
         // load hashed password field from username
         const hashesAreTheSame = await bcrypt.compare(plainTextPassword, hashedPassword);
@@ -209,8 +205,7 @@ const validatePassword = async (username, plainTextPassword) => {
 const signJwtToken = async (user) => {
 
     try {
-
-        const jwtResponse = await fetch(`https://localhost:8015/jwt-api/sign`, {
+        const jwtResponse = await fetch(`https://safesave.ddns.net:8015/jwt-api/sign`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

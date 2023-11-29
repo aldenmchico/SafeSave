@@ -1,11 +1,10 @@
 // Import dependencies.
 import 'dotenv/config';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import * as db from './db-connector.mjs';
 var con = mysql.createConnection(db.dbConfig);
 
 import https from 'https';
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 //Date stuff
 const currentDate = new Date();
 const year = currentDate.getFullYear();
@@ -76,7 +75,7 @@ const getUserHash = (userID) => {
 const createUserLoginItem = async function (userID, reqBody, callback) {
 
     const agent = new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     });
 
     const userSalt = await getUserSalt(userID);
@@ -90,7 +89,7 @@ const createUserLoginItem = async function (userID, reqBody, callback) {
     const userHash = await getUserHash(userID);
 
 
-    await fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://safesave.ddns.net:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -112,7 +111,7 @@ const createUserLoginItem = async function (userID, reqBody, callback) {
         })
         .then(data => {
             responseData = data;
-            console.log("data is", data);
+            //console.log("data is", data);
 
             let q = `INSERT INTO UserLoginItems (userLoginItemWebsite, userLoginItemUsername, userLoginItemPassword,
     userLoginItemDateCreated, userLoginItemDateUpdated, userLoginItemDateAccessed, userID, websiteIV, usernameIV, passwordIV, authTag)
@@ -166,12 +165,12 @@ const createUserNote = async function (userID, reqBody, callback) {
 
 
     const agent = new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     });
 
     let responseData; // Variable to store the JSON response
 
-    await fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://safesave.ddns.net:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -196,7 +195,7 @@ const createUserNote = async function (userID, reqBody, callback) {
         })
         .then(data => {
             responseData = data;
-            console.log("data is", data);
+            //console.log("data is", data);
 
             let q = `INSERT INTO UserNotes (userNoteTitle, userNoteText, userNoteCreated,
           userNoteUpdated, userNoteAccessed, userID, userNoteIV, userNoteTextIV, authTag)
@@ -315,7 +314,7 @@ const getSingleUserNotes = function (id, callback) {
         }
         try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
-            console.log("application-model.mjs result", decryptedResult);
+            //console.log("application-model.mjs result", decryptedResult);
             callback(null, decryptedResult);
         } catch (error) {
             callback(error);
@@ -332,7 +331,7 @@ const getSingleUserNotesFavorites = function (id, callback) {
         }
         try {
             const decryptedResult = await Promise.all(result.map(decryptRowData));
-            console.log("application-model.mjs result", decryptedResult);
+            //console.log("application-model.mjs result", decryptedResult);
             callback(null, decryptedResult);
         } catch (error) {
             callback(error);
@@ -357,11 +356,11 @@ async function decryptRowData(row) {
         encryptedData[key] = userHash
 
         const agent = new https.Agent({
-            rejectUnauthorized: false
+            rejectUnauthorized: true
         });
 
         try {
-            const response = await fetch("https://127.0.0.1:8001/decrypttext", {
+            const response = await fetch("https://safesave.ddns.net:8001/decrypttext", {
                 method: "POST",
                 body: JSON.stringify(encryptedData),
                 headers: {
@@ -401,55 +400,66 @@ const getUserNoteByTitle = function (id, title, callback) {
 const patchUser = function (reqBody, callback) {
     if (reqBody.userID === undefined) {
         callback({ "code": "NO_USER_ID" }, null);
-    }
-    else {
+    } else {
         let q = '';
+        let values = [];
+
         if (reqBody.email !== undefined) {
-            q = `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
-        }
-        if (reqBody.password !== undefined) {
-            q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
-        }
-        // Additional fields for userSecret and userTempSecret
-        if (reqBody.userSecret !== undefined) {
-            const secretValue = reqBody.userSecret === null ? null : `"${reqBody.userSecret}"`;
-            q += `UPDATE Users SET userSecret = ${secretValue} WHERE userID = ${reqBody.userID}; `;
-        }
-        if (reqBody.userTempSecret !== undefined) {
-            // If userTempSecret is explicitly set to null, construct the SQL without quotes
-            const tempSecretValue = reqBody.userTempSecret === null ? null : `"${reqBody.userTempSecret}"`;
-            q += `UPDATE Users SET userTempSecret = ${tempSecretValue} WHERE userID = ${reqBody.userID}; `;
-        }
-        // Additional fields for user2FAEnabled
-        if (reqBody.user2FAEnabled !== undefined) {
-            q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
+            q += 'UPDATE Users SET userEmail = ? WHERE userID = ?; ';
+            values.push(reqBody.email, reqBody.userID);
         }
 
-        // model function for handling user session id when logging out 
-        if (reqBody.userSessionID !== undefined) {
-            // If userSessionID is explicitly set to null, construct the SQL without quotes
-            const tempSessionID = reqBody.userSessionID === null ? null : `"${reqBody.userSessionID}"`;
-            q += `UPDATE Users SET userSessionID = ${tempSessionID} WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.password !== undefined) {
+            q += 'UPDATE Users SET userPassword = ? WHERE userID = ?; ';
+            values.push(reqBody.password, reqBody.userID);
         }
-        if (q === '') callback({ "code": "NO_CHANGE" }, null)
-        else {
-            con.query(q, (err, result) => {
+
+        // Additional fields for userSecret and userTempSecret
+        if (reqBody.userSecret !== undefined) {
+            q += 'UPDATE Users SET userSecret = ? WHERE userID = ?; ';
+            values.push(reqBody.userSecret === null ? null : reqBody.userSecret, reqBody.userID);
+        }
+
+        if (reqBody.userTempSecret !== undefined) {
+            q += 'UPDATE Users SET userTempSecret = ? WHERE userID = ?; ';
+            values.push(reqBody.userTempSecret === null ? null : reqBody.userTempSecret, reqBody.userID);
+        }
+
+        // Additional fields for user2FAEnabled
+        if (reqBody.user2FAEnabled !== undefined) {
+            q += 'UPDATE Users SET user2FAEnabled = ? WHERE userID = ?; ';
+            values.push(reqBody.user2FAEnabled, reqBody.userID);
+        }
+
+        // model function for handling user session id when logging out
+        if (reqBody.userSessionID !== undefined) {
+            q += 'UPDATE Users SET userSessionID = ? WHERE userID = ?; ';
+            values.push(reqBody.userSessionID === null ? null : reqBody.userSessionID, reqBody.userID);
+        }
+
+        if (q === '') {
+            callback({ "code": "NO_CHANGE" }, null);
+        } else {
+            con.query(q, values, (err, result) => {
                 if (err) {
                     console.log(err);
                     callback(err, null);
+                } else {
+                    callback(null, result);
                 }
-                else callback(null, result);
             });
         }
     }
-}
+};
+
+
 
 const patchLoginItem = async function (userID, reqBody, callback) {
     if (reqBody.userLoginItemID === undefined) {
         callback({ "code": "NO_ID" }, null);
     } else {
         const agent = new https.Agent({
-            rejectUnauthorized: false
+            rejectUnauthorized: true
         });
 
         let responseData;
@@ -460,7 +470,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
         let userHash = await getUserHash(userID);
         const userSalt = await getUserSalt(userID);
 
-        await fetch('https://localhost:8002/ciphertext', {
+        await fetch('https://safesave.ddns.net:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -482,7 +492,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
             })
             .then(data => {
                 responseData = data;
-                console.log("data is", data);
+                //console.log("data is", data);
 
                 let q = `UPDATE UserLoginItems SET`;
 
@@ -582,12 +592,12 @@ const patchNote = async function (userID, reqBody, callback) {
         const userSalt = await getUserSalt(userID);
 
         const agent = new https.Agent({
-            rejectUnauthorized: false
+            rejectUnauthorized: true
         });
 
         let responseData; // Variable to store the JSON response
 
-        await fetch('https://127.0.0.1:8002/ciphertext', {
+        await fetch('https://safesave.ddns.net:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -612,7 +622,7 @@ const patchNote = async function (userID, reqBody, callback) {
             })
             .then(data => {
                 responseData = data;
-                console.log("data is", data);
+                //console.log("data is", data);
 
                 let q = `UPDATE UserNotes SET`;
 
@@ -637,7 +647,7 @@ const patchNote = async function (userID, reqBody, callback) {
 
                 values.push(formattedDate, formattedDate, responseData.iv, responseData.userNoteTextIV, responseData.authTag, reqBody.noteID);
 
-                console.log(q)
+                //console.log(q)
                 con.query(q, values, (err, result) => {
                     if (err) callback(err, null);
                     else callback(null, result);

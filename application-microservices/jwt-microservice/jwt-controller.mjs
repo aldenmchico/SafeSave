@@ -17,8 +17,8 @@ import crypto from 'crypto';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
 
 let privateKey;
 let certificate;
@@ -56,10 +56,10 @@ app.get('/jwt-api/cookies', function (req, res) {
     Function to list all cookies
     */
     // Cookies that have not been signed
-    console.log('Cookies: ', req.cookies)
+    //console.log('Cookies: ', req.cookies)
 
     // Cookies that have been signed
-    console.log('Signed Cookies: ', req.signedCookies)
+    //console.log('Signed Cookies: ', req.signedCookies)
 })
 
 app.post('/jwt-api/sign', cors(), (req, res) => {
@@ -69,7 +69,7 @@ app.post('/jwt-api/sign', cors(), (req, res) => {
 
     const { user } = req.body   // grab User from login-controller - only time I ask for User (curr only sending username, id and 2faenabled )
 
-    console.log(`req.body.session id in /jwt-api/sign is ${req.body.sessionID}`); // null rn since DNE
+    //console.log(`req.body.session id in /jwt-api/sign is ${req.body.sessionID}`); // null rn since DNE
 
     if (!user) {
         return res.status(400).json({ error: "User data is required" });

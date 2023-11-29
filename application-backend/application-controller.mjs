@@ -23,8 +23,8 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const privateKeyPath = path.resolve(__dirname, 'key.pem');
-const certificatePath = path.resolve(__dirname, 'cert.pem');
+const privateKeyPath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/privkey.pem');
+const certificatePath = path.resolve('/etc/letsencrypt/live/safesave.ddns.net/fullchain.pem');
 
 let privateKey;
 let certificate;
@@ -37,7 +37,6 @@ try {
     process.exit(1);
 }
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const passphrase = process.env.SSL_PASSPHRASE;
 const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
@@ -49,7 +48,7 @@ const httpsServer = https.createServer(creds, app);
 //CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
 //which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
 //allowed origins will EVENTUALLY have our domain name at port 443 once we host!
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
+const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://safesave.ddns.net' ]
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -96,7 +95,7 @@ userRouter.post('/', (req, res) => {
         else {
             if (result.length == 0) res.status(400).send({ "error": "Could not create user." });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(201).send({ "insertId": `${result.insertId}` });
             }
@@ -115,7 +114,7 @@ loginItemRouter.post('/', checkAuth, (req, res) => {
         else {
             if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(201).send({ "insertId": `${result.insertId}` });
             }
@@ -134,7 +133,7 @@ notesRouter.post('/', checkAuth, (req, res) => {
         else {
             if (result.length == 0) res.status(400).send({ "error": "Could not create user login item" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(201).send({ "insertId": `${result.insertId}` });
             }
@@ -146,7 +145,6 @@ notesRouter.post('/', checkAuth, (req, res) => {
 
 // GET Users Table endpoints ****************************************************
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 userRouter.get('/byUsername/:username', (req, res) => {
     appModel.getUserByUsername(req.params.username, (err, result) => {
@@ -155,7 +153,7 @@ userRouter.get('/byUsername/:username', (req, res) => {
         else {
             if (result.length == 0) res.status(404).send({ "error": "Username not found" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -173,8 +171,8 @@ userRouter.get('/byEmail/:email', (req, res) => {
             if (result.length == 0) {
                 res.status(404).send({ "error": "User email not found." });
             } else {
-                console.log(result);  // Be cautious about logging sensitive information in a production environment
-                res.set('Content-Type', 'application/json');
+                //console.log(result);  
+		res.set('Content-Type', 'application/json');
                 res.status(200).send(result); // Express can stringify the result directly
             }
         }
@@ -192,7 +190,7 @@ loginItemRouter.get('/users/userID', checkAuth, (req, res) => {
         else {
             if (result.length === 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -207,7 +205,7 @@ loginItemRouter.get('/users/id/favorites', checkAuth, (req, res) => {
         else {
             if (result.length === 0) res.status(404).send({ "error": "No user favorite items found for specified user ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -235,7 +233,7 @@ loginItemRouter.get('/users/:id/username/:username', (req, res) => {
         else {
             if (result.length == 0) res.status(404).send({ "error": "No user login items found for specified user ID with given username" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -252,7 +250,7 @@ notesRouter.get('/users/userID', checkAuth, (req, res) => {
         else {
             if (result.length == 0) res.status(404).send({ "error": "No notes found for specified user ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -267,7 +265,7 @@ notesRouter.get('/users/id/favorites', checkAuth, (req, res) => {
         else {
             if (result.length === 0) res.status(404).send({ "error": "No user login items found for specified user ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(200).send(JSON.stringify(result));
             }
@@ -305,7 +303,7 @@ userRouter.patch('/', checkAuth,(req, res) => {
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            console.log(result);
+            //console.log(result);
             res.set('Content-Type', 'application/json');
             // res.status(200).end();
             res.status(200).json({ message: "User updated successfully" });
@@ -322,7 +320,7 @@ loginItemRouter.patch('/', checkAuth, (req, res) => {
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            console.log(result);
+            //console.log(result);
             res.set('Content-Type', 'application/json');
             res.status(200).end();
         }
@@ -335,7 +333,7 @@ userRouter.patch('/session', checkAuth,(req, res) => {
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No users found with specified user ID in PATCH /session" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(204).end();
             }
@@ -350,7 +348,7 @@ loginItemRouter.patch('/favorite', checkAuth, (req, res) => {
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            console.log(result);
+            //console.log(result);
             res.set('Content-Type', 'application/json');
             res.status(200).end();
         }
@@ -367,7 +365,7 @@ notesRouter.patch('/', checkAuth, (req, res) => {
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            console.log(result);
+            //console.log(result);
             res.set('Content-Type', 'application/json');
             res.status(200).end();
         }
@@ -381,7 +379,7 @@ notesRouter.patch('/favorite', checkAuth,(req, res) => {
             else res.status(400).send({ "error": `${err.code} - Bad Request.` });
         }
         else {
-            console.log(result);
+            //console.log(result);
             res.set('Content-Type', 'application/json');
             res.status(200).end();
         }
@@ -401,7 +399,7 @@ userRouter.delete('/:userId', checkAuth, (req, res) => {
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No users found with specified user ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(204).end();
             }
@@ -417,7 +415,7 @@ loginItemRouter.delete('/:loginItemId', checkAuth,(req, res) => {
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No login items with given login item ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(204).end();
             }
@@ -432,7 +430,7 @@ notesRouter.delete('/:noteId', checkAuth, (req, res) => {
         else {
             if (result.affectedRows === 0) res.status(404).send({ "error": "No notes found for specified user ID with given note ID" });
             else {
-                console.log(result);
+                //console.log(result);
                 res.set('Content-Type', 'application/json');
                 res.status(204).end();
             }

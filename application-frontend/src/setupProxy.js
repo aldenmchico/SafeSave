@@ -5,18 +5,18 @@ module.exports = function (app) {
     app.use(
         '/loginvalidation',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://safesave.ddns.net:8008',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
     app.use(
         '/create',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://safesave.ddns.net:8008',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
@@ -26,9 +26,9 @@ module.exports = function (app) {
     app.use(
         '/api',
         createProxyMiddleware({
-            target: 'https://localhost:8006',
+            target: 'https://safesave.ddns.net:8006',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     )
 
@@ -38,7 +38,7 @@ module.exports = function (app) {
     //     createProxyMiddleware({
     //         target: 'https://localhost:8006',
     //         changeOrigin: true,
-    //         secure: false,
+    //         secure: true,
     //     })
     // )
 
@@ -47,9 +47,9 @@ module.exports = function (app) {
     app.use(
         '/users',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://safesave.ddns.net:3001',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
@@ -57,9 +57,9 @@ module.exports = function (app) {
     app.use(
         '/jwt-api/sign',
         createProxyMiddleware({
-            target: 'https://localhost:8015',
+            target: 'https://safesave.ddns.net:8015',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
@@ -67,18 +67,18 @@ module.exports = function (app) {
     app.use(
         '/login_items',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://safesave.ddns.net:3001',
             changeOrigin: true,
-            secure: false, // Ignore SSL certificate validation (for development only)
+            secure: true, // Ignore SSL certificate validation (for development only)
         })
     );
 
     app.use(
         '/notes',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://safesave.ddns.net:3001',
             changeOrigin: true,
-            secure: false, // Ignore SSL certificate validation (for development only)
+            secure: true, // Ignore SSL certificate validation (for development only)
         })
     );
 
@@ -88,25 +88,25 @@ module.exports = function (app) {
     //     createProxyMiddleware({
     //         target: 'https://localhost:8006',
     //         changeOrigin: true,
-    //         secure: false,
+    //         secure: true,
     //     })
     // )
 
     app.use(
         '/ciphertext',
         createProxyMiddleware({
-            target: 'https://localhost:8002',
+            target: 'https://safesave.ddns.net:8002',
             changeOrigin: true,
-            secure: false,
+            secure: true,
         })
     )
 
     app.use(
         '/logout',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://safesave.ddns.net:8008',
             changeOrigin: true,
-            secure: false,
+            secure: true,
         })
     )
 

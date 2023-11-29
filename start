@@ -1,6 +1,4 @@
 #!/bin/bash
-# Starts backend, encryption ms, decrypt ms, and frontend
-# Adjust to your needs
 
 killall node && killall node-20
 

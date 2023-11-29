@@ -1,0 +1,15 @@
+#!/bin/bash
+# Starts everything, forever
+# sudo npm install -g forever required first
+# as well as sudo npm install -g pm2
+killall node && killall node-20
+
+cd ./application-backend/ && forever start application-controller.mjs  &
+cd ./application-microservices/data-encryption-microservice/ &&  forever start data-encryption-controller.mjs &
+cd ./application-microservices/data-decryption-microservice/ &&  forever start data-decryption-controller.mjs &
+cd ./application-frontend/ &&  pm2 start npm -- start &
+cd ./application-microservices/user-login-microservice/ &&  forever start user-login-controller.mjs &
+cd ./application-microservices/jwt-microservice/ &&  forever start jwt-controller.mjs &
+cd ./application-microservices/two-factor-authentication-code-microservice/ && forever start two-factor-authentication-code-controller.mjs &
+
+

@@ -144,7 +144,7 @@ function TwoFactorAuthenticationPage() {
             ) : (
                 // If 2FA is enabled, display the form and other elements.
                 <>
-                    <p>We've sent a 6-digit 2FA code to your email. Please enter it below to proceed. If you haven't received it, check your spam folder or click the resend button below.</p>
+                    <p>Please scan the QR code below with a 2FA authenticator app and enter the six-digit code in the box below. Microsoft Authenticator is the preferred choice.</p>
                     <form onSubmit={handleSubmit}>
                         <input
                             type="text"

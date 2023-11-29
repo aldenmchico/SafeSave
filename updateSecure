@@ -1,0 +1,5 @@
+#!/bin/bash
+
+search_dir="/home/opc/SafeSave"
+
+find "$search_dir" -type f -name "*" -exec sed -i 's/secure: true/secure: true/g' {} +

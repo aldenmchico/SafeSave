@@ -7,9 +7,9 @@ module.exports = function (app) {
     app.use(
         '/users',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://safesave.ddns.net:3001',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
@@ -17,9 +17,9 @@ module.exports = function (app) {
     app.use(
         '/jwt-api',
         createProxyMiddleware({
-            target: 'https://localhost:8015',
+            target: 'https://safesave.ddns.net:8015',
             changeOrigin: true,
-            secure: false
+            secure: true
         })
     );
 
@@ -27,9 +27,9 @@ module.exports = function (app) {
     app.use(
         '/api',
         createProxyMiddleware({
-            target: 'https://localhost:8006',
+            target: 'https://safesave.ddns.net:8006',
             chanrgeOrigin: true,
-            secure: false
+            secure: true
         })
     )
 }
