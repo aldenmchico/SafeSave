@@ -9,6 +9,7 @@ function TwoFactorAuthenticationPage() {
     const [resendCooldown, setResendCooldown] = useState(false);
     const [is2FAEnabled, setIs2FAEnabled] = useState(true); // New state variable
     const [qrCode, setQRCode] = useState('');
+    const [mfaSecret, setmfaSecret] = useState('');
 
     const navigate = useNavigate();
     const cooldownTimer = useRef(null);
@@ -40,8 +41,20 @@ function TwoFactorAuthenticationPage() {
             const response = await fetch('/api/generate-mfa-qr-code');
 
             if (response.ok) {
-                const qrCodeImageBlob = await response.blob();
+                const responseData = await response.json();
+                const base64Image = responseData.qrCodeImage;
+                const binaryImage = atob(base64Image); // Decoding base64
+                const length = binaryImage.length;
+                const imageBytes = new Uint8Array(length);
+
+                for (let i = 0; i < length; i++) {
+                    imageBytes[i] = binaryImage.charCodeAt(i);
+                }
+
+                const qrCodeImageBlob = new Blob([imageBytes], { type: 'image/png' });
+            
                 setQRCode(URL.createObjectURL(qrCodeImageBlob));
+                setmfaSecret(responseData.mfaTempSecret);
             } else {
                 throw new Error('Failed to generate QR code');
             }
@@ -165,6 +178,10 @@ function TwoFactorAuthenticationPage() {
                         <div>
                             <p>Scan this QR code with your 2FA app:</p>
                             <img src={qrCode} alt="2FA QR Code" />
+                            <br></br>
+                            <br></br>
+                            <p>Alternatively, you can copy this code directly into your authenticator app:</p>
+                            <code>{mfaSecret}</code>
                         </div>
                     )}
                     {isLoading && <p>Loading...</p>}
