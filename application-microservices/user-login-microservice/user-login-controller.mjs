@@ -88,7 +88,7 @@ app.post('/loginvalidation', async (req, res) => {
 
         const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
-        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
 
         const con = mysql.createConnection(db.dbConfig);
 
@@ -188,9 +188,9 @@ app.post('/create/account', async (req, res) => {
 
         const secretKey = readFileSync("/etc/letsencrypt/live/safesave.ddns.net/secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
-        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
         const emailHMAC = crypto.createHmac('sha256', secretKey)
-        const digestedEmailHMAC = emailHMAC.update(email).digest('hex');
+        const digestedEmailHMAC = emailHMAC.update(email.toLowerCase()).digest('hex');
 
 
 
