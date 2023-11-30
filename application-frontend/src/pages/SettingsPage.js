@@ -121,11 +121,6 @@ function SettingsPage() {
                 </div>
             </section>
             <section>
-                <h2>Account</h2>
-                <button onClick={() => {/* Navigate to account details */ }}>View Account Details</button>
-                {/* <button onClick={handleDeleteAccount}>Delete Account</button> */}
-            </section>
-            <section>
                 <h2>Save Changes</h2>
                 {message && <p>{message}</p>}
                 <button onClick={handleSaveChanges}>Save Changes</button>
