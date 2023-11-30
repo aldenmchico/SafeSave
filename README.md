@@ -10,7 +10,7 @@
 <br />
 <div align="center">
 
-<h3 align="center">SafeSave</h3>
+<h1 align="center">SafeSave</h1>
 
   <p align="center">
     a complete, secure data and notes management web application
@@ -36,6 +36,7 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
+    <li><a href="#roadmap">Roadmap</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -44,7 +45,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    
     <!-- <li><a href="#contributing">Contributing</a></li> -->
     <!-- <li><a href="#license">License</a></li> -->
     <!-- <li><a href="#contact">Contact</a></li> -->
@@ -67,14 +68,27 @@ SafeSave is a fully secure password and personal information web application man
 
 
 ### Built With
-* **React** frontend user interface
-* **Javascript** primary programming language
-* **MySQL** for database storage
-* **ExpressJS** for backend server code
+* **React** - frontend user interface
+* **Javascript** - primary programming language
+* **MySQL** - database storage
+* **ExpressJS** - backend server code
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- ROADMAP -->
+## Roadmap
+
+- [x] Feature 1: Relational database management system to securely store encrypted user credentials.
+- [x] Feature 2: Backend API to manage user data and authentication.
+- [x] Feature 3: Front-end website for users to interact with.
+- [x] Feature 4: Security will be a primary focus, and we will implement industry-standard encryption techniques, two-factor authentication, and continuous security assessments.
+
+- [ ] Stretch Goal 1: A Mobile app that allows users to manage their passwords and copy to the clipboard for use.
+- [ ] Stretch Goal 2: A Browser Extension that will provide users with efficient access to their stored credentials.
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- GETTING STARTED -->
@@ -121,33 +135,130 @@ To get a local copy up and running complete both Prerequisites and Installation 
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
-#### Adding Login/Note Item
+#### Encrypting Note/Login Item
+```js
+POST /ciphertext
+{
+    userLoginWebsite:
+    userLoginUsername:
+    userLoginPassword:
+    userHash:
+    userSalt:
+    noteCreatedDate:
+    noteUpdatedDate:
+    noteAccessedDate:
+}
+```
+#### Decrypting Note/Login Item
+```js
+POST /decrypttext
+{
+    userNoteID
+    userNoteTitle
+    userNoteText
+    userNoteCreated
+    userNoteUpdated 
+    userNoteAccessed
+    userID
+    userNoteIV
+    userNoteTextIV 
+    userHash
+    userLoginItemID 
+    userLoginItemWebsite 
+    userLoginItemPassword
+    userLoginItemDateCreated userLoginItemDateUpdated
+    userLoginItemDateAccessed
+    userLoginItemUsername
+    websiteIV
+    usernameIV
+    passwordIV
+    authTag
+    favorited
+}
+```
+
+#### Adding Note/Login Item 
+```js
+POST /login_items 
+{
+    website:
+    username:
+    password:
+    userLoginItemDateCreated:
+    userLoginItemDateUpdated:
+    userLoginItemDateAccessed:
+}
+
+POST /notes
+{
+    title:
+    content:
+    userNoteDateCreated:
+    userNoteDateUpdated:
+}
+
+```
 ---
 #### Editing Login/Note Item
+```js
+
+PATCH /login_items 
+{
+    userLoginItemID:
+    website:
+    username:
+    password:
+    dateUpdated: 
+    dateAccessed:
+}
+
+PATCH /notes
+{
+    noteID:
+    title:
+    text:
+    dateUpdated:
+    dateAccessed:
+}
+```
 ---
-#### Deleting Item
+#### Deleting Note/Login Item
+```js
+DELETE /login_items/${_id}
+DELETE /notes/${noteID}
+```
 ---
-#### Favoriting Item
----
-#### 2-Factor Authentication Setup
+#### Favoriting Note/Login Item
+```js
+POST /login_items/favorite
+{
+    loginItemID:
+    favorite: 0
+}
+
+POST /notes/favorite
+{
+    noteID:
+    favorite: 1
+}
+
+```
 ---
 #### 2-Factor Authentication Login
+```js
+POST /api/verify-2fa-login-token
+{
+    token: 194263
+}
+```
 ---
+There are more API endpoints that are not listed but are integral to the project's functionality. For more information, see all files with `-controller.mjs` extension in project.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- ROADMAP -->
-## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
