@@ -127,20 +127,6 @@ app.post('/decrypttext', async (req, res) => {
 
 
 
-app.get('/', async (req, res) => {
-    const queryDatabase = `SELECT * FROM UserNotes`;
-
-    await db.pool.query(queryDatabase, function(error, notes, fields) {
-        if (error) {
-            console.log(error);
-            res.send('An error occurred while fetching data from the database.');
-        } else {
-            res.render('table', { notes });
-        }
-    });
-});
-
-
 httpsServer.listen(PORT, () => {
     console.log(`Decryption server listening on port ${PORT}...`);
 });

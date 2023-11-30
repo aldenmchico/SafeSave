@@ -59,20 +59,20 @@ const createUser = async (username, email, password) => {
         const secretKey = readFileSync("secret_key", "utf-8");
         const emailHMAC = crypto.createHmac('sha256', secretKey);
 
-        const digestedEmailHMAC = emailHMAC.update(email).digest('hex')
+        const digestedEmailHMAC = emailHMAC.update(email.toLowerCase()).digest('hex')
 
         const userHMAC = crypto.createHmac('sha256', secretKey)
-        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
 
         //TODO: CHANGE KEYS UPON HOSTING
         const pubKey = readFileSync("public-useremail.pem")
         const privKey = readFileSync("private-useremail-key.pem")
 
         const encryptedUsername =  crypto.publicEncrypt({key: pubKey, padding: crypto.constants.RSA_PKCS1_PADDING},
-            Buffer.from(username)).toString('hex');
+            Buffer.from(username.toLowerCase())).toString('hex');
 
         const encryptedEmail = crypto.publicEncrypt({key: pubKey, padding: crypto.constants.RSA_PKCS1_PADDING},
-            Buffer.from(email)).toString('hex');
+            Buffer.from(email.toLowerCase())).toString('hex');
 
 
         // Prepare data for the POST request
@@ -114,7 +114,7 @@ const checkIfUsernameExists = async (username) => {
     try {
         const secretKey = readFileSync("secret_key", "utf-8");
         const userHMAC = crypto.createHmac('sha256', secretKey)
-        const digestedUserHMAC = userHMAC.update(username).digest('hex');
+        const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
 
         const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
         if (!response.ok) {
