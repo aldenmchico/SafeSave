@@ -10,7 +10,7 @@
 <br />
 <div align="center">
 
-<h1 align="center">SafeSave</h1>
+<h1 align="center"><a href="https://safesave.ddns.net">SafeSave</a></h1>
 
   <p align="center">
     a complete, secure data and notes management web application
