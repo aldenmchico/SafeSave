@@ -28,8 +28,7 @@ try {
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const passphrase = process.env.SSL_PASSPHRASE;
-const creds = { key: privateKey, cert: certificate, passphrase: passphrase };
+const creds = { key: privateKey, cert: certificate};
 
 const PORT = process.env.PORT;
 const app = express();

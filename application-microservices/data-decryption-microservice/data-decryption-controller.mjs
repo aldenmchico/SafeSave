@@ -11,9 +11,13 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import * as dataDecryptionModel from "./data-decryption-model.mjs";
 
+import * as db from "./db-connector.mjs";
+import mysql from 'mysql';
+
+const con = mysql.createConnection(db.dbConfig);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import * as db from "./db-connector.mjs";
 
 const privateKeyPath = path.resolve(__dirname, 'key.pem');
 const certificatePath = path.resolve(__dirname, 'cert.pem');
@@ -60,7 +64,7 @@ app.post('/decrypttext', async (req, res) => {
     const getUserSalt = (userID) => {
         return new Promise((resolve, reject) => {
             const saltQuery = `SELECT userSalt FROM Users WHERE userID = ?`;
-            db.pool.query(saltQuery, [userID], (err, result) => {
+            con.query(saltQuery, [userID], (err, result) => {
                 if (err) {
                     reject(err);
                 } else {

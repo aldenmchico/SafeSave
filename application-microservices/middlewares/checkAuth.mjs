@@ -58,6 +58,7 @@ export const checkAuth = async (req, res, next) => {
     }
     if (!token) {
         return res.status(401).json('No token found');
+
     }
 
 
