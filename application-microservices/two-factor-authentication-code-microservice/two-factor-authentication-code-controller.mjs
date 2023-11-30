@@ -364,9 +364,19 @@ app.get('/api/generate-mfa-qr-code', checkAuth, async (req, res) => {
         const otpType = 'totp';
         const configUri = `otpauth://${otpType}/${issuer}:${userID}?algorithm=${algorithm}&digits=${digits}&period=${period}&issuer=${issuer}&secret=${mfaTempSecret}`;
 
-        // generate qr code
-        res.setHeader('Content-Type', 'image/png');
-        return qrcode.toFileStream(res, configUri);
+// Generate QR code buffer
+        qrcode.toBuffer(configUri, (err, buffer) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Internal Server Error');
+                return;
+            }
+
+            res.json({
+                qrCodeImage: buffer.toString('base64'), // Encode buffer to base64
+                mfaTempSecret: mfaTempSecret,
+            });
+        });
     } catch (error) {
         console.error('Error in /api/generate-mfa-qr-code');
         res.status(500).json({ message: "Error generating QR Code in Controller" })
