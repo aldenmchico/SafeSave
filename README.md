@@ -121,7 +121,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
     database: '\''replaceMeWithDatabase'\'',
    ```
 
-4. Import database schema into MySQL instance, `enhancedCookieSecurity.db`
+4. Import database schema into MySQL instance by running `source empty_schema.db` within your MySQL terminal.
 5. Run all Microservices using `start` script
    ```sh
    ./start
