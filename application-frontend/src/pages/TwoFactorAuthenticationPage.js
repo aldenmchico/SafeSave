@@ -171,9 +171,6 @@ function TwoFactorAuthenticationPage() {
                         {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
                         <button type="submit" disabled={isLoading}>Verify</button>
                     </form>
-                    <button onClick={handleResendCode} disabled={resendCooldown || isLoading}>
-                        Resend Code
-                    </button>
                     {qrCode && (
                         <div>
                             <p>Scan this QR code with your 2FA app:</p>
