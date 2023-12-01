@@ -46,10 +46,11 @@ function AboutPage() {
             </section>
             <section style={styles.section}>
                 <h2>Contact Us</h2>
-                <p>If you have any questions, feedback, or concerns, please <a href="mailto:support@safesave.com">contact us</a>.</p>
+                <p>If you have any questions, feedback, or concerns, please <a href="mailto:safesavehelp@gmail.com">contact us</a>.</p>
             </section>
         </div>
     );
 }
 
 export default AboutPage;
+

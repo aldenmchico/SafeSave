@@ -5,6 +5,15 @@ function SettingsPage() {
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
     const [pendingTwoFactorEnabled, setPendingTwoFactorEnabled] = useState(false);
     const [message, setMessage] = useState('');
+    const [invalidCookie, setInvalidCookie] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     // check if current User has 2FA enabled on mounting 
     useEffect(() => {
@@ -28,12 +37,21 @@ function SettingsPage() {
 
             if (response.ok && !responseData.verified) {
                 return false
-            } else if (response.ok && responseData.verified) {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (response.ok && responseData.verified) {
                 return true
             }
 
         } catch (error) {
             console.error('There was a problem with the fetch operation in locateUserAndCheck2FAEnabled() in SettingsPage:', error.message);
+            if(!invalidCookie){
+                setInvalidCookie(true)
+            }
         }
     }
 
@@ -130,3 +148,4 @@ function SettingsPage() {
 }
 
 export default SettingsPage;
+

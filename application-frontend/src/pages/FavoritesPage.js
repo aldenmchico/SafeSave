@@ -8,6 +8,14 @@ function FavoritesPage({ setLoginItem, setNote }) {
     // Use state variable exercises to bring in the data
     const [favoriteLogins, setFavoriteLogins] = useState([]);
     const [favoriteNotes, setFavoriteNotes] = useState([]);
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     // Load favorite logins from the backend
     const loadFavoriteLogins = async () => {
@@ -21,11 +29,19 @@ function FavoritesPage({ setLoginItem, setNote }) {
                 setFavoriteLogins([]);
                 return;
             }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
             else {
                 throw new Error('Failed to fetch favorite login items');
             }
         } catch (error) {
-            alert(error.message);
+            console.log(error.message);
+            if(!invalidCookie){
+                setInvalidCookie(true)
+            }
         }
     };
 
@@ -36,7 +52,13 @@ function FavoritesPage({ setLoginItem, setNote }) {
             if (response.ok) {
                 const notesData = await response.json();
                 setFavoriteNotes(notesData);
-            } else if (response.status === 404) {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (response.status === 404) {
                 console.log('Response code in loadFavoriteNotes is 404 - nothing to return. Dont worry about this 404 Error code.');
                 setFavoriteNotes([]);
                 return;
@@ -45,7 +67,10 @@ function FavoritesPage({ setLoginItem, setNote }) {
                 throw new Error('Failed to fetch favorite note items');
             }
         } catch (error) {
-            alert(error.message);
+            console.log(error.message);
+            if(!invalidCookie){
+                setInvalidCookie(true)
+            }
         }
     };
 
@@ -120,3 +145,4 @@ function FavoritesPage({ setLoginItem, setNote }) {
 }
 
 export default FavoritesPage;
+
