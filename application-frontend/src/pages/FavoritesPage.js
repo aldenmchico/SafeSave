@@ -52,7 +52,13 @@ function FavoritesPage({ setLoginItem, setNote }) {
             if (response.ok) {
                 const notesData = await response.json();
                 setFavoriteNotes(notesData);
-            } else if (response.status === 404) {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (response.status === 404) {
                 console.log('Response code in loadFavoriteNotes is 404 - nothing to return. Dont worry about this 404 Error code.');
                 setFavoriteNotes([]);
                 return;
@@ -62,6 +68,9 @@ function FavoritesPage({ setLoginItem, setNote }) {
             }
         } catch (error) {
             console.log(error.message);
+            if(!invalidCookie){
+                setInvalidCookie(true)
+            }
         }
     };
 

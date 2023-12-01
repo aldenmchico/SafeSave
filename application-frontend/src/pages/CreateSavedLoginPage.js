@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function CreateSavedLoginPage() {
@@ -7,14 +7,23 @@ function CreateSavedLoginPage() {
         username: '',
         password: '',
     });
+    const [invalidCookie, setInvalidCookie] = useState(false);
     const navigate = useNavigate();
 
     // Update state with userID and unencrypted password
-    React.useEffect(() => {
+    useEffect(() => {
         setLoginDetails(prevState => ({
             ...prevState,
         }));
     }, []);
+
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
 
 
@@ -49,12 +58,21 @@ function CreateSavedLoginPage() {
             if (response.ok) {
                 alert('Login details saved successfully!');
                 navigate('/savedlogins');
-            } else {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else {
                 const errorMessage = await response.text();
                 alert(`Failed to save login details. Error: ${errorMessage}`);
             }
         } catch (error) {
             alert(`An error occurred while saving the login details: ${error}`);
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
         }
     };
 

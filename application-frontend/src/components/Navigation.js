@@ -1,27 +1,30 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App.js';
 import logo from '../SafeSave-Logo.svg';
 import { useLocation } from 'react-router-dom';
 
 
+
 const Navigation = () => {
     const location = useLocation();
     const isLoginOrCreateAccountPage = location.pathname === '/' || location.pathname === '/createaccount' ;
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
 
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const { isAuthenticated, logout } = useContext(AuthContext);
 
+    useEffect(() => {
+        if (invalidCookie) {
+            navigate('/');
+        }
+    }, [invalidCookie]);
+
     if (isLoginOrCreateAccountPage) {
         return null; // Don't render Navigation on the login page and on CreateAccount Page
     }
-
-
-    // const handleSearch = (e) => {
-    //     e.preventDefault();
-    //     navigate(`/search/${searchTerm}`);
-    // };
 
     // TODO: make an HTTP endpoint to a delete cookie endpoint 
     const handleLogout = async () => {
@@ -37,13 +40,24 @@ const Navigation = () => {
                 console.log('Logging Out. Cookies should have been deleted.');
                 navigate('/');
                 return;
-            } else {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                    navigate('/');
+                }
+            }
+            else {
                 // Handle error (e.g., show an error message)
                 console.error('Logout failed:', response.statusText);
+                navigate('/');
             }
         } catch (error) {
             // Handle network or other errors
             console.error('Error during logout:', error);
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
         }
     };
 
