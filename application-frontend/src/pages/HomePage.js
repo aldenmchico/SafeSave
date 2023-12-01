@@ -38,7 +38,6 @@ function HomePage({ setLoginItem }) {
             setSavedLogins(logins);
         } catch (error) {
             console.error('Failed to load logins:', error);
-            setInvalidCookie(true);
         }
     };
 
@@ -57,7 +56,6 @@ function HomePage({ setLoginItem }) {
             setSavedNotes(notes);
         } catch (error) {
             console.error('Failed to load notes:', error);
-            setInvalidCookie(true);
         }
     };
 
