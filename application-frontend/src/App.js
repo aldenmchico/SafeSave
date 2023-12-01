@@ -10,9 +10,6 @@ const TwoFactorAuthenticationPage = lazy(() => import('./pages/TwoFactorAuthenti
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SavedLoginsPage = lazy(() => import('./pages/SavedLoginsPage'));
 const NotesPage = lazy(() => import('./pages/SavedNotesPage'));
-const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
-const PersonalInfoPage = lazy(() => import('./pages/PersonalInfoPage'));
-const IDsPage = lazy(() => import('./pages/IDsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const CreateAccountPage = lazy(() => import('./pages/CreateAccountPage'));

@@ -7,6 +7,14 @@ function HomePage({ setLoginItem }) {
     const [savedNotes, setSavedNotes] = useState([]);
 
     const navigate = useNavigate();
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     useEffect(() => {
         loadSavedLogins();
@@ -17,26 +25,39 @@ function HomePage({ setLoginItem }) {
     const loadSavedLogins = async () => {
         try {
             const response = await fetch('/login_items/users/userID');
-            if (!response.ok) {
+
+        if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (!response.ok) {
                 throw new Error('Failed to fetch logins');
             }
             const logins = await response.json();
             setSavedLogins(logins);
         } catch (error) {
             console.error('Failed to load logins:', error);
+            setInvalidCookie(true);
         }
     };
 
     const loadSavedNotes = async () => {
         try {
             const response = await fetch('/notes/users/userID');
-            if (!response.ok) {
+            if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (!response.ok) {
                 throw new Error('Failed to fetch notes');
             }
             const notes = await response.json();
             setSavedNotes(notes);
         } catch (error) {
             console.error('Failed to load notes:', error);
+            setInvalidCookie(true);
         }
     };
 

@@ -7,12 +7,21 @@ function CreateSavedNotePage() {
         content: '',
     });
     const navigate = useNavigate();
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
 
     useEffect(() => {
         setNoteDetails(prevState => ({
             ...prevState,
         }));
     }, []);
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -43,12 +52,21 @@ function CreateSavedNotePage() {
             if (response.ok) {
                 alert('Note saved successfully!');
                 navigate('/savednotes');
-            } else {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else {
                 const errorMessage = await response.text();
                 alert(`Failed to save note. Error: ${errorMessage}`);
             }
         } catch (error) {
-            alert(`An error occurred: ${error}`);
+            console.log(error)
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
         }
     };
 

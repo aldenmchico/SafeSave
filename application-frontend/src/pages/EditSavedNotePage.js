@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function EditSavedNotePage({note}) {
     const [title, setTitle] = useState(note.userNoteTitle);
     const [content, setContent] = useState(note.userNoteText);
     const navigate = useNavigate();
+
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     const handleNoteCreation = async (e) => {
         e.preventDefault();
@@ -32,13 +42,24 @@ function EditSavedNotePage({note}) {
                 setTitle(''); // Reset the title field
                 setContent(''); // Reset the content field
                 navigate('/savednotes'); // Redirect to the saved notes page after creation
-            } else {
+            }
+
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+
+            else {
                 // Extract error message if any from the response
                 const errorMessage = await response.text();
                 alert(`Failed to save note. Please try again. Error: ${errorMessage}`);
             }
         } catch (error) {
             alert(`An error occurred while saving the note: ${error}`);
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
         }
     }
 

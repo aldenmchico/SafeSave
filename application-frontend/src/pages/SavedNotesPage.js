@@ -6,6 +6,15 @@ function SavedNotesPage({ setNote }) {
     const [savedNotes, setSavedNotes] = useState([]);
     const navigate = useNavigate();
 
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
+
     // Load saved notes from the backend
     const loadSavedNotes = async () => {
         const url = `/notes/users/userID`;
@@ -14,7 +23,13 @@ function SavedNotesPage({ setNote }) {
             if (response.ok) {
                 const notesData = await response.json();
                 setSavedNotes(notesData);
-            } else if (response.status === 404) {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else if (response.status === 404) {
                 console.log('Response code in loadSavedNotes is 404 - nothing to return. Dont worry about this 404 Error code.')
                 setSavedNotes([]); 
                 return;
@@ -24,6 +39,9 @@ function SavedNotesPage({ setNote }) {
             }
         } catch (error) {
             alert(error.message);
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
         }
     };
 

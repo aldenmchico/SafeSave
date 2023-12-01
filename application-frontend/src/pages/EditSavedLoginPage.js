@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function EditSavedLoginPage({loginItem}) {
@@ -7,6 +7,15 @@ function EditSavedLoginPage({loginItem}) {
     const [username, setUsername] = useState(loginItem.userLoginItemUsername);
     const [password, setPassword] = useState(loginItem.userLoginItemPassword);
     const navigate = useNavigate();
+    const [invalidCookie, setInvalidCookie] = useState(false);
+
+
+    useEffect(() => {
+        if (invalidCookie) {
+            alert('Invalid or expired cookie');
+            navigate('/');
+        }
+    }, [invalidCookie]);
 
     const handleSaveLogin = async (e) => {
         e.preventDefault();
@@ -36,13 +45,23 @@ function EditSavedLoginPage({loginItem}) {
                 setUsername(''); // Reset the username field
                 setPassword(''); // Reset the password field
                 navigate('/savedlogins'); // Redirect to the saved logins page after saving
-            } else {
+            }
+            else if(response.status === 401 || response.status === 403 || response.status === 500){
+                if(!invalidCookie){
+                    setInvalidCookie(true);
+                }
+            }
+            else {
                 // Extract error message if any from the response
                 const errorMessage = await response.text();
                 alert(`Failed to save login details. Please try again. Error: ${errorMessage}`);
             }
         } catch (error) {
-            alert(`An error occurred while saving the login details: ${error}`);
+            console.log(error)
+            if(!invalidCookie){
+                setInvalidCookie(true);
+            }
+
         }
     }
 
