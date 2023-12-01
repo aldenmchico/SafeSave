@@ -128,6 +128,31 @@ To get a local copy up and running complete both Prerequisites and Installation 
    ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## No log policy
+
+SafeSave does not log any user credentials or decrypted information. Below is a sample of what is logged when a user logs in and fetches their notes. The local version on the main branch logs much more for diagnostic purposes.
+
+
+```sh
+xxx@xxx ~> cat /home/xxx/.forever/735V.log
+Express application-controller server started listening on port 3001...
+VALIDATION CHECK true
+VALIDATION FOR HMAC CHECK PASSED
+loginItemRouter/users/userID, userID is: 1
+VALIDATION CHECK true
+VALIDATION FOR HMAC CHECK PASSED
+VALIDATION CHECK true
+VALIDATION FOR HMAC CHECK PASSED
+loginItemRouter/users/userID, userID is: 1
+VALIDATION CHECK true
+VALIDATION FOR HMAC CHECK PASSED
+VALIDATION CHECK true
+VALIDATION FOR HMAC CHECK PASSED
+```
+
+## Your data is safe with SafeSave
+![ezgif-4-e594f5dcf1](https://github.com/aldenmchico/SafeSave/assets/97023911/668052bb-9795-492a-8c42-b49e4f552f6b)
+
 
 
 <!-- USAGE EXAMPLES -->
