@@ -151,7 +151,8 @@ VALIDATION FOR HMAC CHECK PASSED
 ```
 
 ## Your data is safe with SafeSave
-![ezgif-4-e594f5dcf1](https://github.com/aldenmchico/SafeSave/assets/97023911/668052bb-9795-492a-8c42-b49e4f552f6b)
+![ezgif-3-0376bd5763](https://github.com/aldenmchico/SafeSave/assets/97023911/6d35c01b-e9ac-426a-8f41-907ca308a4fc)
+
 
 
 
