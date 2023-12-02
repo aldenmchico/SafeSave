@@ -108,7 +108,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
     chmod +x ./docker.sh
     ```
 3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial. </a>
-4. Otherwise, execute the script.
+4. Otherwise, execute the script. If you did not add yourself to the docker group, you will need to run the script with `sudo`. 
     ```sh
         ./docker.sh
     ```
