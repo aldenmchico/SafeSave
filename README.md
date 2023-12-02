@@ -102,7 +102,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
 
 ### Docker (Easiest method)
 
-1. Download the latest version of <a href=https://docs.docker.com/get-docker/>Docker</a> on your system
+1. Download the latest version of <a href=https://docs.docker.com/get-docker/>Docker</a> on your system and clone the repo. 
 2. Make the docker script executable.
     ```sh
     chmod +x ./docker.sh
@@ -113,6 +113,10 @@ To get a local copy up and running complete both Prerequisites and Installation 
         ./docker.sh
     ```
 5. The application will be live at <a href=https://localhost:3000> https://localhost:3000 </a>
+
+### Docker Tutorial
+
+[![Video](https://img.youtube.com/vi/NzJ90ia40G4/maxresdefault.jpg)](https://www.youtube.com/watch?v=NzJ90ia40G4)
 
 
 ### Alternative local installation
