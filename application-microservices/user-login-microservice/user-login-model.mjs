@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import {readFileSync} from "fs";
 import * as db from "./db-connector.mjs";
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
 const con = mysql.createConnection(db.dbConfig);
 
@@ -17,7 +17,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
     let emailExists = false;
 
     try {
-        const usernameResponse = await fetch(`https://localhost:3001/users/byUsername/${username}`);
+        const usernameResponse = await fetch(`https://backend:3001/users/byUsername/${username}`);
         console.log(`usernameResponse is: ${usernameResponse}`); 
         if (usernameResponse.ok) {
             const usernameData = await usernameResponse.json();
@@ -29,7 +29,7 @@ const checkIfUsernameOrEmailExists = async (username, email) => {
             throw new Error('An error occurred while checking the username.');
         }
 
-        const emailResponse = await fetch(`https://localhost:3001/users/byEmail/${email}`);
+        const emailResponse = await fetch(`https://backend:3001/users/byEmail/${email}`);
         if (emailResponse.ok) {
             const emailData = await emailResponse.json();
             console.log(`Email exists: `, emailData);
@@ -87,7 +87,7 @@ const createUser = async (username, email, password) => {
 
         };
 
-        const createResponse = await fetch(`https://localhost:3001/users`, {
+        const createResponse = await fetch(`https://backend:3001/users`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const checkIfUsernameExists = async (username) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
 
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -157,7 +157,7 @@ const fetchUserFromUsername = async (username) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
 
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             console.log(`response was ${response.toString()}`)
             throw new Error('Network response was not ok');
@@ -180,7 +180,7 @@ const validatePassword = async (username, plainTextPassword) => {
     - pass username externally
     */
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -210,7 +210,7 @@ const signJwtToken = async (user) => {
 
     try {
 
-        const jwtResponse = await fetch(`https://localhost:8015/jwt-api/sign`, {
+        const jwtResponse = await fetch(`https://jwt:8015/jwt-api/sign`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

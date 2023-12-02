@@ -4,7 +4,7 @@ import * as userLoginModel from './user-login-model.mjs';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 import cookieparser from 'cookie-parser';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import * as db from "./db-connector.mjs";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -56,7 +56,7 @@ app.use(cookieparser());
 //CORS is VERY picky about the origin IP; app.use(cors()) is not strict enough when dealing with any sort of cookie
 //which is the reason why localhost worked, and 127.0.0.1 didn't and vice-versa.
 //allowed origins will EVENTUALLY have our domain name at port 443 once we host!
-const allowedOrigins = ['https://localhost:3000', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
+const allowedOrigins = ['https://localhost:3000', 'frontend', 'https://127.0.0.1:3000', 'https://192.168.88.79:3000', 'https://107.181.189.57:7263']
 
 app.use(cors({
     origin: function (origin, callback) {
@@ -239,7 +239,7 @@ app.get('/logout', checkAuth, async (req, res) => {
         };
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`https://localhost:3001/users/session`, {
+        const response = await fetch(`https://backend:3001/users/session`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

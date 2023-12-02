@@ -20,7 +20,7 @@ import { readFileSync } from 'fs';
 // Obtain __dirname in an ES module
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import mysql from "mysql";
+import mysql from "mysql2";
 
 
 const __filename = fileURLToPath(import.meta.url);

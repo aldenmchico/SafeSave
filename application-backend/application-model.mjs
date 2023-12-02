@@ -1,6 +1,6 @@
 // Import dependencies.
 import 'dotenv/config';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import * as db from './db-connector.mjs';
 var con = mysql.createConnection(db.dbConfig);
 
@@ -90,7 +90,7 @@ const createUserLoginItem = async function (userID, reqBody, callback) {
     const userHash = await getUserHash(userID);
 
 
-    await fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://encrypt:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ const createUserNote = async function (userID, reqBody, callback) {
 
     let responseData; // Variable to store the JSON response
 
-    await fetch('https://127.0.0.1:8002/ciphertext', {
+    await fetch('https://encrypt:8002/ciphertext', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -361,7 +361,7 @@ async function decryptRowData(row) {
         });
 
         try {
-            const response = await fetch("https://127.0.0.1:8001/decrypttext", {
+            const response = await fetch("https://decrypt:8001/decrypttext", {
                 method: "POST",
                 body: JSON.stringify(encryptedData),
                 headers: {
@@ -460,7 +460,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
         let userHash = await getUserHash(userID);
         const userSalt = await getUserSalt(userID);
 
-        await fetch('https://localhost:8002/ciphertext', {
+        await fetch('https://encrypt:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -587,7 +587,7 @@ const patchNote = async function (userID, reqBody, callback) {
 
         let responseData; // Variable to store the JSON response
 
-        await fetch('https://127.0.0.1:8002/ciphertext', {
+        await fetch('https://encrypt:8002/ciphertext', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

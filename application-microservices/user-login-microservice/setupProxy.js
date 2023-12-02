@@ -7,7 +7,7 @@ module.exports = function (app) {
     app.use(
         '/users',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://backend:3001',
             changeOrigin: true,
             secure: false
         })
@@ -17,7 +17,7 @@ module.exports = function (app) {
     app.use(
         '/jwt-api',
         createProxyMiddleware({
-            target: 'https://localhost:8015',
+            target: 'https://jwt:8015',
             changeOrigin: true,
             secure: false
         })
@@ -27,7 +27,7 @@ module.exports = function (app) {
     app.use(
         '/api',
         createProxyMiddleware({
-            target: 'https://localhost:8006',
+            target: 'https://twofac:8006',
             chanrgeOrigin: true,
             secure: false
         })

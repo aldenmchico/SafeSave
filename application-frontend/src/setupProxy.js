@@ -5,7 +5,7 @@ module.exports = function (app) {
     app.use(
         '/loginvalidation',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://login:8008',
             changeOrigin: true,
             secure: false
         })
@@ -14,7 +14,7 @@ module.exports = function (app) {
     app.use(
         '/create',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://login:8008',
             changeOrigin: true,
             secure: false
         })
@@ -26,7 +26,7 @@ module.exports = function (app) {
     app.use(
         '/api',
         createProxyMiddleware({
-            target: 'https://localhost:8006',
+            target: 'https://twofac:8006',
             changeOrigin: true,
             secure: false
         })
@@ -47,7 +47,7 @@ module.exports = function (app) {
     app.use(
         '/users',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://backend:3001',
             changeOrigin: true,
             secure: false
         })
@@ -57,7 +57,7 @@ module.exports = function (app) {
     app.use(
         '/jwt-api/sign',
         createProxyMiddleware({
-            target: 'https://localhost:8015',
+            target: 'https://jwt:8015',
             changeOrigin: true,
             secure: false
         })
@@ -67,7 +67,7 @@ module.exports = function (app) {
     app.use(
         '/login_items',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://backend:3001',
             changeOrigin: true,
             secure: false, // Ignore SSL certificate validation (for development only)
         })
@@ -76,7 +76,7 @@ module.exports = function (app) {
     app.use(
         '/notes',
         createProxyMiddleware({
-            target: 'https://localhost:3001',
+            target: 'https://backend:3001',
             changeOrigin: true,
             secure: false, // Ignore SSL certificate validation (for development only)
         })
@@ -95,7 +95,7 @@ module.exports = function (app) {
     app.use(
         '/ciphertext',
         createProxyMiddleware({
-            target: 'https://localhost:8002',
+            target: 'https://encrypt:8002',
             changeOrigin: true,
             secure: false,
         })
@@ -104,7 +104,7 @@ module.exports = function (app) {
     app.use(
         '/logout',
         createProxyMiddleware({
-            target: 'https://localhost:8008',
+            target: 'https://login:8008',
             changeOrigin: true,
             secure: false,
         })

@@ -12,7 +12,7 @@ import { dirname } from 'path';
 import * as dataDecryptionModel from "./data-decryption-model.mjs";
 
 import * as db from "./db-connector.mjs";
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
 const con = mysql.createConnection(db.dbConfig);
 

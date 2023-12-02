@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import crypto from 'crypto';
 import base32 from 'hi-base32';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
 import * as db from "./db-connector.mjs";
 
@@ -32,7 +32,7 @@ const generateAndStoreTempSecretToken = async (userId, accessToken, length = 20)
         };
 
         // Send PATCH request to update user's temp secret
-        const response = await fetch(`https://localhost:3001/users/`, {
+        const response = await fetch(`https://backend:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const verifyTemporaryTOTP = async (userId, token, secret, window = 2, accessToke
                 };
 
                 // Send PATCH request to update user's primary secret field
-                const response = await fetch(`https://localhost:3001/users/`, {
+                const response = await fetch(`https://backend:3001/users/`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ const disableTwoFactor =
     };
     try {
         // Send PATCH request to update user's primary secret field
-        const response = await fetch(`https://localhost:3001/users/`, {
+        const response = await fetch(`https://backend:3001/users/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ const getUserSecret = (userID) => {
 
 const checkIfUserHas2FAEnabled = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`, {
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`, {
             credentials: 'include',
         });        if (!response.ok) {
             throw new Error('Network response was not ok in two factor model file in checkIfUserHas2FAEnabled(). ');
@@ -284,7 +284,7 @@ const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
 
 
 
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAEnabledAndNoSecret');
         }
@@ -302,7 +302,7 @@ const checkIfUserHas2FAEnabledAndNoSecret = async (username) => {
 
 const checkIfUserHas2FAAndSecretEstablished = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: checkIfUserHas2FAAndSecretEstablished');
         }
@@ -320,7 +320,7 @@ const checkIfUserHas2FAAndSecretEstablished = async (username) => {
 
 const returnUserDataByUsername = async (username) => {
     try {
-        const response = await fetch(`https://localhost:3001/users/byUsername/${username}`)
+        const response = await fetch(`https://backend:3001/users/byUsername/${username}`)
         if (!response.ok) {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: returnUserDataByUsername');
         }

@@ -17,7 +17,7 @@
     "hi-base32": "^0.5.1",
     "http-proxy-middleware": "^2.0.6",
     "https": "^1.0.0",
-    "mysql": "^2.18.1",
+    "mysql2": "^3.6.5",
     "node-json-db": "^2.3.0",
     "nodemon": "^2.0.22",
     "pem": "^1.14.8",

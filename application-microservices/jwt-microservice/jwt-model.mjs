@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken'
 import 'dotenv/config';
 import crypto from 'crypto';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import * as db from "./db-connector.mjs";
 import {readFileSync} from "fs";
 

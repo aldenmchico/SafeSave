@@ -1,0 +1,141 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: DemoDatabasePassword!!123
+      MYSQL_DATABASE: capstone_2023_securepass1
+      MYSQL_USER: Demo
+      MYSQL_PASSWORD: DemoDatabasePassword!!123
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./db-init.sql:/docker-entrypoint-initdb.d/db-init.sql
+    networks:
+      - safenet
+
+  middleware:
+    build:
+      context: ./application-microservices/middlewares
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/application-microservices/middlewares
+    command: /bin/sh -c "cd /usr/src/application-microservices/middlewares && npm install && npm start"
+    networks:
+      - safenet
+  
+  jwt:
+    build:
+      context: ./application-microservices/jwt-microservice
+    depends_on:
+      - middleware
+      - db
+    env_file:
+      - ./application-microservices/jwt-microservice/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/application-microservices/middlewares
+    networks:
+      - safenet
+  
+  twofac:
+    build:
+      context: ./application-microservices/two-factor-authentication-code-microservice
+    depends_on:
+      - middleware
+      - db
+    env_file:
+      - ./application-microservices/two-factor-authentication-code-microservice/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/middlewares
+    networks:
+      - safenet
+
+  backend:
+    build:
+      context: ./application-backend
+    depends_on:
+      - middleware
+      - db
+    env_file:
+      - ./application-backend/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/application-microservices/middlewares
+    networks:
+      - safenet
+
+  decrypt:
+    build:
+      context: ./application-microservices/data-decryption-microservice
+    depends_on:
+      - middleware
+      - db
+    env_file:
+      - ./application-microservices/data-decryption-microservice/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/middlewares
+    networks:
+      - safenet
+
+  encrypt:
+    build:
+      context: ./application-microservices/data-encryption-microservice
+    depends_on:
+      - middleware
+      - db
+    env_file:
+      - ./application-microservices/data-encryption-microservice/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/middlewares
+    networks:
+      - safenet
+
+  frontend:
+    build:
+      context: ./application-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - middleware
+      - login
+    env_file:
+      - ./application-frontend/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/application-microservices/middlewares
+    networks:
+      - safenet
+
+  login:
+    build:
+      context: ./application-microservices/user-login-microservice/
+    ports:
+      - "8008:8008"
+    depends_on:
+      - backend
+      - middleware
+    env_file:
+      - ./application-microservices/user-login-microservice/.env
+    volumes:
+      - type: bind
+        source: ./application-microservices/middlewares
+        target: /usr/src/middlewares
+    networks:
+      - safenet
+  
+networks:
+  safenet:
+    driver: bridge
+volumes:
+  mysqldata:

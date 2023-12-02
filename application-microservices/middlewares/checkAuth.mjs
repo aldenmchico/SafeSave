@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { config } from 'dotenv';
 config({ path: '../jwt-microservice/.env' });
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import * as db from "./db-connector.mjs"
 import crypto from 'crypto';
 import fs, {readFileSync} from 'fs';
