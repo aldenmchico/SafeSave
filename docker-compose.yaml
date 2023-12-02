@@ -120,11 +120,11 @@ services:
   login:
     build:
       context: ./application-microservices/user-login-microservice/
-    ports:
-      - "8008:8008"
     depends_on:
       - backend
       - middleware
+      - db
+      - jwt
     env_file:
       - ./application-microservices/user-login-microservice/.env
     volumes:
