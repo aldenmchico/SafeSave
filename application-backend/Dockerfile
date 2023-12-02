@@ -6,10 +6,16 @@
 
 ARG NODE_VERSION=20.8.1
 
-FROM node:${NODE_VERSION}-alpine
+FROM node:latest
 
 # Use production node environment by default.
 ENV NODE_ENV production
+
+# Install dockerize
+RUN apt-get update && apt-get install -y wget \
+    && wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz \
+    && rm dockerize-linux-amd64-v0.6.1.tar.gz
 
 
 WORKDIR /usr/src/application-backend

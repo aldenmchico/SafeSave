@@ -12,6 +12,8 @@ services:
       - ./db-init.sql:/docker-entrypoint-initdb.d/db-init.sql
     networks:
       - safenet
+    healthcheck:
+      test: ["CMD", "dockerize", "-wait", "tcp://db:3306", "-timeout", "20s"]
 
   middleware:
     build:
@@ -20,10 +22,12 @@ services:
       - type: bind
         source: ./application-microservices/middlewares
         target: /usr/src/application-microservices/middlewares
-    command: /bin/sh -c "cd /usr/src/application-microservices/middlewares && npm install && npm start"
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
     networks:
       - safenet
-  
+    depends_on:
+      - db
+
   jwt:
     build:
       context: ./application-microservices/jwt-microservice
@@ -38,7 +42,8 @@ services:
         target: /usr/src/application-microservices/middlewares
     networks:
       - safenet
-  
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
+
   twofac:
     build:
       context: ./application-microservices/two-factor-authentication-code-microservice
@@ -54,6 +59,7 @@ services:
         target: /usr/src/middlewares
     networks:
       - safenet
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
 
   backend:
     build:
@@ -69,6 +75,7 @@ services:
         target: /usr/src/application-microservices/middlewares
     networks:
       - safenet
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
 
   decrypt:
     build:
@@ -84,6 +91,7 @@ services:
         target: /usr/src/middlewares
     networks:
       - safenet
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
 
   encrypt:
     build:
@@ -99,6 +107,7 @@ services:
         target: /usr/src/middlewares
     networks:
       - safenet
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
 
   frontend:
     build:
@@ -118,6 +127,7 @@ services:
         target: /usr/src/application-microservices/middlewares
     networks:
       - safenet
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
 
   login:
     build:
@@ -136,7 +146,8 @@ services:
         target: /usr/src/middlewares
     networks:
       - safenet
-  
+    command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
+
 networks:
   safenet:
     driver: bridge
