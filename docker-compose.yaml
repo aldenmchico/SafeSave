@@ -29,7 +29,7 @@ services:
       context: ./application-microservices/jwt-microservice
     depends_on:
       - middleware
-      - db
+      - db  
     env_file:
       - ./application-microservices/jwt-microservice/.env
     volumes:
@@ -45,6 +45,7 @@ services:
     depends_on:
       - middleware
       - db
+      - backend
     env_file:
       - ./application-microservices/two-factor-authentication-code-microservice/.env
     volumes:
@@ -107,7 +108,8 @@ services:
     depends_on:
       - backend
       - middleware
-      - login
+      - db
+      - twofac
     env_file:
       - ./application-frontend/.env
     volumes:
@@ -125,6 +127,7 @@ services:
       - middleware
       - db
       - jwt
+      - frontend
     env_file:
       - ./application-microservices/user-login-microservice/.env
     volumes:
@@ -139,3 +142,4 @@ networks:
     driver: bridge
 volumes:
   mysqldata:
+
