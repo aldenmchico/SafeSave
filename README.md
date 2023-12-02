@@ -114,6 +114,21 @@ To get a local copy up and running complete both Prerequisites and Installation 
     ```
 5. The application will be live at <a href=https://localhost:3000> https://localhost:3000 </a>
 
+#### Other architectures
+
+The `docker.sh` script assumes you are running on an amd64-based platform. Here is a sample script of what you could do if you were running on arm64-based Linux (tested on Oracle server and rpi):
+
+```sh
+#!/bin/bash
+
+tar -xvzf SafeSaveDocker.tar.gz && \
+	cd SafeSave && \
+	find . -type f -name Dockerfile -exec sed -i 's|https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz|https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-arm64-v0.7.0.tar.gz|; s|dockerize-linux-amd64-v0.6.1.tar.gz|dockerize-linux-arm64-v0.7.0.tar.gz|' {} + && \
+docker compose up --build
+```
+
+You can easily adjust the sed command to <a href=https://github.com/jwilder/dockerize/releases> fit your architecture. </a>
+
 ### Docker Tutorial
 
 [![Video](https://img.youtube.com/vi/NzJ90ia40G4/maxresdefault.jpg)](https://www.youtube.com/watch?v=NzJ90ia40G4)
