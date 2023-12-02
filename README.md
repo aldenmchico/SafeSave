@@ -98,10 +98,24 @@ To get a local copy up and running complete both Prerequisites and Installation 
 
 ### Prerequisites
 
-1. Before running the app locally, you will need to have an instance of an active MySQL server to drop the database schema into. 
+1. Before running the app locally, you will either need to have the latest version of Docker installed on your system, or you will need to have an instance of an active MySQL server to drop the database schema into. 
+
+### Docker (Easiest method)
+
+1. Download the latest version of <a href=https://docs.docker.com/get-docker/>Docker</a> on your system
+2. Make the docker script executable.
+    ```sh
+    chmod +x ./docker.sh
+    ```
+3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial. </a>
+4. Otherwise, execute the script.
+    ```sh
+        ./docker.sh
+    ```
+5. The application will be live at <a href=https://localhost:3000> https://localhost:3000 </a>
 
 
-### Installation
+### Alternative local installation
 
 1. Clone the repo.
    ```sh
