@@ -116,7 +116,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
 
 #### Other architectures
 
-The `docker.sh` script assumes you are running on an amd64-based platform. Here is a sample script of what you could do if you were running on arm64-based Linux (tested on Oracle server and rpi):
+The `docker.sh` script assumes you are running on an amd64-based platform. The `docker.sh` script was also tested and confirmed to work on Apple Silicon with no modifications. Here is a sample script of what you could do if you were running on arm64-based Linux (tested on Oracle server and rpi):
 
 ```sh
 #!/bin/bash
