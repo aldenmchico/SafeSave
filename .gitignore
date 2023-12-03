@@ -26,4 +26,10 @@
 /application-microservices/jwt-microservice/package-lock.json
 database/db-connector.js
 /.idea
+16NovHMAC.db
+18NovEncryptedIV.db
+enhancedCookieSecurity.db
+localhost.pem
+modinstall.sh
+reverseCredSwitchtoAustin
 

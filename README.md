@@ -98,10 +98,43 @@ To get a local copy up and running complete both Prerequisites and Installation 
 
 ### Prerequisites
 
-1. Before running the app locally, you will need to have an instance of an active MySQL server to drop the database schema into. 
+1. Before running the app locally, you will either need to have the latest version of Docker installed on your system, or you will need to have an instance of an active MySQL server to drop the database schema into. 
+
+### Docker (Easiest method)
+
+1. Download the latest version of <a href=https://docs.docker.com/get-docker/>Docker</a> on your system and clone the repo. 
+2. Make the docker script executable.
+    ```sh
+    chmod +x ./docker.sh
+    ```
+3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial. </a>
+4. Otherwise, execute the script. If you did not add yourself to the docker group, you will need to run the script with `sudo`. 
+    ```sh
+        ./docker.sh
+    ```
+5. The application will be live at <a href=https://localhost:3000> https://localhost:3000 </a>
+
+#### Other architectures
+
+The `docker.sh` script assumes you are running on an amd64-based platform. The `docker.sh` script was also tested and confirmed to work on Apple Silicon with no modifications. Here is a sample script of what you could do if you were running on arm64-based Linux (tested on Oracle server and rpi):
+
+```sh
+#!/bin/bash
+
+tar -xvzf SafeSaveDocker.tar.gz && \
+	cd SafeSave && \
+	find . -type f -name Dockerfile -exec sed -i 's|https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz|https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-arm64-v0.7.0.tar.gz|; s|dockerize-linux-amd64-v0.6.1.tar.gz|dockerize-linux-arm64-v0.7.0.tar.gz|' {} + && \
+docker compose up --build
+```
+
+You can easily adjust the sed command to <a href=https://github.com/jwilder/dockerize/releases> fit your architecture. </a>
+
+### Docker Tutorial
+
+[![Video](https://img.youtube.com/vi/NzJ90ia40G4/maxresdefault.jpg)](https://www.youtube.com/watch?v=NzJ90ia40G4)
 
 
-### Installation
+### Alternative local installation
 
 1. Clone the repo.
    ```sh
@@ -291,4 +324,3 @@ There are more API endpoints that are not listed but are integral to the project
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [product-screenshot]: https://github.com/EugenSong/EugenSong/assets/75242911/b68cd924-93de-4372-a9d4-e17f6dd5da33
-

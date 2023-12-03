@@ -13,7 +13,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 const getUserSession = (userID) => {
 
     return new Promise((resolve, reject) => {
@@ -58,6 +58,7 @@ export const checkAuth = async (req, res, next) => {
     }
     if (!token) {
         return res.status(401).json('No token found');
+
     }
 
 
@@ -139,3 +140,4 @@ export const checkAuth = async (req, res, next) => {
         return res.status(500).json({ error: "Error verifying token, clearing cookies." });
     }
 };
+
