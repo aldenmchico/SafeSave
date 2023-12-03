@@ -42,7 +42,7 @@ try {
 }
 
 const creds = { key: privateKey, cert: certificate };
-const con = mysql.createConnection(db.dbConfig)
+const con = mysql.createPool(db.dbConfig)
 const httpsServer = https.createServer(creds, app);
 
 app.use(express.json());
@@ -91,7 +91,6 @@ app.post('/loginvalidation', async (req, res) => {
         const userHMAC = crypto.createHmac('sha256', secretKey)
         const digestedUserHMAC = userHMAC.update(username.toLowerCase()).digest('hex');
 
-        const con = mysql.createConnection(db.dbConfig);
 
 
 

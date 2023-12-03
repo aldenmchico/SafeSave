@@ -2,7 +2,7 @@
 import 'dotenv/config';
 import mysql from 'mysql';
 import * as db from './db-connector.mjs';
-var con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 import https from 'https';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -396,27 +396,24 @@ const getUserNoteByTitle = function (id, title, callback) {
 };
 
 
-// UPDATE (PATCH) MODEL FUNCTIONS *****************************************************
-
+// Function to patch user data
 const patchUser = function (reqBody, callback) {
     if (reqBody.userID === undefined) {
         callback({ "code": "NO_USER_ID" }, null);
-    }
-    else {
+    } else {
         let q = '';
-        if (reqBody.email !== undefined) {
-            q = `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
+        if (reqBody.email !== undefined) { 
+            q += `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
         }
         if (reqBody.password !== undefined) {
             q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
-        }
+        } 
         // Additional fields for userSecret and userTempSecret
         if (reqBody.userSecret !== undefined) {
             const secretValue = reqBody.userSecret === null ? null : `"${reqBody.userSecret}"`;
             q += `UPDATE Users SET userSecret = ${secretValue} WHERE userID = ${reqBody.userID}; `;
         }
         if (reqBody.userTempSecret !== undefined) {
-            // If userTempSecret is explicitly set to null, construct the SQL without quotes
             const tempSecretValue = reqBody.userTempSecret === null ? null : `"${reqBody.userTempSecret}"`;
             q += `UPDATE Users SET userTempSecret = ${tempSecretValue} WHERE userID = ${reqBody.userID}; `;
         }
@@ -424,25 +421,53 @@ const patchUser = function (reqBody, callback) {
         if (reqBody.user2FAEnabled !== undefined) {
             q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
         }
-
         // model function for handling user session id when logging out 
         if (reqBody.userSessionID !== undefined) {
-            // If userSessionID is explicitly set to null, construct the SQL without quotes
             const tempSessionID = reqBody.userSessionID === null ? null : `"${reqBody.userSessionID}"`;
             q += `UPDATE Users SET userSessionID = ${tempSessionID} WHERE userID = ${reqBody.userID}; `;
         }
-        if (q === '') callback({ "code": "NO_CHANGE" }, null)
-        else {
-            con.query(q, (err, result) => {
+        
+        if (q === '') {
+            callback({ "code": "NO_CHANGE" }, null);
+        } else {
+            const queries = q.split(';').filter(query => query.trim() !== '');
+
+            // Execute each query sequentially
+            executeQuerySequentially(queries, 0, (err, result) => {
                 if (err) {
-                    console.log(err);
+                    console.log('Error:', err);
                     callback(err, null);
+                } else {
+                    console.log('All queries executed successfully');
+                    callback(null, { "message": "All queries executed successfully" });
                 }
-                else callback(null, result);
             });
         }
     }
+};
+
+// Function to execute queries sequentially
+function executeQuerySequentially(queries, index, callback) {
+    if (index >= queries.length) {
+        // All queries executed successfully
+        callback(null, { "message": "All queries executed successfully" });
+        return;
+    }
+
+    // Execute the current query
+    con.query(queries[index], (err, result) => {
+        if (err) {
+            console.log(`Error executing query: ${queries[index]}`, err);
+            callback(err, null);
+        } else {
+            console.log(`Query executed successfully: ${queries[index]}`);
+            // Move on to the next query
+            executeQuerySequentially(queries, index + 1, callback);
+        }
+    });
 }
+
+
 
 const patchLoginItem = async function (userID, reqBody, callback) {
     if (reqBody.userLoginItemID === undefined) {
@@ -486,7 +511,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
 
                 let q = `UPDATE UserLoginItems SET`;
 
-                const values = [];
+               const values = [];
                 if (reqBody.website !== undefined) {
                     q += ` userLoginItemWebsite = ?,`;
                     values.push(responseData.encryptedWebsite);

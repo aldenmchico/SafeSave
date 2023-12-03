@@ -35,6 +35,7 @@ function SavedNotesPage({ setNote }) {
                 return;
             }
             else {
+                setSavedNotes([])
                 throw new Error('Failed to fetch notes');
             }
         } catch (error) {

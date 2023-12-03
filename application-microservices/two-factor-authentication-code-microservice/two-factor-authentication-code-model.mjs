@@ -6,7 +6,7 @@ import mysql from 'mysql';
 
 import * as db from "./db-connector.mjs";
 
-const con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 import https from 'https';
 

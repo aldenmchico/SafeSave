@@ -1,8 +1,8 @@
 let dbConfig = {
-    host: 'classmysql.engr.oregonstate.edu',
-    user: 'capstone_2023_securepass1',
-    password: 'zxob8b@T8!yF',
+    host: 'localhost',
+    user: 'root',
+    password: 'DemoDatabasePassword!!123',
     database: 'capstone_2023_securepass1',
-    multipleStatements: true
+    connectionLimit: 10
 }
 export { dbConfig }

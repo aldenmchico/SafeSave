@@ -4,7 +4,7 @@ import * as twoFACodeModel from './two-factor-authentication-code-model.mjs';
 import qrcode from 'qrcode';
 import cors from 'cors';
 import * as db from './db-connector.mjs';
-var con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 
 import { checkAuth } from '../middlewares/checkAuth.mjs';
