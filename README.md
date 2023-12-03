@@ -107,7 +107,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
     ```sh
     chmod +x ./docker.sh
     ```
-3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial. </a>
+3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial</a>, or run `sudo usermod -aG docker $USER` and source your shell config/open a new shell. 
 4. Otherwise, execute the script. If you did not add yourself to the docker group, you will need to run the script with `sudo`. 
     ```sh
         ./docker.sh
@@ -324,3 +324,4 @@ There are more API endpoints that are not listed but are integral to the project
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [product-screenshot]: https://github.com/EugenSong/EugenSong/assets/75242911/b68cd924-93de-4372-a9d4-e17f6dd5da33
+

@@ -19,9 +19,7 @@ services:
     build:
       context: ./application-microservices/middlewares
     volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/application-microservices/middlewares
+      - middleware_data:/usr/src/app
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
     networks:
       - safenet
@@ -32,14 +30,9 @@ services:
     build:
       context: ./application-microservices/jwt-microservice
     depends_on:
-      - middleware
       - db  
     env_file:
       - ./application-microservices/jwt-microservice/.env
-    volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/application-microservices/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -54,9 +47,7 @@ services:
     env_file:
       - ./application-microservices/two-factor-authentication-code-microservice/.env
     volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/middlewares
+      - middleware_data:/usr/src/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -70,9 +61,7 @@ services:
     env_file:
       - ./application-backend/.env
     volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/application-microservices/middlewares
+      - middleware_data:/usr/src/application-microservices/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -81,14 +70,9 @@ services:
     build:
       context: ./application-microservices/data-decryption-microservice
     depends_on:
-      - middleware
       - db
     env_file:
       - ./application-microservices/data-decryption-microservice/.env
-    volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -97,14 +81,9 @@ services:
     build:
       context: ./application-microservices/data-encryption-microservice
     depends_on:
-      - middleware
       - db
     env_file:
       - ./application-microservices/data-encryption-microservice/.env
-    volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -116,15 +95,10 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-      - middleware
       - db
       - twofac
     env_file:
       - ./application-frontend/.env
-    volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/application-microservices/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -141,9 +115,7 @@ services:
     env_file:
       - ./application-microservices/user-login-microservice/.env
     volumes:
-      - type: bind
-        source: ./application-microservices/middlewares
-        target: /usr/src/middlewares
+      - middleware_data:/usr/src/middlewares
     networks:
       - safenet
     command: dockerize -wait tcp://db:3306 -timeout 20s sh -c "npm start"
@@ -153,4 +125,5 @@ networks:
     driver: bridge
 volumes:
   mysqldata:
+  middleware_data:
 
