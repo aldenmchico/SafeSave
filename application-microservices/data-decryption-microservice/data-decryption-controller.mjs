@@ -14,7 +14,7 @@ import * as dataDecryptionModel from "./data-decryption-model.mjs";
 import * as db from "./db-connector.mjs";
 import mysql from 'mysql';
 
-const con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

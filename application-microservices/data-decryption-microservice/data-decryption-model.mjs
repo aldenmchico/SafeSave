@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import crypto from 'crypto';
-import * as db from "./db-connector.mjs";
 import fs from "fs";
 
 async function decryptIV(encryptedData) {

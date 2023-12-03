@@ -6,7 +6,7 @@ import {readFileSync} from "fs";
 import * as db from "./db-connector.mjs";
 import mysql from 'mysql';
 
-const con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const checkIfUsernameOrEmailExists = async (username, email) => {

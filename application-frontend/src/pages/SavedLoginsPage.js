@@ -35,6 +35,7 @@ function SavedLoginsPage({ setLoginItem }) {
                 return;
             }   
             else {
+                setSavedLogins([])
                 throw new Error('Failed to fetch login items');
             }
         } catch (error) {
