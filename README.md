@@ -120,9 +120,9 @@ The `docker.sh` script assumes you are running on an amd64-based platform. The `
 
 ```sh
 #!/bin/bash
-
-tar -xvzf SafeSaveDocker.tar.gz && \
-	cd SafeSave && \
+mkdir SafeSaveDocker && \
+tar -xvzf SafeSaveDocker.tar.gz -C SafeSaveDocker && \
+	cd SafeSaveDocker/SafeSave && \
 	find . -type f -name Dockerfile -exec sed -i 's|https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz|https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-arm64-v0.7.0.tar.gz|; s|dockerize-linux-amd64-v0.6.1.tar.gz|dockerize-linux-arm64-v0.7.0.tar.gz|' {} + && \
 docker compose up --build
 ```
