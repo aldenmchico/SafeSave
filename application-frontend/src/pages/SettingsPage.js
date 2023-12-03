@@ -33,7 +33,7 @@ function SettingsPage() {
                 throw new Error('Something went wrong with fetch in SettingsPage');
             }
             const responseData = await response.json();
-            console.log(`user data found in SettingsPage, locateUserAndCheck2FAEnabled: `, responseData);
+            //console.log(`user data found in SettingsPage, locateUserAndCheck2FAEnabled: `, responseData);
 
             if (response.ok && !responseData.verified) {
                 return false
@@ -72,7 +72,7 @@ function SettingsPage() {
             if (response.ok) {
                 const data = await response.json();
                 // Handle success. If a token is sent back, you can use it here.
-                console.log('2FA setting updated', data);
+                //console.log('2FA setting updated', data);
                 setMessage('Two-factor authentication settings have been updated.');
             } else {
                 throw new Error('Failed to update two-factor authentication settings');

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function EditSavedLoginPage({loginItem}) {
-    console.log("Login item is on EditSavedLoginPage.js", loginItem)
+    //console.log("Login item is on EditSavedLoginPage.js", loginItem)
     const [website, setWebsite] = useState(loginItem.userLoginItemWebsite);
     const [username, setUsername] = useState(loginItem.userLoginItemUsername);
     const [password, setPassword] = useState(loginItem.userLoginItemPassword);

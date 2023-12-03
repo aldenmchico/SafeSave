@@ -155,7 +155,7 @@ const fetchUserFromUsername = async (username) => {
         const digestedUserHMAC = userHMAC.update(username).digest('hex');
         const response = await fetch(`https://safesave.ddns.net:3001/users/byUsername/${username}`)
         if (!response.ok) {
-            console.log(`response was ${response.toString()}`)
+            //console.log(`response was ${response.toString()}`)
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
@@ -253,7 +253,7 @@ const hashPasswordAndUpdateExistingUser = async (plainTextPassword, userId) => {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(`User updated: `, data);
+        //console.log(`User updated: `, data);
         return data;
     } catch (error) {
         console.error('Error in hashing password or updating user:', error.message);

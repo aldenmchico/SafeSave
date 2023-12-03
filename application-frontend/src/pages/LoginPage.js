@@ -28,7 +28,7 @@ function LoginPage() {
                 throw new Error('Something went wrong with fetch in SettingsPage');
             }
             const responseData = await response.json();
-            console.log(`user data found in SettingsPage, locateUserAndCheck2FAEnabled: `, responseData);
+            //console.log(`user data found in SettingsPage, locateUserAndCheck2FAEnabled: `, responseData);
 
             if (response.ok && !responseData.verified) {
                 return false
@@ -110,7 +110,7 @@ function LoginPage() {
 
         try {
 
-            console.log(`token is ${code}`)
+            //console.log(`token is ${code}`)
 
             const response = await fetch('/api/verify-2fa-login-token', {
                 method: 'POST',
@@ -123,7 +123,7 @@ function LoginPage() {
             });
 
             const responseData = await response.json();
-            console.log(`responseData is`, responseData)
+            //console.log(`responseData is`, responseData)
 
             if (response.ok && responseData.verified === true) {
                 alert('It worked! Navigating to Home page now.');

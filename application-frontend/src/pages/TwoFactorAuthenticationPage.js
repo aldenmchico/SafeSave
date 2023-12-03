@@ -89,7 +89,7 @@ function TwoFactorAuthenticationPage() {
                 throw new Error('Something went wrong with fetch in TwoFactorAuthPage');
             }
             const responseData = await response.json();
-            console.log(`user data found in TwoFactorAuthPage, locateUserAndCheck2FAEnabledAndNoSecret: `, responseData);
+            //console.log(`user data found in TwoFactorAuthPage, locateUserAndCheck2FAEnabledAndNoSecret: `, responseData);
 
             if (response.ok && !responseData.has2FAAndNoSecret) {
                 return false
@@ -125,7 +125,7 @@ function TwoFactorAuthenticationPage() {
 
         try {
 
-            console.log(`token is ${code}`)
+            //console.log(`token is ${code}`)
 
             const response = await fetch('/api/verify-2fa-setup-token', {
                 method: 'POST',
@@ -137,7 +137,7 @@ function TwoFactorAuthenticationPage() {
             });
 
             const responseData = await response.json();
-            console.log(`responseData is`, responseData)
+            //console.log(`responseData is`, responseData)
 
             if (response.ok && responseData.verified) {
                 setErrorMsg('It worked! 2FA has been set up for your account. Do not lose the Authenticator entry.');

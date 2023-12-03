@@ -325,7 +325,7 @@ const returnUserDataByUsername = async (username) => {
             throw new Error('Network response was not ok in twoFactorAuthenticationModel: returnUserDataByUsername');
         }
         const data = await response.json();
-        console.log(`user data found in returnUserDataByUsername(): `, data);
+        //console.log(`user data found in returnUserDataByUsername(): `, data);
         if (!data) return null
         return data
     } catch (error) {

@@ -404,25 +404,21 @@ const patchUser = function (reqBody, callback) {
         if (reqBody.email !== undefined) { 
             q += `UPDATE Users SET userEmail = "${reqBody.email}" WHERE userID = ${reqBody.userID}; `;
         }
-
         if (reqBody.password !== undefined) {
             q += `UPDATE Users SET userPassword = "${reqBody.password}" WHERE userID = ${reqBody.userID}; `;
         } 
         // Additional fields for userSecret and userTempSecret
         if (reqBody.userSecret !== undefined) {
-            q += 'UPDATE Users SET userSecret = ? WHERE userID = ?; ';
-            values.push(reqBody.userSecret === null ? null : reqBody.userSecret, reqBody.userID);
+            const secretValue = reqBody.userSecret === null ? null : `"${reqBody.userSecret}"`;
+            q += `UPDATE Users SET userSecret = ${secretValue} WHERE userID = ${reqBody.userID}; `;
         }
-
         if (reqBody.userTempSecret !== undefined) {
             const tempSecretValue = reqBody.userTempSecret === null ? null : `"${reqBody.userTempSecret}"`;
             q += `UPDATE Users SET userTempSecret = ${tempSecretValue} WHERE userID = ${reqBody.userID}; `;
         }
-
         // Additional fields for user2FAEnabled
         if (reqBody.user2FAEnabled !== undefined) {
-            q += 'UPDATE Users SET user2FAEnabled = ? WHERE userID = ?; ';
-            values.push(reqBody.user2FAEnabled, reqBody.userID);
+            q += `UPDATE Users SET user2FAEnabled = "${reqBody.user2FAEnabled}" WHERE userID = ${reqBody.userID}; `;
         }
         // model function for handling user session id when logging out 
         if (reqBody.userSessionID !== undefined) {
@@ -438,7 +434,8 @@ const patchUser = function (reqBody, callback) {
             // Execute each query sequentially
             executeQuerySequentially(queries, 0, (err, result) => {
                 if (err) {
-                    console.log('Error:', err);
+                    //console.log('Error:', err);
+		    console.log("Error in executeQuerySequentially");
                     callback(err, null);
                 } else {
                     console.log('All queries executed successfully');
@@ -460,10 +457,10 @@ function executeQuerySequentially(queries, index, callback) {
     // Execute the current query
     con.query(queries[index], (err, result) => {
         if (err) {
-            console.log(`Error executing query: ${queries[index]}`, err);
+            //console.log(`Error executing query: ${queries[index]}`, err);
             callback(err, null);
         } else {
-            console.log(`Query executed successfully: ${queries[index]}`);
+            //console.log(`Query executed successfully: ${queries[index]}`);
             // Move on to the next query
             executeQuerySequentially(queries, index + 1, callback);
         }
@@ -510,7 +507,7 @@ const patchLoginItem = async function (userID, reqBody, callback) {
             })
             .then(data => {
                 responseData = data;
-                //console.log("data is", data);
+                // console.log("data is", data);
 
                 let q = `UPDATE UserLoginItems SET`;
 
@@ -640,7 +637,7 @@ const patchNote = async function (userID, reqBody, callback) {
             })
             .then(data => {
                 responseData = data;
-                //console.log("data is", data);
+                // console.log("data is", data);
 
                 let q = `UPDATE UserNotes SET`;
 
@@ -739,3 +736,4 @@ export {
     patchUser, patchLoginItem, patchLoginItemFavorite, patchNote, patchNoteFavorite,
     deleteNote, deleteUserLoginItem, deleteUser, nullSessionID
 };
+

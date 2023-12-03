@@ -58,7 +58,7 @@ const getEncryptedData = async (options) => {
             hmac.update(noteText + noteTitle);
             const authTag = hmac.digest('hex');
 
-            console.log("authtag is", authTag);
+            //console.log("authtag is", authTag);
 
 
             const encryptedData = {
