@@ -3,5 +3,4 @@
 # Site will be live at https://localhost:3000
 
 
-tar -xzvf SafeSaveDocker.tar.gz && cd SafeSave && docker compose up --build
-
+mkdir SafeSaveDocker && tar -xzvf SafeSaveDocker.tar.gz -C SafeSaveDocker && cd SafeSaveDocker/SafeSave && docker compose up --build
