@@ -1,3 +1,4 @@
+.idea/
 /application-backend/node_modules
 /application-backend/test-requests.http
 /application-frontend/node_modules
