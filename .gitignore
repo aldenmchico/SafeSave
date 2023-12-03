@@ -9,6 +9,5 @@
 /application-microservices/two-factor-authentication-code-microservice/node_modules
 /application-microservices/two-factor-validation-microservice/node_modules
 /application-microservices/user-login-microservice/node_modules
-/application-microservices/middlewares/node_modules
 /application-microservices/jwt-microservice/node_modules
 
