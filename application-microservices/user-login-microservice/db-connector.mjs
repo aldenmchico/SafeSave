@@ -3,6 +3,6 @@ let dbConfig = {
     user: 'root',
     password: 'DemoDatabasePassword!!123',
     database: 'capstone_2023_securepass1',
-    multipleStatements: true
+    connectionLimit: 10
 }
 export { dbConfig }

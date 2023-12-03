@@ -8,7 +8,7 @@ import {readFileSync} from "fs";
 
 
 
-const con = mysql.createConnection(db.dbConfig);
+const con = mysql.createPool(db.dbConfig);
 
 //TODO: Update secret when going live
 

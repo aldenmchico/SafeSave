@@ -32,10 +32,12 @@ function HomePage({ setLoginItem }) {
                 }
             }
             else if (!response.ok) {
+                setSavedLogins([])
                 throw new Error('Failed to fetch logins');
             }
             const logins = await response.json();
             setSavedLogins(logins);
+
         } catch (error) {
             console.error('Failed to load logins:', error);
         }
@@ -50,6 +52,7 @@ function HomePage({ setLoginItem }) {
                 }
             }
             else if (!response.ok) {
+                setSavedNotes([])
                 throw new Error('Failed to fetch notes');
             }
             const notes = await response.json();
@@ -82,7 +85,7 @@ function HomePage({ setLoginItem }) {
                 <h2>Your Saved Logins</h2>
                 <div className="login-item-list">
                     <SavedLoginList
-                        loginItems={savedLogins}
+                        loginItems= {savedLogins}
                         editLoginItem={editLoginRow}
                         deleteLoginItem={deleteLoginRow}
                     />

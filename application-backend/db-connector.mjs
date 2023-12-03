@@ -1,8 +1,8 @@
 let dbConfig = {
-    host: 'db',
     user: 'root',
+    host: 'db',
     password: 'DemoDatabasePassword!!123',
     database: 'capstone_2023_securepass1',
-    multipleStatements: true
+    connectionLimit: 10
 }
 export { dbConfig }
