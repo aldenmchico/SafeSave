@@ -41,7 +41,8 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#docker-easiest-method">Docker (Easiest method)</a></li>
+        <li><a href="#alternative-local-installation">Alternative Local Installation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -89,7 +90,7 @@ SafeSave is a fully secure password and personal information web application man
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get a local copy up and running complete both Prerequisites and Installation steps.
+To get a local copy up and running complete both Prerequisites and choose one to follow from either Installation steps: Docker or Local.
 
 ### Prerequisites
 
