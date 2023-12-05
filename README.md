@@ -18,7 +18,7 @@
     <!-- <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a> -->
     <br />
     <br />
-    · <a href="https://github.com/github_username/repo_name">View Demo</a>
+    · <a href="https://youtu.be/GrjcAxfGwSM">View Demo</a>
     ·
   </p>
 
@@ -41,15 +41,11 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+        <li><a href="#docker-easiest-method">Docker (Easiest method)</a></li>
+        <li><a href="#alternative-local-installation">Alternative Local Installation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    
-    <!-- <li><a href="#contributing">Contributing</a></li> -->
-    <!-- <li><a href="#license">License</a></li> -->
-    <!-- <li><a href="#contact">Contact</a></li> -->
-    <!-- <li><a href="#acknowledgments">Acknowledgments</a></li> -->
   </ol>
 </details>
 
@@ -94,7 +90,7 @@ SafeSave is a fully secure password and personal information web application man
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To get a local copy up and running complete both Prerequisites and Installation steps.
+To get a local copy up and running complete both Prerequisites and choose one to follow from either Installation steps: Docker or Local.
 
 ### Prerequisites
 
@@ -107,7 +103,7 @@ To get a local copy up and running complete both Prerequisites and Installation 
     ```sh
     chmod +x ./docker.sh
     ```
-3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial. </a>
+3. If you want to run the Docker image without root privileges, see <a href=https://linuxopsys.com/topics/add-user-to-docker-group> this tutorial</a>, or run `sudo usermod -aG docker $USER` and source your shell config/open a new shell. 
 4. Otherwise, execute the script. If you did not add yourself to the docker group, you will need to run the script with `sudo`. 
     ```sh
         ./docker.sh
@@ -120,9 +116,9 @@ The `docker.sh` script assumes you are running on an amd64-based platform. The `
 
 ```sh
 #!/bin/bash
-
-tar -xvzf SafeSaveDocker.tar.gz && \
-	cd SafeSave && \
+mkdir SafeSaveDocker && \
+tar -xvzf SafeSaveDocker.tar.gz -C SafeSaveDocker && \
+	cd SafeSaveDocker/SafeSave && \
 	find . -type f -name Dockerfile -exec sed -i 's|https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz|https://github.com/jwilder/dockerize/releases/download/v0.7.0/dockerize-linux-arm64-v0.7.0.tar.gz|; s|dockerize-linux-amd64-v0.6.1.tar.gz|dockerize-linux-arm64-v0.7.0.tar.gz|' {} + && \
 docker compose up --build
 ```
@@ -198,14 +194,14 @@ Use this space to show useful examples of how a project can be used. Additional 
 ```js
 POST /ciphertext
 {
-    userLoginWebsite:
-    userLoginUsername:
-    userLoginPassword:
-    userHash:
-    userSalt:
-    noteCreatedDate:
-    noteUpdatedDate:
-    noteAccessedDate:
+    userLoginWebsite
+    userLoginUsername
+    userLoginPassword
+    userHash
+    userSalt
+    noteCreatedDate
+    noteUpdatedDate
+    noteAccessedDate
 }
 ```
 #### Decrypting Note/Login Item
@@ -225,7 +221,8 @@ POST /decrypttext
     userLoginItemID 
     userLoginItemWebsite 
     userLoginItemPassword
-    userLoginItemDateCreated userLoginItemDateUpdated
+    userLoginItemDateCreated 
+    userLoginItemDateUpdated
     userLoginItemDateAccessed
     userLoginItemUsername
     websiteIV
@@ -240,20 +237,20 @@ POST /decrypttext
 ```js
 POST /login_items 
 {
-    website:
-    username:
-    password:
-    userLoginItemDateCreated:
-    userLoginItemDateUpdated:
-    userLoginItemDateAccessed:
+    website
+    username
+    password
+    userLoginItemDateCreated
+    userLoginItemDateUpdated
+    userLoginItemDateAccessed
 }
 
 POST /notes
 {
-    title:
-    content:
-    userNoteDateCreated:
-    userNoteDateUpdated:
+    title
+    content
+    userNoteDateCreated
+    userNoteDateUpdated
 }
 
 ```
@@ -263,21 +260,21 @@ POST /notes
 
 PATCH /login_items 
 {
-    userLoginItemID:
-    website:
-    username:
-    password:
-    dateUpdated: 
-    dateAccessed:
+    userLoginItemID
+    website
+    username
+    password
+    dateUpdated
+    dateAccessed
 }
 
 PATCH /notes
 {
-    noteID:
-    title:
-    text:
-    dateUpdated:
-    dateAccessed:
+    noteID
+    title
+    text
+    dateUpdated
+    dateAccessed
 }
 ```
 ---
@@ -291,14 +288,14 @@ DELETE /notes/${noteID}
 ```js
 POST /login_items/favorite
 {
-    loginItemID:
-    favorite: 0
+    loginItemID
+    favorite
 }
 
 POST /notes/favorite
 {
-    noteID:
-    favorite: 1
+    noteID
+    favorite
 }
 
 ```
@@ -307,7 +304,7 @@ POST /notes/favorite
 ```js
 POST /api/verify-2fa-login-token
 {
-    token: 194263
+    token
 }
 ```
 ---
