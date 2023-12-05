@@ -194,14 +194,14 @@ Use this space to show useful examples of how a project can be used. Additional 
 ```js
 POST /ciphertext
 {
-    userLoginWebsite:
-    userLoginUsername:
-    userLoginPassword:
-    userHash:
-    userSalt:
-    noteCreatedDate:
-    noteUpdatedDate:
-    noteAccessedDate:
+    userLoginWebsite
+    userLoginUsername
+    userLoginPassword
+    userHash
+    userSalt
+    noteCreatedDate
+    noteUpdatedDate
+    noteAccessedDate
 }
 ```
 #### Decrypting Note/Login Item
@@ -236,20 +236,20 @@ POST /decrypttext
 ```js
 POST /login_items 
 {
-    website:
-    username:
-    password:
-    userLoginItemDateCreated:
-    userLoginItemDateUpdated:
-    userLoginItemDateAccessed:
+    website
+    username
+    password
+    userLoginItemDateCreated
+    userLoginItemDateUpdated
+    userLoginItemDateAccessed
 }
 
 POST /notes
 {
-    title:
-    content:
-    userNoteDateCreated:
-    userNoteDateUpdated:
+    title
+    content
+    userNoteDateCreated
+    userNoteDateUpdated
 }
 
 ```
@@ -259,21 +259,21 @@ POST /notes
 
 PATCH /login_items 
 {
-    userLoginItemID:
-    website:
-    username:
-    password:
-    dateUpdated: 
-    dateAccessed:
+    userLoginItemID
+    website
+    username
+    password
+    dateUpdated
+    dateAccessed
 }
 
 PATCH /notes
 {
-    noteID:
-    title:
-    text:
-    dateUpdated:
-    dateAccessed:
+    noteID
+    title
+    text
+    dateUpdated
+    dateAccessed
 }
 ```
 ---
@@ -287,14 +287,14 @@ DELETE /notes/${noteID}
 ```js
 POST /login_items/favorite
 {
-    loginItemID:
-    favorite: 0
+    loginItemID
+    favorite
 }
 
 POST /notes/favorite
 {
-    noteID:
-    favorite: 1
+    noteID
+    favorite
 }
 
 ```
@@ -303,7 +303,7 @@ POST /notes/favorite
 ```js
 POST /api/verify-2fa-login-token
 {
-    token: 194263
+    token
 }
 ```
 ---
